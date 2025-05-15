@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Agbalumo&display=swap');
+
+@font-face {
+  font-family: 'Spooky';
+  src: url('./fonts/Toxia-OwOA.ttf');
+}
+
+@font-face {
+  font-family: 'spook1';
+  src: url('./fonts/HighandDemoRegular-vm1X4.otf');
+}
+
+@font-face {
+  font-family: 'ifont';
+  src: url('./fonts/KeepCheese-nArGP.otf');
+}
+
+@font-face {
+  font-family: 'sawarabi';
+  src: url('./fonts/SawarabiGothic-Regular.ttf');
+}
+
+body {
+  @apply bg-zinc-800 m-0 p-0;
+}
