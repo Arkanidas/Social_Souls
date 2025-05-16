@@ -8,29 +8,27 @@ function Landing() {
       {/* Header */}
       <div className="flex justify-center items-center flex-wrap mb-8">
         <div className="max-w-[60%] p-5">
-          <h1 className="text-[60px] text-center text-white font-[Spooky]">
+          <h1 className="text-[65px] text-center text-white font-[Spooky] mt-7">
             Welcome to
             <span className="text-[#f06868] text-[65px] px-2">Social Souls</span>
           </h1>
-          <p className="text-center font-[Agbalumo] text-[#d7dee5] text-[25px] -mt-5">
+          <p className="text-center font-[desc] text-[#d7dee5] text-[25px] ">
             A dreadfully engaging social platform
           </p>
         </div>
       </div>
 
       {/* Auth Container */}
-      <div className="relative w-[400px] h-[500px] mx-auto rounded-md overflow-hidden text-white border border-gray-800 shadow-lg transition-shadow"
+      <div className="relative w-[400px] h-[500px] mx-auto rounded-[10px] overflow-hidden text-white border border-gray-950 shadow-lg transition-shadow mt-11"
   style={{
-    borderTopColor: "rgba(255, 255, 255, 0.7)",
-    borderLeftColor: "rgba(85, 85, 85, 0.7)",
-    boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.8)"
+    boxShadow:"4px 4px 10px rgba(0, 0, 0, 0.8)"
   }}>
         <input type="checkbox" id="register_toggle" className="hidden peer" />
 
         <div className="w-[200%] h-full relative flex transition-transform duration-500 ease-out peer-checked:-translate-x-1/2">
           {/* Sign In */}
-          <form className="w-1/2 flex flex-col justify-center items-center gap-6 p-6">
-            <h2 className="text-3xl font-bold text-[#ffeedd] font-[spook1]">Sign In</h2>
+          <form className="w-1/2 flex flex-col justify-center items-center gap-12 p-6">
+            <h2 className="text-4xl font-bold text-[#ffeedd] font-[spook1]">Sign In</h2>
 
             <div className="relative w-[250px]">
   <input
