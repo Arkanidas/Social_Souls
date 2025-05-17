@@ -44,6 +44,7 @@ function Landing() {
   >
     Username
   </label>
+  
   <FontAwesomeIcon icon={faUser} className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400" />
 </div>
 
