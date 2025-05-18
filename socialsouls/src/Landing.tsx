@@ -5,7 +5,7 @@ import './index.css'
 function Landing() {
   return (
     <>
-      {/* Header */}
+   
       <div className="flex justify-center items-center flex-wrap mb-8">
         <div className="max-w-[60%] p-5">
           <h1 className="text-[65px] text-center text-white font-[Spooky] mt-7">
