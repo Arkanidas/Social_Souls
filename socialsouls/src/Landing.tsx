@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLock, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faLock, faUser, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import './index.css'
 
 function Landing() {
@@ -27,8 +27,10 @@ function Landing() {
 
         <div className="w-[200%] h-full relative flex transition-transform duration-500 ease-out peer-checked:-translate-x-1/2">
           {/* Sign In */}
-          <form className="w-1/2 flex flex-col justify-center items-center gap-12 p-6">
+          <form className="w-1/2 flex flex-col justify-center items-center gap-12 p-5">
             <h2 className="text-4xl font-bold text-[#ffeedd] font-[spook1]">Sign In</h2>
+
+            
 
             <div className="relative w-[250px]">
   <input
@@ -36,16 +38,16 @@ function Landing() {
     id="username"
     required
     className="peer w-full text-white bg-transparent border-0 border-b-2 border-gray-400 placeholder-transparent focus:border-[#f34040] outline-none text-[17px]"
-    placeholder="Username"
+   
   />
   <label
     htmlFor="username"
-    className="absolute left-0 bottom-5 text-[17px] text-gray-400 font-[ifont] transition-all duration-300 transform peer-placeholder-shown:translate-y-4 peer-placeholder-shown:text-[17px] peer-focus:translate-y-[-10px] peer-focus:text-[20px] peer-focus:text-[#f34040]"
+    className="absolute left-0 bottom-1 text-[17px] text-gray-400 font-[ifont] transition-all duration-300 transform peer-placeholder-shown:translate-y-6 peer-placeholder-shown:text-[17px] peer-focus:translate-y-[-10px] peer-focus:text-[20px] peer-focus:text-[#f34040]"
   >
     Username
   </label>
   
-  <FontAwesomeIcon icon={faUser} className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400" />
+  <FontAwesomeIcon icon={faUser} className="absolute right-0 top-2 -translate-y-1/2 text-gray-400" />
 </div>
 
 
@@ -54,10 +56,9 @@ function Landing() {
               <input
                 type="password"
                 required
-                className="w-full border-0 border-b-2 border-gray-400 text-white bg-transparent placeholder-transparent focus:border-[#f34040] focus:font-bold outline-none text-[17px]"
-                placeholder="Password"
+                className="peer w-full text-white bg-transparent border-0 border-b-2 border-gray-400 placeholder-transparent focus:border-[#f34040] outline-none text-[17px]"
               />
-              <label className="absolute left-0 top-0 text-[17px] text-gray-400 font-[ifont] transition-all">
+              <label className="absolute left-0 bottom-1 text-[17px] text-gray-400 font-[ifont] transition-all duration-300 transform peer-placeholder-shown:translate-y-6 peer-placeholder-shown:text-[17px] peer-focus:translate-y-[-10px] peer-focus:text-[20px] peer-focus:text-[#f34040]">
                 Password
               </label>
               <FontAwesomeIcon icon={faLock} className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -70,7 +71,7 @@ function Landing() {
             </button>
 
             <span className="text-sm text-[#d5d4d4] font-[sawarabi]">
-              Don’t have an account?{" "}
+              Don't have an account?{" "}
               <label htmlFor="register_toggle" className="underline font-bold cursor-pointer">
                 Sign Up
               </label>
@@ -85,13 +86,25 @@ function Landing() {
               <input
                 type="text"
                 required
+                className="peer w-full text-white bg-transparent border-0 border-b-2 border-gray-400 placeholder-transparent focus:border-[#f34040] outline-none text-[17px]"
+              />
+              <label className="absolute left-0 bottom-1 text-[17px] text-gray-400 font-[ifont] transition-all duration-300 transform peer-placeholder-shown:translate-y-6 peer-placeholder-shown:text-[17px] peer-focus:translate-y-[-10px] peer-focus:text-[20px] peer-focus:text-[#f34040]">
+                Email
+              </label>
+              <FontAwesomeIcon icon={faEnvelope} className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400" />
+            </div>
+
+            <div className="relative w-[250px]">
+              <input
+                type="text"
+                required
                 className="w-full border-0 border-b-2 border-gray-400 text-white bg-transparent placeholder-transparent focus:border-[#f34040] focus:font-bold outline-none text-[17px]"
                 placeholder="Username"
               />
               <label className="absolute left-0 top-0 text-[17px] text-gray-400 font-[ifont] transition-all">
                 Username
               </label>
-              <FontAwesomeIcon icon={faUser} className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400" />
+              <FontAwesomeIcon icon={faUser} className="absolute right-0 top-2 -translate-y-1/2 text-gray-400" />
             </div>
 
             <div className="relative w-[250px]">
