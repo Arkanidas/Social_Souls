@@ -8,9 +8,9 @@ function Landing() {
    
       <div className="flex justify-center items-center flex-wrap mb-8">
         <div className="max-w-[60%] p-5">
-          <h1 className="text-[65px] text-center text-white font-[Spooky] mt-7">
+          <h1 className="text-[65px] text-center text-white font-[Spooky] mt-7 text-[clamp(3rem,4vw,4.5rem)]">
             Welcome to
-            <span className="text-[#f06868] text-[65px] px-2">Social Souls</span>
+            <span className="text-[#f06868] text-[65px] px-2 text-[clamp(3rem,4vw,4.5rem)]">Social Souls</span>
           </h1>
           <p className="text-center font-[desc] text-[#d7dee5] text-[25px] ">
             A dreadfully engaging social platform
