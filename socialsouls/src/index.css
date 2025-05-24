@@ -30,3 +30,11 @@
 body {
   @apply bg-zinc-800 m-0 p-0;
 }
+
+@layer utilities {
+  @media (min-width: 978px) {
+    .text-clamp-header {
+      font-size: clamp(1.5rem, 2vw + 1rem);
+    }
+  }
+}
