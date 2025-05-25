@@ -32,6 +32,8 @@ function Landing() {
 
             
 
+            
+
   <div className="relative w-[250px]">
   <input
     type="text"
