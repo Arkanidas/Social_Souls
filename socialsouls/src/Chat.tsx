@@ -1,14 +1,16 @@
-import React from 'react';
+import {Sidebar} from './chat components/sidebar';
+import {useTheme} from './chat components/ThemeContext'
+import {ChatArea} from './chat components/ChatArea';
 
 
-const Chat = () => {
-    return (
-        <div className='Chat'>
+ const Chat = () => {
+    const {
+      isDark
+    } = useTheme();
+    return <div className={`flex h-screen ${isDark ? 'bg-gray-900/95' : 'bg-gray-50/95'}`}>
+        <Sidebar />
+        <ChatArea />
+      </div>;
+  };
 
-            <h1>this is chat </h1>
-        
-        </div>
-    );
-};
-
-export default Chat;
+  export default Chat
