@@ -1,4 +1,4 @@
-import {Sidebar} from './chat components/sidebar';
+import {Sidebar} from './chat components/Sidebar';
 import {useTheme} from './chat components/ThemeContext'
 import {ChatArea} from './chat components/ChatArea';
 
