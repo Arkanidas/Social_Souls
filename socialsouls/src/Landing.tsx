@@ -1,10 +1,59 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
 import { faLock, faUser, faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { doc,setDoc, getDoc } from "firebase/firestore";
+import { auth, db} from './firebase/firebaseConfig'; // auth: connects app to firebase auth service, db: handles storing and app data in cloud lets your app read, write, update, and delete data in your Firestore database.
 import './index.css'
 
 
 function Landing() {
 
+const [username, setUsername] = useState('');
+const [email, setEmail] = useState('');
+const [password, setPassword] = useState('');
+
+
+const HandleSignup = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+ await setDoc(doc(db, "users", user.uid), {
+      email: user.email,
+      username: username,
+      createdAt: new Date()
+
+    });
+    console.log( user + " signed up!");
+  } catch (error) {
+    console.error("❌ Sign-up failed:", error);
+  }
+};
+
+const HandleLogin = async (email: string, password: string) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Fetch the user's data from Firestore
+    const docRef = doc(db, "users", user.uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const userData = docSnap.data();
+      console.log("👤 Username:", userData.username);
+      // Save to state and display on Chat page
+    } else {
+      console.log("No user document found!");
+    }
+
+  } catch (error) {
+    console.error("❌ Login failed:", error);
+  }
+};
 
   return (
     <>
@@ -27,26 +76,26 @@ function Landing() {
     boxShadow:"4px 4px 10px rgba(0, 0, 0, 0.8)"
   }}>
         <input type="checkbox" id="register_toggle" className="hidden peer" />
-
         <div className="w-[200%] h-full relative flex transition-transform duration-500 ease-out peer-checked:-translate-x-1/2">
+
+
+
+
           {/* Sign In */}
-          <form className="w-1/2 flex flex-col justify-center items-center gap-12">
-            <h2 className="text-4xl font-bold text-[#ffeedd] font-[spook1]">Sign In</h2>
-
-            
-
-            
-
+  <form className="w-1/2 flex flex-col justify-center items-center gap-12">
+  <h2 className="text-4xl font-bold text-[#ffeedd] font-[spook1]">Sign In</h2>
   <div className="relative w-[250px]">
   <input
-    type="text"
+    type="email"
     id="username"
     required
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
     className="peer w-full text-white bg-transparent border-0 border-b-2 border-gray-400 placeholder-transparent focus:border-[#FF8C19] outline-none text-[17px]  "
-   placeholder="Username"
+    placeholder="E-mail"
   />
   <label
-    htmlFor="username"
+    htmlFor="email"
     className="
     absolute left-0 bottom-1 text-[17px] font-[ifont] text-gray-400
     transition-all duration-200 transform
@@ -58,20 +107,19 @@ function Landing() {
     peer-valid:text-[22px]
     peer-valid:text-gray-400
     cursor-text">
-
-    Username
+    Email
   </label>
-  <FontAwesomeIcon icon={faUser} className="absolute right-0 top-2 -translate-y-1/2 text-gray-400 text-lg" />
+  <FontAwesomeIcon icon={faEnvelope} className="absolute right-0 top-2 -translate-y-1/2 text-gray-400 text-lg" />
 </div>
-
-
 
 <div className="relative w-[250px]">
   <input
   type="password"
   id="password"
+  value={password}
   required
   placeholder="Password"
+  onChange={(e) => setPassword(e.target.value)}
   className="peer w-full text-white bg-transparent border-0 border-b-2 border-gray-400 placeholder-transparent focus:border-[#FF8C19] outline-none text-[17px]"
    />
    <label 
@@ -88,8 +136,7 @@ function Landing() {
  cursor-text"     
  htmlFor="password"
    >
- 
-                Password
+    Password
               </label>
               <FontAwesomeIcon icon={faLock} className="absolute right-0 top-2 -translate-y-1/2 text-gray-400 text-lg"/>
             </div>
@@ -120,6 +167,8 @@ function Landing() {
               <input
                 type="email"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="peer w-full text-white bg-transparent border-0 border-b-2 border-gray-400 placeholder-transparent focus:border-[#f34040] outline-none text-[17px]"
               />
               <label
@@ -144,6 +193,8 @@ function Landing() {
               <input
                 type="text"
                 required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full border-0 border-b-2 border-gray-400 text-white bg-transparent placeholder-transparent focus:border-[#f34040] focus:font-bold outline-none text-[17px]"
                 placeholder="Username"
               />
@@ -167,6 +218,8 @@ function Landing() {
             <div className="relative w-[250px]">
               <input
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full border-0 border-b-2 border-gray-400 text-white bg-transparent placeholder-transparent focus:border-[#f34040] focus:font-bold outline-none text-[17px]"
                 placeholder="Password"
