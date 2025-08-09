@@ -1,17 +1,39 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { faLock, faUser, faEnvelope } from "@fortawesome/free-solid-svg-icons";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { doc,setDoc, getDoc } from "firebase/firestore";
 import { auth, db} from './firebase/firebaseConfig'; // auth: connects app to firebase auth service, db: handles storing and app data in cloud lets your app read, write, update, and delete data in your Firestore database.
 import './index.css'
+import { useNavigate } from 'react-router-dom';
+import type { ReactFormState } from "react-dom/client";
 
 
 function Landing() {
 
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+
+      if (user) {
+        navigate('/chat'); 
+        console.log("👤 User is logged in:", user.email);
+      }
+    });
+
+    return () => unsubscribe(); // cleanup
+
+    
+  }, [navigate]);
+  
+ 
+
 const [username, setUsername] = useState('');
 const [email, setEmail] = useState('');
 const [password, setPassword] = useState('');
+const [ErrorMessage, setErrorMessage] = useState('');
 
 
 const HandleSignup = async (e: React.FormEvent) => {
@@ -33,7 +55,10 @@ const HandleSignup = async (e: React.FormEvent) => {
   }
 };
 
-const HandleLogin = async (email: string, password: string) => {
+const HandleLogin = async (e:React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(''); // Clear previous error message
+
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -50,8 +75,9 @@ const HandleLogin = async (email: string, password: string) => {
       console.log("No user document found!");
     }
 
-  } catch (error) {
+  } catch (error:any) {
     console.error("❌ Login failed:", error);
+    setErrorMessage("Login failed. Please check your email and password.");
   }
 };
 
@@ -82,29 +108,31 @@ const HandleLogin = async (email: string, password: string) => {
 
 
           {/* Sign In */}
-  <form className="w-1/2 flex flex-col justify-center items-center gap-12">
+  <form className="w-1/2 flex flex-col justify-center items-center gap-12" onSubmit={HandleLogin}>
   <h2 className="text-4xl font-bold text-[#ffeedd] font-[spook1]">Sign In</h2>
   <div className="relative w-[250px]">
   <input
     type="email"
-    id="username"
+    id="email"
     required
     value={email}
     onChange={(e) => setEmail(e.target.value)}
-    className="peer w-full text-white bg-transparent border-0 border-b-2 border-gray-400 placeholder-transparent focus:border-[#FF8C19] outline-none text-[17px]  "
-    placeholder="E-mail"
+    className="peer w-full border-0 border-b-2 border-gray-400 text-white bg-transparent placeholder-transparent focus:border-[#FF8C19] outline-none text-[17px]"
+    placeholder=""
   />
   <label
     htmlFor="email"
     className="
     absolute left-0 bottom-1 text-[17px] font-[ifont] text-gray-400
     transition-all duration-200 transform
-    peer-placeholder-shown:text-[17px]
+    peer-not-placeholder-shown:-translate-y-5
+    peer-not-placeholder-shown:text-[21px]
+    peer-not-placeholder-shown:text-gray-400
     peer-focus:translate-y-[-20px]
-    peer-focus:text-[22px]
+    peer-focus:text-[21px]
     peer-focus:text-[#FF8C19]
     peer-valid:translate-y-[-20px]
-    peer-valid:text-[22px]
+    peer-valid:text-[21px]
     peer-valid:text-gray-400
     cursor-text">
     Email
@@ -141,7 +169,7 @@ const HandleLogin = async (email: string, password: string) => {
               <FontAwesomeIcon icon={faLock} className="absolute right-0 top-2 -translate-y-1/2 text-gray-400 text-lg"/>
             </div>
 
-            <button className="w-[250px] h-[45px] bg-gradient-to-r from-[#e5e5e5] via-[#ff8c19] to-[#f34040] bg-[length:250%] bg-left rounded-[10px] relative text-[#ffd277] font-bold text-[16px] flex justify-center items-center transition-all duration-1000 hover:bg-right active:scale-95 overflow-hidden">
+            <button onClick={HandleLogin} type="submit" className="w-[250px] h-[45px] bg-gradient-to-r from-[#e5e5e5] via-[#ff8c19] to-[#f34040] bg-[length:250%] bg-left rounded-[10px] relative text-[#ffd277] font-bold text-[16px] flex justify-center items-center transition-all duration-1000 hover:bg-right active:scale-95 overflow-hidden">
               <span className="absolute w-[97%] h-[90%] bg-[rgba(0,0,0,0.84)] text-[#ffc042] flex justify-center items-center rounded-[10px]">
                 Login
               </span>
@@ -166,22 +194,26 @@ const HandleLogin = async (email: string, password: string) => {
             <div className="relative w-[250px]">
               <input
                 type="email"
+                id="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="peer w-full text-white bg-transparent border-0 border-b-2 border-gray-400 placeholder-transparent focus:border-[#f34040] outline-none text-[17px]"
+                placeholder="email"
+                className="peer w-full border-0 border-b-2 border-gray-400 text-white bg-transparent placeholder-transparent focus:border-[#FF8C19] outline-none text-[17px]"
               />
               <label
-              htmlFor="Email"
+              htmlFor="email"
     className="
     absolute left-0 bottom-1 text-[17px] font-[ifont] text-gray-400
     transition-all duration-200 transform
-    peer-placeholder-shown:text-[17px]
+    peer-not-placeholder-shown:-translate-y-5
+    peer-not-placeholder-shown:text-[21px]
+    peer-not-placeholder-shown:text-gray-400
     peer-focus:translate-y-[-20px]
-    peer-focus:text-[22px]
+    peer-focus:text-[21px]
     peer-focus:text-[#FF8C19]
     peer-valid:translate-y-[-20px]
-    peer-valid:text-[22px]
+    peer-valid:text-[21px]
     peer-valid:text-gray-400
     cursor-text">
                 Email
@@ -192,22 +224,23 @@ const HandleLogin = async (email: string, password: string) => {
             <div className="relative w-[250px]">
               <input
                 type="text"
+                id="username"
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full border-0 border-b-2 border-gray-400 text-white bg-transparent placeholder-transparent focus:border-[#f34040] focus:font-bold outline-none text-[17px]"
-                placeholder="Username"
+                className="peer w-full border-0 border-b-2 border-gray-400 text-white bg-transparent placeholder-transparent focus:border-[#FF8C19] focus:font-bold outline-none text-[17px]"
+                placeholder="username"
               />
-              <label htmlFor="Username"
+              <label htmlFor="username"
     className="
     absolute left-0 bottom-1 text-[17px] font-[ifont] text-gray-400
     transition-all duration-200 transform
     peer-placeholder-shown:text-[17px]
     peer-focus:translate-y-[-20px]
-    peer-focus:text-[22px]
+    peer-focus:text-[21px]
     peer-focus:text-[#FF8C19]
     peer-valid:translate-y-[-20px]
-    peer-valid:text-[22px]
+    peer-valid:text-[21px]
     peer-valid:text-gray-400
     cursor-text">
                 Username
@@ -221,16 +254,27 @@ const HandleLogin = async (email: string, password: string) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full border-0 border-b-2 border-gray-400 text-white bg-transparent placeholder-transparent focus:border-[#f34040] focus:font-bold outline-none text-[17px]"
+                className="peer w-full border-0 border-b-2 border-gray-400 text-white bg-transparent placeholder-transparent focus:border-[#FF8C19] focus:font-bold outline-none text-[17px]"
                 placeholder="Password"
               />
-              <label className="absolute left-0 top-0 text-[17px] text-gray-400 font-[ifont] transition-all">
+              <label className="
+ absolute left-0 bottom-1 text-[17px] font-[ifont] text-gray-400
+ transition-all duration-200 transform
+ peer-placeholder-shown:text-[17px]
+ peer-focus:translate-y-[-20px]
+ peer-focus:text-[21px]
+ peer-focus:text-[#FF8C19]
+ peer-valid:translate-y-[-20px]
+ peer-valid:text-[21px]
+ peer-valid:text-gray-400
+ cursor-text"     
+ htmlFor="password">
                 Password
               </label>
               <FontAwesomeIcon icon={faLock} className="absolute right-0 top-2 -translate-y-1/2 text-gray-400 text-lg" />
             </div>
 
-            <button className="w-[250px] h-[45px] bg-gradient-to-r from-[#e5e5e5] via-[#ff8c19] to-[#f34040] bg-[length:250%] bg-left rounded-[10px] relative text-[#ffd277] font-bold text-[16px] flex justify-center items-center transition-all duration-1000 hover:bg-right active:scale-95 overflow-hidden">
+            <button onClick={HandleSignup} className="w-[250px] h-[45px] bg-gradient-to-r from-[#e5e5e5] via-[#ff8c19] to-[#f34040] bg-[length:250%] bg-left rounded-[10px] relative text-[#ffd277] font-bold text-[16px] flex justify-center items-center transition-all duration-1000 hover:bg-right active:scale-95 overflow-hidden">
               <span className="absolute w-[97%] h-[90%] bg-[rgba(0,0,0,0.84)] text-[#ffc042] flex justify-center items-center rounded-[10px]">
                 Register
               </span>
@@ -242,6 +286,12 @@ const HandleLogin = async (email: string, password: string) => {
                 Sign In
               </label>
             </span>
+
+            {ErrorMessage && (
+              <div className="text-red-500 text-sm mt-2">
+                {ErrorMessage}
+              </div>
+            )}
           </form>
         </div>
       </div>

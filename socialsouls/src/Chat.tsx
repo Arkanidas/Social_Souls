@@ -3,7 +3,12 @@ import {useTheme} from './chat components/ThemeContext'
 import {ChatArea} from './chat components/ChatArea';
 
 
+
+
  const Chat = () => {
+
+
+
     const {
       isDark
     } = useTheme();

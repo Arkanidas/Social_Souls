@@ -2,7 +2,23 @@ import { useState } from 'react';
 import { UserCard } from './UserCard';
 import { Users2Icon, MessageSquareIcon, SettingsIcon, SearchIcon, MoonIcon, SunIcon, LogOutIcon } from 'lucide-react';
 import { useTheme } from './ThemeContext';
+import { signOut } from "firebase/auth";
+import { useNavigate } from 'react-router-dom';
+import { auth} from '../firebase/firebaseConfig'; 
+
+
+
 export const Sidebar = () => {
+
+  const navigate = useNavigate();
+
+const handleLogout = async () => {
+  await signOut(auth);
+  navigate("/");
+};
+
+
+
   const [activeTab, setActiveTab] = useState('chats');
   const {
     isDark,
@@ -63,9 +79,12 @@ export const Sidebar = () => {
       </div>
       {/* Bottom Navigation */}
       <div className={`p-4 border-t ${isDark ? 'border-purple-900/30' : 'border-gray-200'} flex justify-around`}>
-        <button className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 p-2`}>
+
+        <button onClick={() => handleLogout()}className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 p-2`}>
           <SettingsIcon className="h-6 w-6" />
         </button>
+
+
         <button className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 p-2`} onClick={toggleTheme}>
           {isDark ? <SunIcon className="h-6 w-6" /> : <MoonIcon className="h-6 w-6" />}
         </button>
