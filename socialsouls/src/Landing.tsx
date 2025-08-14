@@ -23,7 +23,7 @@ function Landing() {
       }
     });
 
-    return () => unsubscribe(); // cleanup
+    return () => unsubscribe(); 
 
     
   }, [navigate]);

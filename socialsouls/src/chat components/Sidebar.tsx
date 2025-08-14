@@ -6,9 +6,17 @@ import { signOut } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import { auth} from '../firebase/firebaseConfig'; 
 
+type ProfileType = {
+  username: string;
+  profilepic: string;
+  bio: string;
+};
 
+type SidebarProps = {
+  profile?: ProfileType; 
+};
 
-export const Sidebar = () => {
+export const Sidebar = ({profile}:SidebarProps) => {
 
   const navigate = useNavigate();
 
@@ -49,7 +57,7 @@ const handleLogout = async () => {
           </div>
           <div>
             <h3 className={isDark ? 'text-white' : 'text-gray-900'}>
-              Ghost Whisperer
+              {profile? profile.username : 'unknown ghost'}
             </h3>
             <p className="text-sm text-purple-500">Haunting Online</p>
           </div>
