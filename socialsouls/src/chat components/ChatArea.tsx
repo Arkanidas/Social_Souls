@@ -22,12 +22,6 @@ export const ChatArea = () => {
     content: 'Shall we conduct a séance?',
     time: '11:33 PM',
     type: 'received'
-  }, {
-    id: 4,
-    sender: 'You',
-    content: "I'll prepare the ritual circle",
-    time: '11:35 PM',
-    type: 'sent'
   }];
   
   return <div className="flex-1 flex flex-col relative z-10">
