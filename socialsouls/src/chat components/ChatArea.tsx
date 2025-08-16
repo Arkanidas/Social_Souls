@@ -16,13 +16,7 @@ export const ChatArea = () => {
     content: 'Indeed, I can feel their presence',
     time: '11:32 PM',
     type: 'sent'
-  }, {
-    id: 3,
-    sender: 'Shadow Walker',
-    content: 'Shall we conduct a séance?',
-    time: '11:33 PM',
-    type: 'received'
-  }];
+  },];
   
   return <div className="flex-1 flex flex-col relative z-10">
       <div className={`p-4 border-b backdrop-blur-sm ${isDark ? 'border-purple-900/30 bg-gray-900/95' : 'border-gray-200 bg-white/95'} flex items-center`}>
