@@ -31,7 +31,7 @@ useEffect(() => {
       const user = auth.currentUser;
       if (!user) return null;
 
-      console.log("User is authenticated:", "here is userid:" + user.uid);
+      console.log("User is authenticated with userid: " + user.uid);
 
       try {
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -58,7 +58,7 @@ useEffect(() => {
       isDark
     } = useTheme();
     return <div className={`flex h-screen ${isDark ? 'bg-gray-900/95' : 'bg-gray-50/95'}`}>
-      
+
         <Sidebar profile={profile ? {
           username: profile.username,
           profilepic: profile.profilePic,
