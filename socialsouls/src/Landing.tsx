@@ -110,6 +110,7 @@ const HandleLogin = async (e:React.FormEvent) => {
           {/* Sign In */}
   <form className="w-1/2 flex flex-col justify-center items-center gap-12" onSubmit={HandleLogin}>
   <h2 className="text-4xl font-bold text-[#ffeedd] font-[spook1]">Sign In</h2>
+  <h3>{ErrorMessage}</h3>
   <div className="relative w-[250px]">
   <input
     type="email"
