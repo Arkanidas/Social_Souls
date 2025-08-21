@@ -7,6 +7,7 @@ import { auth, db} from './firebase/firebaseConfig'; // auth: connects app to fi
 import './index.css'
 import { useNavigate } from 'react-router-dom';
 import type { ReactFormState } from "react-dom/client";
+import {Toaster, toast} from 'react-hot-toast';
 
 
 function Landing() {
@@ -52,12 +53,16 @@ const HandleSignup = async (e: React.FormEvent) => {
     console.log( user + " signed up!");
   } catch (error) {
     console.error("❌ Sign-up failed:", error);
+    toast.error("Please enter a valid email, password and username", {
+    duration: 6000, 
+});
+     
   }
 };
 
 const HandleLogin = async (e:React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage(''); // Clear previous error message
+    setErrorMessage(''); 
 
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -70,6 +75,7 @@ const HandleLogin = async (e:React.FormEvent) => {
     if (docSnap.exists()) {
       const userData = docSnap.data();
       console.log("👤 Username:", userData.username);
+
       // Save to state and display on Chat page
     } else {
       console.log("No user document found!");
@@ -78,12 +84,20 @@ const HandleLogin = async (e:React.FormEvent) => {
   } catch (error:any) {
     console.error("❌ Login failed:", error);
     setErrorMessage("Login failed. Please check your email and password.");
+    toast.error("Password or email is incorrect, please try again", {
+    duration: 6000, // milliseconds (4 seconds)
+});
   }
 };
 
   return (
     <>
-   
+   <div><Toaster   
+  position="bottom-center"
+  reverseOrder={false}
+  />
+  </div>
+
       <div className="flex justify-center items-center flex-wrap mb-8">
         <div className="max-w-[60%] p-5">
           <h1 className="text-[65px] text-center text-white font-[Spooky] mt-7 text-clamp-header">
@@ -97,7 +111,7 @@ const HandleLogin = async (e:React.FormEvent) => {
       </div>
 
       {/* Auth Container */}
-      <div className="relative w-[400px] h-[500px] mx-auto rounded-[10px] overflow-hidden text-white border border-gray-950 shadow-lg transition-shadow mt-11"
+      <div className="relative w-[400px] h-[500px] mx-auto rounded-[10px] overflow-hidden text-white border border-gray-950 shadow-lg transition-shadow mt-6"
   style={{
     boxShadow:"4px 4px 10px rgba(0, 0, 0, 0.8)"
   }}>
@@ -109,8 +123,8 @@ const HandleLogin = async (e:React.FormEvent) => {
 
           {/* Sign In */}
   <form className="w-1/2 flex flex-col justify-center items-center gap-12" onSubmit={HandleLogin}>
-  <h2 className="text-4xl font-bold text-[#ffeedd] font-[spook1]">Sign In</h2>
-  <h3>{ErrorMessage}</h3>
+  <h2 className="text-4xl font-bold text-[#ffeedd] font-[spook1] relative bottom-2">Sign In</h2>
+
   <div className="relative w-[250px]">
   <input
     type="email"
@@ -288,11 +302,7 @@ const HandleLogin = async (e:React.FormEvent) => {
               </label>
             </span>
 
-            {ErrorMessage && (
-              <div className="text-red-500 text-sm mt-2">
-                {ErrorMessage}
-              </div>
-            )}
+            
           </form>
         </div>
       </div>
