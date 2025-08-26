@@ -76,7 +76,7 @@ const HandleLogin = async (e:React.FormEvent) => {
       const userData = docSnap.data();
       console.log("👤 Username:", userData.username);
 
-      // Save to state and display on Chat page
+      
     } else {
       console.log("No user document found!");
     }
@@ -85,7 +85,7 @@ const HandleLogin = async (e:React.FormEvent) => {
     console.error("❌ Login failed:", error);
     setErrorMessage("Login failed. Please check your email and password.");
     toast.error("Password or email is incorrect, please try again", {
-    duration: 6000, // milliseconds (4 seconds)
+    duration: 6000, 
 });
   }
 };

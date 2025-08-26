@@ -5,6 +5,9 @@ import { useTheme } from './ThemeContext';
 import { signOut } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import { auth} from '../firebase/firebaseConfig'; 
+import { SettingsPopup } from '../chat components/SettingsModal'
+
+
 
 type ProfileType = {
   username: string;
@@ -25,6 +28,7 @@ const handleLogout = async () => {
   navigate("/");
 };
 
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
 
   const [activeTab, setActiveTab] = useState('chats');
@@ -32,6 +36,8 @@ const handleLogout = async () => {
     isDark,
     toggleTheme
   } = useTheme();
+
+
   const onlineUsers = [{
     id: 1,
     name: 'Shadow Walker',
@@ -48,6 +54,8 @@ const handleLogout = async () => {
     status: 'online',
     avatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=800&auto=format&fit=crop'
   }];
+
+  
   return <div className={`w-80 border-r backdrop-blur-sm ${isDark ? 'border-purple-900/30 bg-gray-900/95' : 'border-gray-200 bg-white/95'} flex flex-col relative z-10`}>
       {/* User Profile Header */}
       <div className={`p-4 border-b ${isDark ? 'border-purple-900/30' : 'border-gray-200'}`}>
@@ -88,7 +96,7 @@ const handleLogout = async () => {
       {/* Bottom Navigation */}
       <div className={`p-4 border-t ${isDark ? 'border-purple-900/30' : 'border-gray-200'} flex justify-around`}>
 
-        <button onClick={() => handleLogout()}className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 p-2`}>
+        <button className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 p-2`}>
           <SettingsIcon className="h-6 w-6" />
         </button>
 
@@ -100,5 +108,11 @@ const handleLogout = async () => {
           <LogOutIcon className="h-6 w-6" />
         </button>
       </div>
+
+        <SettingsPopup
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
+
     </div>;
 };
