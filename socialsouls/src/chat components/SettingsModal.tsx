@@ -29,7 +29,7 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
       </div>
       {/* Settings popup */}
       <div
-        className={`relative w-full max-w-md ${isDark ? 'bg-gray-900 border-purple-900/50 text-gray-200' : 'bg-gray-100 border-purple-300/50 text-gray-800'} border-2 rounded-lg shadow-2xl overflow-hidden z-10`}
+        className={`relative w-full h-full max-w-md ${isDark ? 'bg-gray-900 border-none text-gray-200' : 'bg-gray-100 border-purple-300/50 text-gray-800'} border-2 rounded-lg shadow-2xl overflow-hidden z-10`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Decorative elements */}

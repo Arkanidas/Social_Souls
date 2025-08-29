@@ -96,7 +96,7 @@ const handleLogout = async () => {
       {/* Bottom Navigation */}
       <div className={`p-4 border-t ${isDark ? 'border-purple-900/30' : 'border-gray-200'} flex justify-around`}>
 
-        <button className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 p-2`}>
+        <button  onClick={() => setIsSettingsOpen(true)} className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 p-2`}>
           <SettingsIcon className="h-6 w-6" />
         </button>
 
