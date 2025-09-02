@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect} from 'react';
 import { UserCard } from './UserCard';
 import { Users2Icon, MessageSquareIcon, SettingsIcon, SearchIcon, MoonIcon, SunIcon, LogOutIcon } from 'lucide-react';
 import { useTheme } from './ThemeContext';
 import { signOut } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import { auth} from '../firebase/firebaseConfig'; 
-import { SettingsPopup } from '../chat components/SettingsModal'
+import { SettingsPopup } from '../chat components/SettingsModal';
+
 
 
 
@@ -21,6 +22,15 @@ type SidebarProps = {
 
 export const Sidebar = ({profile}:SidebarProps) => {
 
+  const chatsTabRef = useRef<HTMLButtonElement>(null)
+  const friendsTabRef = useRef<HTMLButtonElement>(null)
+  const tabContainerRef = useRef<HTMLDivElement>(null)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState('chats');
+  const [underlineStyle, setUnderlineStyle] = useState({left: '0%', width: '50%', isAnimating: false,});
+
+ 
+
   const navigate = useNavigate();
 
 const handleLogout = async () => {
@@ -28,10 +38,27 @@ const handleLogout = async () => {
   navigate("/");
 };
 
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
+   useEffect(() => {
+    if (
+      chatsTabRef.current &&
+      friendsTabRef.current &&
+      tabContainerRef.current
+    ) {
+      const activeTabElement = activeTab === 'chats' ? chatsTabRef.current : friendsTabRef.current
+      const containerRect = tabContainerRef.current.getBoundingClientRect()
+      const tabRect = activeTabElement.getBoundingClientRect()
+      // Calculate relative position and width
+      const left = tabRect.left - containerRect.left
+      const width = tabRect.width
+      setUnderlineStyle({
+        left: `${left}px`,
+        width: `${width}px`,
+        isAnimating: true,
+      })
+    }
+  }, [activeTab])
 
-  const [activeTab, setActiveTab] = useState('chats');
   const {
     isDark,
     toggleTheme
@@ -79,12 +106,13 @@ const handleLogout = async () => {
         </div>
       </div>
       {/* Navigation Tabs */}
-      <div className={`flex border-b ${isDark ? 'border-purple-900/30' : 'border-gray-200'}`}>
-        <button onClick={() => setActiveTab('chats')} className={`flex-1 p-4 text-sm font-medium ${activeTab === 'chats' ? 'text-purple-500 border-b-2 border-purple-500' : `${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500`}`}>
+      <div className={`flex border-b ${isDark ? 'border-purple-900/30' : 'border-gray-200'}`}
+          >
+        <button ref={chatsTabRef} onClick={() => setActiveTab('chats')} className={`flex-1 p-4 text-sm font-medium ${activeTab === 'chats' ? 'text-purple-500 border-b-2 border-purple-500' : `${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500`}`}>
           <MessageSquareIcon className="h-5 w-5 mx-auto mb-1" />
           Chats
         </button>
-        <button onClick={() => setActiveTab('friends')} className={`flex-1 p-4 text-sm font-medium ${activeTab === 'friends' ? 'text-purple-500 border-b-2 border-purple-500' : `${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500`}`}>
+        <button ref={friendsTabRef} onClick={() => setActiveTab('friends')} className={`flex-1 p-4 text-sm font-medium ${activeTab === 'friends' ? 'text-purple-500 border-b-2 border-purple-500' : `${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500`}`}>
           <Users2Icon className="h-5 w-5 mx-auto mb-1" />
           Friends
         </button>

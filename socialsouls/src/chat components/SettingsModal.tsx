@@ -3,6 +3,7 @@ import { X, Upload, UserIcon, FileTextIcon, GhostIcon } from 'lucide-react'
 import { useTheme } from '../chat components/ThemeContext'
 
 
+
 interface SettingsPopupProps {
   isOpen: boolean
   onClose: () => void
@@ -15,21 +16,19 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
     'https://images.unsplash.com/photo-1575936123452-b67c3203c357?w=800&auto=format&fit=crop',
   )
   if (!isOpen) return null
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      {/* Overlay with misty effect */}
+    <div className='fixed inset-0 flex items-center justify-center z-50'>
+      
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"
         onClick={onClose}
       >
-        <div className="absolute inset-0 opacity-30">
-          <div className="mist-1"></div>
-          <div className="mist-2"></div>
-        </div>
+       
       </div>
       {/* Settings popup */}
       <div
-        className={`relative w-full h-full max-w-md ${isDark ? 'bg-gray-900 border-none text-gray-200' : 'bg-gray-100 border-purple-300/50 text-gray-800'} border-2 rounded-lg shadow-2xl overflow-hidden z-10`}
+        className={`relative w-full h-full max-w-md ${isDark ? 'bg-gray-900 border-none text-gray-200' : 'bg-gray-100 border-purple-300/50 text-gray-800'} border-2 rounded-lg shadow-2xl overflow-hidden z-10 animate-ghost-appear`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Decorative elements */}
@@ -60,9 +59,9 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
             </h2>
             <button
               onClick={onClose}
-              className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 transition-colors`}
+              className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 transition-colors z-10 `}
             >
-              <X className="h-6 w-6" />
+              <X className="h-6 w-6 hover:text-purple-500 hover:drop-shadow-[0_0_1px_rgba(168,85,247,0.8)] transition duration-300 focus:text-white-500 " />
             </button>
           </div>
           <p className={`mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -70,12 +69,13 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
           </p>
         </div>
         {/* Settings form */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-20">
+
           {/* Profile picture */}
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
               <div
-                className={`w-24 h-24 rounded-full overflow-hidden border-2 ${isDark ? 'border-purple-500' : 'border-purple-400'}`}
+                className={`w-34 h-34 rounded-full relative top-5 overflow-hidden border-2 ${isDark ? 'border-purple-500' : 'border-purple-400'}`}
               >
                 <img
                   src={profilePicture}
@@ -146,8 +146,9 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
           </div>
         </div>
         {/* Footer */}
+
         <div
-          className={`p-6 border-t ${isDark ? 'border-purple-900/30' : 'border-purple-200'} flex justify-end`}
+          className={`p-6 border-t ${isDark ? 'border-purple-900/30' : 'border-purple-200'} flex justify-center gap-5 mt-14`}
         >
           <button
             onClick={onClose}

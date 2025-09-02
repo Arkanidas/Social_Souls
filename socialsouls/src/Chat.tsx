@@ -34,7 +34,9 @@ useEffect(() => {
       console.log("User is authenticated with userid: " + user.uid);
 
       try {
+
         const userDoc = await getDoc(doc(db, "users", user.uid));
+
         if (userDoc.exists()) {
           setProfile(userDoc.data() as UserProfile);
         } else {
@@ -44,7 +46,6 @@ useEffect(() => {
         console.error("Error fetching profile:", error);
       }
     };
-
         fetchProfile();
   }, []);
 
