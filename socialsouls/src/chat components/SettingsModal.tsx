@@ -28,28 +28,14 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
       </div>
       {/* Settings popup */}
       <div
-        className={`relative w-full h-full max-w-md ${isDark ? 'bg-gray-900 border-none text-gray-200' : 'bg-gray-100 border-purple-300/50 text-gray-800'} border-2 rounded-lg shadow-2xl overflow-hidden z-10 animate-ghost-appear`}
+        className={`relative w-full h-full max-w-md ${isDark ? 'bg-gray-900 border-none text-gray-200' : 'bg-gray-100 border-purple-300/50 text-gray-800'} border-2 rounded-lg shadow-2xl overflow-hidden z-10 animate-ghost-appear-shiver`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Decorative elements */}
+      
         <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
           <GhostIcon className="w-full h-full text-purple-500" />
         </div>
-        {/* Floating orbs */}
-        {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className={`absolute floating-orb ${isDark ? 'bg-purple-500/10' : 'bg-purple-300/20'}`}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              width: `${Math.random() * 30 + 10}px`,
-              height: `${Math.random() * 30 + 10}px`,
-            }}
-          ></div>
-        ))}
-        {/* Header */}
+       
         <div
           className={`p-6 border-b ${isDark ? 'border-purple-900/30' : 'border-purple-200'}`}
         >
@@ -85,9 +71,9 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
               </div>
               <label
                 htmlFor="profile-upload"
-                className={`absolute bottom-0 right-0 p-2 rounded-full cursor-pointer ${isDark ? 'bg-gray-800 text-purple-400 hover:bg-gray-700' : 'bg-white text-purple-500 hover:bg-gray-100'} border ${isDark ? 'border-purple-900/30' : 'border-gray-200'}`}
+                className={`absolute top-25 left-25 p-2 rounded-full cursor-pointer ${isDark ? 'bg-gray-800 text-purple-400 hover:bg-gray-700' : 'bg-white text-purple-500 hover:bg-gray-100'} border ${isDark ? 'border-purple-900/30' : 'border-gray-200'}`}
               >
-                <Upload className="h-4 w-4" />
+                <Upload className="h-6 w-6" />
                 <input
                   id="profile-upload"
                   type="file"
@@ -106,14 +92,13 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
                 />
               </label>
             </div>
-            <p className="text-sm text-purple-500">Change your spectral form</p>
+            <p className="text-sm text-purple-500 mt-4">Change your spectral soul</p>
           </div>
           {/* Username */}
-          <div className="space-y-2">
+          <div>
             <label
               htmlFor="username"
-              className={`flex items-center gap-2 text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
-            >
+              className={`flex items-center gap-2 text-sm font-medium relative bottom-7 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
               <UserIcon className="h-4 w-4 text-purple-500" />
               Spirit Name
             </label>
@@ -122,15 +107,15 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border ${isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}
+              className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border relative bottom-5 ${isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}
               placeholder="Enter your spectral name"
             />
           </div>
           {/* Bio */}
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <label
               htmlFor="bio"
-              className={`flex items-center gap-2 text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+              className={`flex items-center gap-2 text-sm font-medium  ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
             >
               <FileTextIcon className="h-4 w-4 text-purple-500" />
               Ethereal Description
@@ -140,7 +125,7 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               rows={3}
-              className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border ${isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}
+              className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border mb-10${isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}
               placeholder="Describe your spectral essence..."
             />
           </div>
@@ -148,7 +133,7 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
         {/* Footer */}
 
         <div
-          className={`p-6 border-t ${isDark ? 'border-purple-900/30' : 'border-purple-200'} flex justify-center gap-5 mt-14`}
+          className={`p-6 border-t ${isDark ? 'border-purple-900/30' : 'border-purple-200'} flex justify-center gap-5 mt-24`}
         >
           <button
             onClick={onClose}

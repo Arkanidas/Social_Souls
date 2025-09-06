@@ -27,7 +27,7 @@ export const Sidebar = ({profile}:SidebarProps) => {
   const tabContainerRef = useRef<HTMLDivElement>(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('chats');
-  const [underlineStyle, setUnderlineStyle] = useState({left: '0%', width: '50%', isAnimating: false,});
+
 
  
 
@@ -39,25 +39,7 @@ const handleLogout = async () => {
 };
 
 
-   useEffect(() => {
-    if (
-      chatsTabRef.current &&
-      friendsTabRef.current &&
-      tabContainerRef.current
-    ) {
-      const activeTabElement = activeTab === 'chats' ? chatsTabRef.current : friendsTabRef.current
-      const containerRect = tabContainerRef.current.getBoundingClientRect()
-      const tabRect = activeTabElement.getBoundingClientRect()
-      // Calculate relative position and width
-      const left = tabRect.left - containerRect.left
-      const width = tabRect.width
-      setUnderlineStyle({
-        left: `${left}px`,
-        width: `${width}px`,
-        isAnimating: true,
-      })
-    }
-  }, [activeTab])
+   
 
   const {
     isDark,
@@ -108,11 +90,11 @@ const handleLogout = async () => {
       {/* Navigation Tabs */}
       <div className={`flex border-b ${isDark ? 'border-purple-900/30' : 'border-gray-200'}`}
           >
-        <button ref={chatsTabRef} onClick={() => setActiveTab('chats')} className={`flex-1 p-4 text-sm font-medium ${activeTab === 'chats' ? 'text-purple-500 border-b-2 border-purple-500' : `${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500`}`}>
+        <button onClick={() => setActiveTab('chats')} className={`flex-1 p-4 text-sm font-medium ${activeTab === 'chats' ? 'text-purple-500 border-b-2 border-purple-500' : `${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500`}`}>
           <MessageSquareIcon className="h-5 w-5 mx-auto mb-1" />
           Chats
         </button>
-        <button ref={friendsTabRef} onClick={() => setActiveTab('friends')} className={`flex-1 p-4 text-sm font-medium ${activeTab === 'friends' ? 'text-purple-500 border-b-2 border-purple-500' : `${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500`}`}>
+        <button onClick={() => setActiveTab('friends')} className={`flex-1 p-4 text-sm font-medium ${activeTab === 'friends' ? 'text-purple-500 border-b-2 border-purple-500' : `${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500`}`}>
           <Users2Icon className="h-5 w-5 mx-auto mb-1" />
           Friends
         </button>
