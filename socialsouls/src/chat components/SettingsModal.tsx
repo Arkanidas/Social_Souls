@@ -28,7 +28,7 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
       </div>
       {/* Settings popup */}
       <div
-        className={`relative w-full h-full max-w-md ${isDark ? 'bg-gray-900 border-none text-gray-200' : 'bg-gray-100 border-purple-300/50 text-gray-800'} border-2 rounded-lg shadow-2xl overflow-hidden z-10 animate-ghost-appear-shiver`}
+        className={`relative w-full h-full max-w-md ${isDark ? 'bg-gray-900 border-none text-gray-200' : 'bg-gray-100 border-purple-300/50 text-gray-800'} border-2 rounded-lg shadow-2xl overflow-hidden z-10 animate-ghost-appear`}
         onClick={(e) => e.stopPropagation()}
       >
       
@@ -47,7 +47,7 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
               onClick={onClose}
               className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 transition-colors z-10 `}
             >
-              <X className="h-6 w-6 hover:text-purple-500 hover:drop-shadow-[0_0_1px_rgba(168,85,247,0.8)] transition duration-300 focus:text-white-500 " />
+              <X className="h-6 w-6 hover:text-purple-500 hover:drop-shadow-[0_0_1px_rgba(168,85,247,0.8)] transition duration-300 focus:text-gray-500 " />
             </button>
           </div>
           <p className={`mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -112,7 +112,7 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
             />
           </div>
           {/* Bio */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 relative bottom-15">
             <label
               htmlFor="bio"
               className={`flex items-center gap-2 text-sm font-medium  ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
@@ -125,7 +125,7 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               rows={3}
-              className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border mb-10${isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}
+              className={`w-full px-4 py-2 h-24 resize-none rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border ${isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}
               placeholder="Describe your spectral essence..."
             />
           </div>
@@ -133,7 +133,7 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
         {/* Footer */}
 
         <div
-          className={`p-6 border-t ${isDark ? 'border-purple-900/30' : 'border-purple-200'} flex justify-center gap-5 mt-24`}
+          className={`p-6 border-t ${isDark ? 'border-purple-900/30' : 'border-purple-200'} flex justify-center gap-5 mt-19`}
         >
           <button
             onClick={onClose}

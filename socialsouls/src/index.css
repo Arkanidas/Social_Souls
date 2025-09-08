@@ -73,20 +73,7 @@ body {
           animation: ghost-appear 0.7s ease-out forwards;
         }
 
-        @keyframes ghost-shiver {
-  0% { transform: translateX(0); }
-  20% { transform: translateX(-2px) rotate(-0.3deg); }
-  40% { transform: translateX(3px) rotate(0.4deg); }
-  60% { transform: translateX(-2px) rotate(-0.3deg); }
-  80% { transform: translateX(2px) rotate(0.3deg); }
-  100% { transform: translateX(0); }
-}
 
-.animate-ghost-appear-shiver {
-  animation: 
-    ghost-appear 0.8s ease-out forwards,
-    ghost-shiver 0.4s ease-in-out 0.6s; /* starts AFTER appear ends */
-}
 
       
       
