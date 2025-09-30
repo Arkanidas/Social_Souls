@@ -28,14 +28,14 @@ const [profile, setProfile] = useState<UserProfile | null>(null);
 useEffect(() => {
 
     const fetchProfile = async () => {
-      const user = auth.currentUser;
-      if (!user) return null;
+      const CurrentUser = auth.currentUser;
+      if (!CurrentUser) return null;
 
-      console.log("User is authenticated with userid: " + user.uid);
+      console.log("User is authenticated with userid: " + CurrentUser.uid);
 
       try {
 
-        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userDoc = await getDoc(doc(db, "users", CurrentUser.uid));
 
         if (userDoc.exists()) {
           setProfile(userDoc.data() as UserProfile);

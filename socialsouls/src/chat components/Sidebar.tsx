@@ -122,6 +122,7 @@ const handleLogout = async () => {
         <SettingsPopup
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+        UserName={profile?.username ?? ""}
       />
 
     </div>;

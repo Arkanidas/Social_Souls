@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, Upload, UserIcon, FileTextIcon, GhostIcon } from 'lucide-react'
 import { useTheme } from '../chat components/ThemeContext'
 
@@ -7,15 +7,33 @@ import { useTheme } from '../chat components/ThemeContext'
 interface SettingsPopupProps {
   isOpen: boolean
   onClose: () => void
+  UserName: string
+  
 }
-export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
+export const SettingsPopup = ({ isOpen, onClose, UserName }: SettingsPopupProps) => {
+
+
+
   const { isDark } = useTheme()
-  const [username, setUsername] = useState('Ghost Whisperer')
+  const [username, setUsername] = useState(UserName)
   const [bio, setBio] = useState('Haunting Online')
   const [profilePicture, setProfilePicture] = useState(
     'https://images.unsplash.com/photo-1575936123452-b67c3203c357?w=800&auto=format&fit=crop',
   )
-  if (!isOpen) return null
+
+
+
+useEffect(() => {
+
+if(isOpen) {
+  setUsername(UserName)
+}
+
+},[UserName, isOpen])
+
+ if (!isOpen) return null
+
+
 
   return (
     <div className='fixed inset-0 flex items-center justify-center z-50'>
@@ -133,7 +151,7 @@ export const SettingsPopup = ({ isOpen, onClose }: SettingsPopupProps) => {
         {/* Footer */}
 
         <div
-          className={`p-6 border-t ${isDark ? 'border-purple-900/30' : 'border-purple-200'} flex justify-center gap-5 mt-19`}
+          className={`p-6 border-t ${isDark ? 'border-purple-900/30' : 'border-purple-200'} flex justify-center gap-5 mt-14`}
         >
           <button
             onClick={onClose}
