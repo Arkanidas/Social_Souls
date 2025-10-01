@@ -6,7 +6,6 @@ import { doc,setDoc, getDoc } from "firebase/firestore";
 import { auth, db} from './firebase/firebaseConfig'; // auth: connects app to firebase auth service, db: handles storing and app data in cloud lets your app read, write, update, and delete data in your Firestore database.
 import './index.css'
 import { useNavigate } from 'react-router-dom';
-import type { ReactFormState } from "react-dom/client";
 import {Toaster, toast} from 'react-hot-toast';
 
 
@@ -52,7 +51,7 @@ const HandleSignup = async (e: React.FormEvent) => {
     });
     console.log( user + " signed up!");
   } catch (error) {
-    console.error("❌ Sign-up failed:", error);
+    console.error("❌ Sign-up failed:", ErrorMessage);
     toast.error("Please enter a valid email, password and username", {
     duration: 6000, 
 });

@@ -18,13 +18,11 @@ type ProfileType = {
 
 type SidebarProps = {
   profile?: ProfileType; 
+  onProfileUpdated?: () => void
 };
 
-export const Sidebar = ({profile}:SidebarProps) => {
+export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
 
-  const chatsTabRef = useRef<HTMLButtonElement>(null)
-  const friendsTabRef = useRef<HTMLButtonElement>(null)
-  const tabContainerRef = useRef<HTMLDivElement>(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('chats');
 
@@ -123,6 +121,9 @@ const handleLogout = async () => {
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         UserName={profile?.username ?? ""}
+        Bio={profile?.bio ?? ""}
+        profilepic={profile?.profilepic ?? ""}
+        onProfileUpdated={onProfileUpdated} 
       />
 
     </div>;

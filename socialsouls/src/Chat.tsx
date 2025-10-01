@@ -6,6 +6,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "./firebase/firebaseConfig"; 
 import { Navigate } from 'react-router-dom';
 import { doc, getDoc } from "firebase/firestore";
+import { Toaster } from "react-hot-toast";
 
 
 interface UserProfile {
@@ -25,9 +26,7 @@ const [user] = useAuthState(auth);
 const [profile, setProfile] = useState<UserProfile | null>(null);
 
 
-useEffect(() => {
-
-    const fetchProfile = async () => {
+const fetchProfile = async () => {
       const CurrentUser = auth.currentUser;
       if (!CurrentUser) return null;
 
@@ -46,6 +45,9 @@ useEffect(() => {
         console.error("Error fetching profile:", error);
       }
     };
+
+
+useEffect(() => {
         fetchProfile();
   }, []);
 
@@ -60,8 +62,10 @@ useEffect(() => {
           username: profile.username,
           profilepic: profile.profilePic,
           bio: profile.bio
-        } : undefined}/>
+        } : undefined}
+        onProfileUpdated={fetchProfile}/>
         <ChatArea />
+         <Toaster position="top-center" reverseOrder={false} />
       </div>;
   };
 
