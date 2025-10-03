@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect} from 'react';
 import { UserCard } from './UserCard';
-import { Users2Icon, MessageSquareIcon, SettingsIcon, SearchIcon, MoonIcon, SunIcon, LogOutIcon } from 'lucide-react';
+import { Users2Icon, MessageSquareIcon, SettingsIcon, SearchIcon, MoonIcon, SunIcon, LogOutIcon, UserPlusIcon } from 'lucide-react';
 import { useTheme } from './ThemeContext';
 import { signOut } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import { auth} from '../firebase/firebaseConfig'; 
 import { SettingsPopup } from '../chat components/SettingsModal';
+import { showAddFriendModal } from './ChatArea'
 
 
 
@@ -76,6 +77,13 @@ const handleLogout = async () => {
             </h3>
             <p className="text-sm text-purple-500">Haunting Online</p>
           </div>
+           <button
+          className={`p-2 rounded-full ${isDark ? 'text-purple-400' : 'bg-gray-100 text-purple-600'} hover:scale-110 transition-transform duration-300 relative left-20 cursor-pointer`}
+          onClick={showAddFriendModal}
+          title="Summon a new spirit"
+        >
+          <UserPlusIcon className="h-6 w-6 hover:animate-pulse" />
+        </button>
         </div>
       </div>
     
