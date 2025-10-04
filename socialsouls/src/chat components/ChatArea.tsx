@@ -129,20 +129,6 @@ export const ChatArea = () => {
                 </button>
               </div>
             </form>
-            {/* Floating orbs for decoration */}
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className={`absolute floating-orb ${isDark ? 'bg-purple-500/10' : 'bg-purple-300/20'}`}
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 5}s`,
-                  width: `${Math.random() * 30 + 10}px`,
-                  height: `${Math.random() * 30 + 10}px`,
-                }}
-              ></div>
-            ))}
           </div>
         </div>
       )}
