@@ -95,7 +95,7 @@ export const ChatArea = () => {
               </h2>
               <button
                 onClick={() => setShowAddFriend(false)}
-                className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-red-500 transition-colors`}
+                className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-red-500 transition-colors cursor-pointer`}
               >
                 <XIcon className="h-6 w-6" />
               </button>
