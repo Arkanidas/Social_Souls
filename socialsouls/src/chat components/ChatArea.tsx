@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { MessageInput } from './MessageInput';
 import { useTheme } from './ThemeContext';
 import { XIcon, SkullIcon } from 'lucide-react'
-
+import { auth, db } from '../firebase/firebaseConfig'
 
 export const showAddFriendModal = () => {
   const event = new CustomEvent('showAddFriendModal')
@@ -132,10 +132,6 @@ export const ChatArea = () => {
           </div>
         </div>
       )}
-
-
-
-
 
       <MessageInput />
     </div>;
