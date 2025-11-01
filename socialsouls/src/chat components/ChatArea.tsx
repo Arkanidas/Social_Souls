@@ -3,6 +3,8 @@ import { MessageInput } from './MessageInput';
 import { useTheme } from './ThemeContext';
 import { XIcon, SkullIcon } from 'lucide-react'
 import { auth, db } from '../firebase/firebaseConfig'
+import { collection, query, where, getDocs, doc, updateDoc, arrayUnion } from "firebase/firestore"
+import { toast } from 'react-hot-toast'
 
 export const showAddFriendModal = () => {
   const event = new CustomEvent('showAddFriendModal')
@@ -22,7 +24,7 @@ export const ChatArea = () => {
       window.removeEventListener('showAddFriendModal', handleShowModal)
     }
   }, [])
-  // Focus the add friend input when it appears
+
   useEffect(() => {
     if (showAddFriend && addFriendInputRef.current) {
       setTimeout(() => {
