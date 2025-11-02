@@ -29,21 +29,69 @@ export const ChatArea = () => {
     if (showAddFriend && addFriendInputRef.current) {
       setTimeout(() => {
         addFriendInputRef.current?.focus()
-      }, 300) // Wait for animation to start
+      }, 300) 
     }
   }, [showAddFriend])
 
-  const handleAddFriendSubmit = (e: React.FormEvent) => {
+
+
+  const handleAddFriendSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const input = addFriendInputRef.current
-    if (input && input.value.trim()) {
+    const friendUsername = input?.value.trim()
+
+      if(!friendUsername) return
+      const user = auth.currentUser
+
+        if(!user) {
+        toast.error("You must be logged in to summon a spirit!", {
+          duration: 4000,
+        });
+        return
+       }
+
+    if (input && friendUsername) {
       console.log(`Searching for user: ${input.value}`)
-      // Here you would typically make an API call to search for users
-      // For demo purposes, just log and clear the input
+      
+try {
+      // Search for the user by username
+      const q = query(collection(db, "users"), where("username", "==", friendUsername))
+      const querySnapshot = await getDocs(q)
+
+      if (querySnapshot.empty) {
+        toast.error("Spirit not found 👻")
+        return
+      }
+
+      const friendDoc = querySnapshot.docs[0]
+      const friendId = friendDoc.id
+
+      // Prevent adding yourself
+      if (friendId === user.uid) {
+        toast.error("You cannot summon yourself 😅")
+        return
+      }
+
+      // Update current user's friends list
+      const userRef = doc(db, "users", user.uid)
+      await updateDoc(userRef, {
+        friends: arrayUnion(friendId)
+      })
+
+      toast.success(`${friendUsername} has been summoned successfully! 🪄`)
       input.value = ''
       setShowAddFriend(false)
+    } catch (error) {
+      console.error("Error adding friend:", error)
+      toast.error("Something went wrong!")
     }
   }
+  
+  }
+
+
+
+
 
   const {
     isDark
@@ -119,13 +167,13 @@ export const ChatArea = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddFriend(false)}
-                  className={`mr-2 px-4 py-2 rounded-md ${isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+                  className={`mr-2 px-4 py-2 rounded-md cursor-pointer ${isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md"
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md cursor-pointer"
                 >
                   Summon
                 </button>
