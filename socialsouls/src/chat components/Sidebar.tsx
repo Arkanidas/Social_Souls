@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect} from 'react';
+import { collection, doc, getDoc, getDocs } from "firebase/firestore"
 import { UserCard } from './UserCard';
 import { Users2Icon, MessageSquareIcon, SettingsIcon, SearchIcon, MoonIcon, SunIcon, LogOutIcon, UserPlusIcon } from 'lucide-react';
 import { useTheme } from './ThemeContext';
 import { signOut } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
-import { auth} from '../firebase/firebaseConfig'; 
+import { auth, db} from '../firebase/firebaseConfig'; 
 import { SettingsPopup } from '../chat components/SettingsModal';
 import { showAddFriendModal } from './ChatArea'
 
@@ -24,11 +25,31 @@ type SidebarProps = {
 
 export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
 
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('chats');
+  const [friends, setFriends] = useState<any[]>([]);
 
 
- 
+ useEffect(() => {
+  const fetchFriends = async () => {
+    const user = auth.currentUser
+    if (!user) return
+
+    const userRef = doc(db, "users", user.uid)
+    const userSnap = await getDoc(userRef)
+
+    if (userSnap.exists()) {
+      const friendIDs = userSnap.data().friends || []
+      const friendDocs = await Promise.all(friendIDs.map(async (id: string) => {
+        const fDoc = await getDoc(doc(db, "users", id))
+        return fDoc.exists() ? fDoc.data() : null
+      }))
+      setFriends(friendDocs.filter(Boolean))
+    }
+  }
+
+  if (activeTab === 'friends') fetchFriends()
+}, [activeTab])
 
   const navigate = useNavigate();
 
@@ -46,22 +67,6 @@ const handleLogout = async () => {
   } = useTheme();
 
 
-  const onlineUsers = [{
-    id: 1,
-    name: 'Shadow Walker',
-    status: 'online',
-    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=800&auto=format&fit=crop'
-  }, {
-    id: 2,
-    name: 'Mystic Wanderer',
-    status: 'away',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop'
-  }, {
-    id: 3,
-    name: 'Night Stalker',
-    status: 'online',
-    avatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=800&auto=format&fit=crop'
-  }];
 
   
   return <div className={`w-80 border-r backdrop-blur-sm ${isDark ? 'border-purple-900/30 bg-gray-900/95' : 'border-gray-200 bg-white/95'} flex flex-col relative z-10`}>
@@ -106,11 +111,25 @@ const handleLogout = async () => {
         </button>
       </div>
     
-      <div className="flex-1 overflow-y-auto">
-        {onlineUsers.map(user => <UserCard key={user.id} user={user} />)}
-      </div>
+          {activeTab === 'friends' ? (
+  <div className="flex flex-col">
+    {friends.length === 0 ? (
+      <p className="text-center text-sm mt-5 text-gray-400">No friends yet 👻</p>
+    ) : (
+      friends.map((f, i) => (
+        <div key={i} className="flex items-center gap-3 p-3 hover:bg-purple-500/10 cursor-pointer">
+          <img src={f.profilepic || 'https://via.placeholder.com/40'} className="w-10 h-10 rounded-full border border-purple-500" />
+          <div>
+            <p className="text-gray-200">{f.username}</p>
+            <p className="text-xs text-purple-400">{f.bio}</p>
+          </div>
+        </div>
+      ))
+    )}
+  </div>
+) : null}
    
-      <div className={`p-4 border-t ${isDark ? 'border-purple-900/30' : 'border-gray-200'} flex justify-around`}>
+      <div className={`p-4 border-t${isDark ? 'border-purple-900/30' : 'border-gray-200'} flex justify-around relative top-75 w-full`}>
 
         <button  onClick={() => setIsSettingsOpen(true)} className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 p-2`}>
           <SettingsIcon className="h-6 w-6" />
@@ -124,6 +143,11 @@ const handleLogout = async () => {
           <LogOutIcon className="h-6 w-6" />
         </button>
       </div>
+
+
+
+
+  
 
         <SettingsPopup
         isOpen={isSettingsOpen}

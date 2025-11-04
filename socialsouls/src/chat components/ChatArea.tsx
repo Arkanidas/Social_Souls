@@ -81,15 +81,14 @@ try {
       toast.success(`${friendUsername} has been summoned successfully! 🪄`)
       input.value = ''
       setShowAddFriend(false)
+      
     } catch (error) {
       console.error("Error adding friend:", error)
       toast.error("Something went wrong!")
     }
   }
-  
+
   }
-
-
 
 
 
