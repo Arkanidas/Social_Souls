@@ -3,7 +3,7 @@ import { MessageInput } from './MessageInput';
 import { useTheme } from './ThemeContext';
 import { XIcon, SkullIcon } from 'lucide-react'
 import { auth, db } from '../firebase/firebaseConfig'
-import { collection, query, where, getDocs, doc, updateDoc, arrayUnion } from "firebase/firestore"
+import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore"
 import { toast } from 'react-hot-toast'
 
 export const showAddFriendModal = () => {
@@ -74,14 +74,21 @@ try {
 
       // Update current user's friends list
       const userRef = doc(db, "users", user.uid)
+
       await updateDoc(userRef, {
-        friends: arrayUnion(friendId)
+        sentRequests: arrayUnion(friendId),
+        friendRequests: arrayRemove(friendId)
       })
+
+      await updateDoc(doc(db, "users", friendId), {
+       friendRequests: arrayUnion(user.uid),
+       sentRequests: arrayRemove(user.uid)
+});
 
       toast.success(`${friendUsername} has been summoned successfully! 🪄`)
       input.value = ''
       setShowAddFriend(false)
-      
+
     } catch (error) {
       console.error("Error adding friend:", error)
       toast.error("Something went wrong!")
