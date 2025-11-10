@@ -1,13 +1,16 @@
-import { useState, useRef, useEffect} from 'react';
+import { useState} from 'react';
 import { collection, doc, getDoc, getDocs } from "firebase/firestore"
 import { UserCard } from './UserCard';
 import { Users2Icon, MessageSquareIcon, SettingsIcon, SearchIcon, MoonIcon, SunIcon, LogOutIcon, UserPlusIcon } from 'lucide-react';
 import { useTheme } from './ThemeContext';
 import { signOut } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
-import { auth, db} from '../firebase/firebaseConfig'; 
+import { auth} from '../firebase/firebaseConfig'; 
 import { SettingsPopup } from '../chat components/SettingsModal';
 import { showAddFriendModal } from './ChatArea'
+import { FriendsTab } from './FriendsTab';
+import { XIcon } from 'lucide-react'
+
 
 
 
@@ -23,33 +26,15 @@ type SidebarProps = {
   onProfileUpdated?: () => void
 };
 
+
+
 export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('chats');
-  const [friends, setFriends] = useState<any[]>([]);
 
 
- useEffect(() => {
-  const fetchFriends = async () => {
-    const user = auth.currentUser
-    if (!user) return
-
-    const userRef = doc(db, "users", user.uid)
-    const userSnap = await getDoc(userRef)
-
-    if (userSnap.exists()) {
-      const friendIDs = userSnap.data().friends || []
-      const friendDocs = await Promise.all(friendIDs.map(async (id: string) => {
-        const fDoc = await getDoc(doc(db, "users", id))
-        return fDoc.exists() ? fDoc.data() : null
-      }))
-      setFriends(friendDocs.filter(Boolean))
-    }
-  }
-
-  if (activeTab === 'friends') fetchFriends()
-}, [activeTab])
+ 
 
   const navigate = useNavigate();
 
@@ -111,23 +96,11 @@ const handleLogout = async () => {
         </button>
       </div>
     
-          {activeTab === 'friends' ? (
+        
   <div className="flex flex-col">
-    {friends.length === 0 ? (
-      <p className="text-center text-sm mt-5 text-gray-400">No friends yet 👻</p>
-    ) : (
-      friends.map((f, i) => (
-        <div key={i} className="flex items-center gap-3 p-3 hover:bg-purple-500/10 cursor-pointer">
-          <img src={f.profilepic || 'https://via.placeholder.com/40'} className="w-10 h-10 rounded-full border border-purple-500" />
-          <div>
-            <p className="text-gray-200">{f.username}</p>
-            <p className="text-xs text-purple-400">{f.bio}</p>
-          </div>
-        </div>
-      ))
-    )}
-  </div>
-) : null}
+     {activeTab === "friends" && <FriendsTab />}
+     </div>
+   
    
       <div className={`p-4 border-t${isDark ? 'border-purple-900/30' : 'border-gray-200'} flex justify-around relative top-75 w-full`}>
 
@@ -139,7 +112,7 @@ const handleLogout = async () => {
         <button className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 p-2`} onClick={toggleTheme}>
           {isDark ? <SunIcon className="h-6 w-6" /> : <MoonIcon className="h-6 w-6" />}
         </button>
-        <button className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 p-2`}>
+        <button  onClick={()=> handleLogout()} className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 p-2`}>
           <LogOutIcon className="h-6 w-6" />
         </button>
       </div>
