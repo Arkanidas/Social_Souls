@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { X, Upload, UserIcon, FileTextIcon, GhostIcon } from 'lucide-react'
+import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
 import { useTheme } from '../chat components/ThemeContext'
 import { auth, db } from '../firebase/firebaseConfig'
 import { doc, updateDoc } from "firebase/firestore"
 import {Toaster, toast} from 'react-hot-toast';
+import ghost from "../assets/ghosts.png"
 
 interface SettingsPopupProps {
   isOpen: boolean
@@ -21,7 +23,7 @@ export const SettingsPopup = ({ isOpen, onClose, UserName, Bio, onProfileUpdated
   const { isDark } = useTheme()
   const [username, setUsername] = useState(UserName)
   const [bio, setBio] = useState(Bio)
-  const [profilePicture, setProfilePicture] = useState('https://images.unsplash.com/photo-1575936123452-b67c3203c357?w=800&auto=format&fit=crop',)
+  const [profilePicture, setProfilePicture] = useState(ghost)
   const [isSaving, setIsSaving] = useState(false)
 
 
@@ -44,12 +46,20 @@ if(isOpen) {
       if (!user) throw new Error("No authenticated user found")
 
       const userRef = doc(db, "users", user.uid)
+      let photoURL = profilePicture;
+
+        if (profilePicture.startsWith("data:image")) {
+      const storage = getStorage();
+      const fileRef = ref(storage, `profilePics/${user.uid}.jpg`);
+      await uploadString(fileRef, profilePicture, "data_url");
+      photoURL = await getDownloadURL(fileRef);
+    }
       await updateDoc(userRef, {
         username: username,
         bio: bio,
-        // you can also save profilePicture if you want:
-        // profilePic: profilePicture
+        profilePic: photoURL
       })
+
       onProfileUpdated?.(); 
        toast.success("Your soul has been successfully updated 👻", {
       duration: 4000,
@@ -58,6 +68,7 @@ if(isOpen) {
       onClose() // Close modal after saving
     } catch (error) {
       console.error("Error updating profile:", error)
+      toast.error("Failed to update your spectral form 💀");
     } finally {
       setIsSaving(false)
    
