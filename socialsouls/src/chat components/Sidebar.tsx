@@ -10,7 +10,7 @@ import { SettingsPopup } from '../chat components/SettingsModal';
 import { showAddFriendModal } from './ChatArea'
 import { FriendsTab } from './FriendsTab';
 import { XIcon } from 'lucide-react'
-
+import ghost from "../assets/ghosts.png"
 
 
 
@@ -59,7 +59,7 @@ const handleLogout = async () => {
       <div className={`p-4 border-b ${isDark ? 'border-purple-900/30' : 'border-gray-200'}`}>
         <div className="flex items-center space-x-3">
           <div className={`w-10 h-10 rounded-full overflow-hidden border-2 ${isDark ? 'border-purple-500' : 'border-purple-400'}`}>
-            <img src="https://images.unsplash.com/photo-1575936123452-b67c3203c357?w=800&auto=format&fit=crop" alt="Profile" className="w-full h-full object-cover" />
+            <img src={ghost} alt="Profile" className="w-full h-full object-cover" />
           </div>
           <div>
             <h3 className={isDark ? 'text-white' : 'text-gray-900'}>
