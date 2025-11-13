@@ -4,7 +4,6 @@ import {ChatArea} from './chat components/ChatArea';
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "./firebase/firebaseConfig"; 
-import { Navigate } from 'react-router-dom';
 import { doc, getDoc } from "firebase/firestore";
 import { Toaster } from "react-hot-toast";
 

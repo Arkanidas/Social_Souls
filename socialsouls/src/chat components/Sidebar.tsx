@@ -1,6 +1,4 @@
 import { useState} from 'react';
-import { collection, doc, getDoc, getDocs } from "firebase/firestore"
-import { UserCard } from './UserCard';
 import { Users2Icon, MessageSquareIcon, SettingsIcon, SearchIcon, MoonIcon, SunIcon, LogOutIcon, UserPlusIcon } from 'lucide-react';
 import { useTheme } from './ThemeContext';
 import { signOut } from "firebase/auth";
@@ -9,7 +7,6 @@ import { auth} from '../firebase/firebaseConfig';
 import { SettingsPopup } from '../chat components/SettingsModal';
 import { showAddFriendModal } from './ChatArea'
 import { FriendsTab } from './FriendsTab';
-import { XIcon } from 'lucide-react'
 import ghost from "../assets/ghosts.png"
 
 
