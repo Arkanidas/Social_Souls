@@ -56,7 +56,7 @@ const handleLogout = async () => {
       <div className={`p-4 border-b ${isDark ? 'border-purple-900/30' : 'border-gray-200'}`}>
         <div className="flex items-center space-x-3">
           <div className={`w-10 h-10 rounded-full overflow-hidden border-2 ${isDark ? 'border-purple-500' : 'border-purple-400'}`}>
-            <img src={ghost} alt="Profile" className="w-full h-full object-cover" />
+            <img src={profile? profile.profilepic : ghost} alt="Profile" className="w-full h-full object-cover" />
           </div>
           <div>
             <h3 className={isDark ? 'text-white' : 'text-gray-900'}>
@@ -95,7 +95,7 @@ const handleLogout = async () => {
     
         
   <div className="flex flex-col">
-     {activeTab === "friends" && <FriendsTab />}
+     {activeTab === "friends" && <FriendsTab/>}
      </div>
    
    
@@ -114,10 +114,6 @@ const handleLogout = async () => {
         </button>
       </div>
 
-
-
-
-  
 
         <SettingsPopup
         isOpen={isSettingsOpen}

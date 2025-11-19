@@ -4,7 +4,7 @@ import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage"
 import { useTheme } from '../chat components/ThemeContext'
 import { auth, db } from '../firebase/firebaseConfig'
 import { doc, updateDoc } from "firebase/firestore"
-import {Toaster, toast} from 'react-hot-toast';
+import {toast} from 'react-hot-toast';
 import ghost from "../assets/ghosts.png"
 
 interface SettingsPopupProps {
@@ -16,7 +16,7 @@ interface SettingsPopupProps {
   onProfileUpdated?: () => void
   
 }
-export const SettingsPopup = ({ isOpen, onClose, UserName, Bio, onProfileUpdated }: SettingsPopupProps) => {
+export const SettingsPopup = ({ isOpen, onClose, UserName, Bio, onProfileUpdated, profilepic }: SettingsPopupProps) => {
 
 
 
@@ -32,9 +32,10 @@ useEffect(() => {
 if(isOpen) {
   setUsername(UserName)
   setBio(Bio)
+  setProfilePicture(profilepic) 
 }
 
-},[UserName, isOpen])
+},[UserName, isOpen, Bio])
 
  if (!isOpen) return null
 
@@ -53,6 +54,7 @@ if(isOpen) {
       const fileRef = ref(storage, `profilePics/${user.uid}.jpg`);
       await uploadString(fileRef, profilePicture, "data_url");
       photoURL = await getDownloadURL(fileRef);
+     
     }
       await updateDoc(userRef, {
         username: username,
@@ -61,14 +63,14 @@ if(isOpen) {
       })
 
       onProfileUpdated?.(); 
-       toast.success("Your soul has been successfully updated 👻", {
+       toast.success("Your spectral soul has been successfully updated 👻", {
       duration: 4000,
     });
       console.log("Profile updated successfully ✅")
-      onClose() // Close modal after saving
+      onClose() 
     } catch (error) {
       console.error("Error updating profile:", error)
-      toast.error("Failed to update your spectral form 💀");
+      toast.error("Failed to update your spectral soul, Please try again later!💀");
     } finally {
       setIsSaving(false)
    

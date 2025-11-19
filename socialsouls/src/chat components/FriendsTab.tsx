@@ -2,6 +2,7 @@ import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firest
 import { auth, db } from "../firebase/firebaseConfig";
 import { useEffect, useState } from "react";
 import { XIcon } from "lucide-react";
+import  Ghost  from "../assets/ghosts.png"
 
 
 
@@ -190,7 +191,7 @@ const SentRequestItem = ({ userId }: { userId: string }) => {
   return (
     <div className="group flex items-center justify-between gap-3 p-5 hover:bg-purple-500/10 rounded-md transition">
       <img
-        src={friendData.profilepic || 'https://via.placeholder.com/40'}
+        src={friendData.profilePic || Ghost}
         className="w-10 h-10 rounded-full border border-purple-500"
       />
       <div>

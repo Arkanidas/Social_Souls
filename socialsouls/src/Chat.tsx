@@ -62,7 +62,8 @@ useEffect(() => {
           profilepic: profile.profilePic,
           bio: profile.bio
         } : undefined}
-        onProfileUpdated={fetchProfile}/>
+        onProfileUpdated={fetchProfile}
+        />
         <ChatArea />
          <Toaster position="top-center" reverseOrder={false} />
       </div>;
