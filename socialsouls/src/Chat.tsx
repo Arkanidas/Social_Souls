@@ -29,12 +29,10 @@ const fetchProfile = async () => {
       const CurrentUser = auth.currentUser;
       if (!CurrentUser) return null;
 
-      console.log("User is authenticated with userid: " + CurrentUser.uid);
+      console.log("Welcome fellow soul! Your userID is" + CurrentUser.uid);
 
       try {
-
         const userDoc = await getDoc(doc(db, "users", CurrentUser.uid));
-
         if (userDoc.exists()) {
           setProfile(userDoc.data() as UserProfile);
         } else {
