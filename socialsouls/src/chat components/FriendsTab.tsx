@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
 import { useEffect, useState } from "react";
 import { XIcon } from "lucide-react";
@@ -28,21 +28,39 @@ export const FriendsTab = () => {
 
   useEffect(() => {
     if (!user) return;
-    const fetchUserData = async () => {
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
 
-      if (userSnap.exists()) {
-        const data = userSnap.data();
-        setFriendRequests(data.friendRequests || []);
-        setFriends(data.friends || []);
-        setSentRequests(data.sentRequests || []); 
-      }
-    };
+   const userRef = doc(db, "users", user.uid);
 
-    fetchUserData();
+  const unsubscribe = onSnapshot(userRef, (snap:any) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      setFriendRequests(data.friendRequests || []);
+      setFriends(data.friends || []);
+      setSentRequests(data.sentRequests || []);
+    }
+  });
+
+  return () => unsubscribe();
   }, [user]);
 
+
+  const handleCancelSentRequest = async (friendId: string) => {
+  const userRef = doc(db, "users", user.uid);
+  const friendRef = doc(db, "users", friendId);
+
+  // Remove the request from your sent list
+  await updateDoc(userRef, {
+    sentRequests: arrayRemove(friendId)
+  });
+
+  // Remove YOU from their incoming requests
+  await updateDoc(friendRef, {
+    friendRequests: arrayRemove(user.uid)
+  });
+
+  // Update UI instantly
+  setSentRequests(prev => prev.filter(id => id !== friendId));
+};
 
   
 
@@ -84,7 +102,7 @@ export const FriendsTab = () => {
     <div className="mb-2">
       <h3 className="text-purple-400 mt-2 ml-2">💌 Sent Soulmate Requests</h3>
       {sentRequests.map((id) => (
-        <SentRequestItem key={id} userId={id} />
+        <SentRequestItem key={id} userId={id} onCancel={handleCancelSentRequest}/>
       ))}
     </div>
   )}
@@ -174,11 +192,11 @@ const FriendRequestItem = ({ userId, onAccept, onDecline }: FriendRequestItemPro
   );
 };
 
-const SentRequestItem = ({ userId }: { userId: string }) => {
+const SentRequestItem = ({ userId, onCancel }: { userId: string; onCancel:(id: string) => void}) => {
   const [friendData, setFriendData] = useState<any>(null);
 
   useEffect(() => {
-    const fetchFriend = async () => {
+      const fetchFriend = async () => {
       const ref = doc(db, "users", userId);
       const snap = await getDoc(ref);
       if (snap.exists()) setFriendData(snap.data());
@@ -200,7 +218,7 @@ const SentRequestItem = ({ userId }: { userId: string }) => {
       </div>
 
      
-    <button className="opacity-0 group-hover:opacity-100 bg-gray-500 text-white px-3 py-1 rounded-md text-sm transition-opacity duration-200 cursor-pointer">
+    <button onClick={() => onCancel(userId)} className="opacity-0 group-hover:opacity-100 bg-gray-500 text-white px-3 py-1 rounded-md text-sm transition-opacity duration-200 cursor-pointer">
       <XIcon className="h-3 w-3" />
     </button>
     </div>

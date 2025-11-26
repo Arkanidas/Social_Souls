@@ -159,6 +159,7 @@ try {
             <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               Search the ethereal plane for lost souls...
             </p>
+            
             <form onSubmit={handleAddFriendSubmit} className="relative">
               <div className="relative flex items-center">
                 <input
