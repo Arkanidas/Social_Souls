@@ -41,6 +41,7 @@ export const FriendsTab = () => {
   });
 
   return () => unsubscribe();
+  
   }, [user]);
 
 
@@ -131,14 +132,13 @@ export const FriendsTab = () => {
         <p className="text-gray-500 text-sm overflow-y-scroll">No friends yet 👻</p>
       ) : (
         friends.map((f) => (
-          <div key={f.id} className="flex items-center gap-3 p-3 hover:bg-purple-500/10 rounded-md">
+          <div key={f.friendId} className="flex items-center gap-3 p-3 hover:bg-purple-500/10 rounded-md">
             <img
-              src={f.profilepic || 'https://via.placeholder.com/40'}
+              src={f.profilePic || Ghost}
               className="w-10 h-10 rounded-full border border-purple-500"
             />
             <div>
               <p className="text-gray-200">{f.username}</p>
-              <p className="text-xs text-purple-400">{f.bio}</p>
             </div>
           </div>
         ))
@@ -165,7 +165,7 @@ const FriendRequestItem = ({ userId, onAccept, onDecline }: FriendRequestItemPro
     <div className="relative group flex items-center justify-between gap-3 p-3 hover:bg-purple-500/10 rounded-md transition">
       <div className="flex items-center gap-3">
         <img
-          src={friendData.profilepic || 'https://via.placeholder.com/40'}
+          src={friendData.profilePic || Ghost}
           className="w-10 h-10 rounded-full border border-purple-500"
         />
         <div>
