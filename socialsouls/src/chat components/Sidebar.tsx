@@ -7,6 +7,7 @@ import { auth} from '../firebase/firebaseConfig';
 import { SettingsPopup } from '../chat components/SettingsModal';
 import { showAddFriendModal } from './ChatArea'
 import { FriendsTab } from './FriendsTab';
+import { ChatTab } from '../chat components/ChatsTab'
 import ghost from "../assets/ghosts.png"
 
 
@@ -96,6 +97,7 @@ const handleLogout = async () => {
         
   <div className="flex flex-col">
      {activeTab === "friends" && <FriendsTab/>}
+     {activeTab === "chats" && <ChatTab/>}
      </div>
    
    

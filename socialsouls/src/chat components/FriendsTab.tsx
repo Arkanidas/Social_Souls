@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { XIcon } from "lucide-react";
 import  Ghost  from "../assets/ghosts.png";
 import { useChat } from '../context/ChatContext';
-
+import { useSidebar } from "../context/SidebarContext";
 
 type FriendRequestItemProps = {
   userId: string;
   onAccept: (friendId: string) => void;
   onDecline: (friendId: string) => void;
+  
 };
 
 
@@ -17,8 +18,17 @@ export const FriendsTab = () => {
   const [friends, setFriends] = useState<any[]>([]);
   const [friendRequests, setFriendRequests] = useState<any[]>([]);
   const [sentRequests, setSentRequests] = useState<any[]>([]);
+
+  const { setActiveChatUser } = useChat();
+  const { setActiveTab } = useSidebar();
   
   const user = auth.currentUser;
+
+  const handleOpenChat = (friend:any) => {
+  setActiveChatUser(friend);       // context -> for ChatArea to show the correct header
+  setActiveTab("chats");            // switch to ChatsTab
+};
+ 
 
   if (!user) {
   console.error("No user is logged in");
@@ -107,6 +117,7 @@ export const FriendsTab = () => {
 
 
 
+
   return (
 
 <div className="flex flex-col">
@@ -135,15 +146,16 @@ export const FriendsTab = () => {
       )}
   
       {friends.length === 0 ? (
-        <p className="text-gray-500 text-sm overflow-y-scroll">No friends yet 👻</p>
-      ) : (friends.map((id) => (<FriendItem userId={id} />))
+        <p  className="text-gray-500 text-sm overflow-y-scroll">No friends yet 👻</p>
+      ) : (friends.map((id) => (<FriendItem key={id} userId={id} onOpenChat={handleOpenChat} /> ))
       )}
     </div>
   );
 };
 
 
-const FriendItem = ({ userId }: { userId: string }) => {
+
+const FriendItem = ({ userId, onOpenChat }: { userId: string; onOpenChat:(friend:any) => void }) => {
   const [friendData, setFriendData] = useState<any>(null);
 
   useEffect(() => {
@@ -157,8 +169,10 @@ const FriendItem = ({ userId }: { userId: string }) => {
 
   if (!friendData) return null;
 
+  
+
   return (
-    <div className="flex items-center gap-3 p-3 hover:bg-purple-500/10 rounded-md cursor-pointer">
+    <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="flex items-center gap-3 p-3 hover:bg-purple-500/10 rounded-md cursor-pointer">
       <img
         src={friendData.profilePic || Ghost}
         className="w-10 h-10 rounded-full border border-purple-500"

@@ -6,10 +6,12 @@ import Chat from './Chat';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import { ChatProvider } from './context/ChatContext';
+import { SidebarProvider } from './context/SidebarContext';
 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <SidebarProvider>
    <Router>
   <Routes>
    
@@ -18,5 +20,6 @@ createRoot(document.getElementById('root')!).render(
    
   </Routes>
 </Router>
+</SidebarProvider>
   </StrictMode>,
 )

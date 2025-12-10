@@ -4,6 +4,13 @@ export const MessageInput = () => {
   const {
     isDark
   } = useTheme();
+
+
+
+
+
+
+  
   return <div className={`p-4 border-t ${isDark ? 'border-purple-900/30 bg-gray-900' : 'border-gray-200 bg-white'}`}>
       <div className="flex items-center space-x-4">
         <button className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500`}>
