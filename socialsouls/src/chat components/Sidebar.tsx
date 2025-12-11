@@ -9,7 +9,7 @@ import { showAddFriendModal } from './ChatArea'
 import { FriendsTab } from './FriendsTab';
 import { ChatTab } from '../chat components/ChatsTab'
 import ghost from "../assets/ghosts.png"
-
+import { useSidebar } from "../context/SidebarContext";
 
 
 
@@ -29,9 +29,7 @@ type SidebarProps = {
 export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('chats');
-
-
+  const { activeTab, setActiveTab } = useSidebar(); 
  
 
   const navigate = useNavigate();
