@@ -25,14 +25,14 @@ export const FriendsTab = () => {
   const user = auth.currentUser;
 
   const handleOpenChat = (friend:any) => {
-  setActiveChatUser(friend);       // context -> for ChatArea to show the correct header
-  setActiveTab("chats");            // switch to ChatsTab
+  setActiveChatUser(friend);      
+  setActiveTab("chats");         
 };
  
 
   if (!user) {
-  console.error("No user is logged in");
-  return null; // or a small message like "Please log in"
+  console.error("No user is logged in, Please log in again!");
+  return null; 
 }
 
   useEffect(() => {

@@ -16,7 +16,7 @@ export const ChatTab = () => {
     <div className="flex flex-col h-full">
       
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-purple-600/20 bg-purple-900/20">
+      <div className="flex items-center gap-3 p-4 border-b border-purple-600/20 hover:bg-purple-500/10 transition cursor-pointer">
         <img
           src={activeChatUser.profilePic || Ghost}
           className="w-10 h-10 rounded-full border border-purple-500"
