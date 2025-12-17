@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
 import { useEffect, useState } from "react";
 import { XIcon } from "lucide-react";
@@ -24,7 +24,30 @@ export const FriendsTab = () => {
   
   const user = auth.currentUser;
 
-  const handleOpenChat = (friend:any) => {
+
+  const handleOpenChat = async (friend:any) => {
+   if (!user) return null;
+
+     const currentUser = user;
+     const currentUserId = currentUser.uid;
+     const friendId = friend.uid;
+
+  
+
+  const chatId = [currentUserId, friendId].sort().join("_");
+  const chatRef = doc(db, "Chats", chatId);
+  const chatSnap = await getDoc(chatRef);
+
+  if (!chatSnap.exists()) {
+
+    await setDoc(chatRef, {
+      participants: [currentUserId, friendId],
+      createdAt: serverTimestamp(),
+      lastMessage: "",
+      lastMessageAt: serverTimestamp(),
+    });
+  }
+ console.log("New chat created with ID:", chatId);
   setActiveChatUser(friend);      
   setActiveTab("chats");         
 };
@@ -162,7 +185,7 @@ const FriendItem = ({ userId, onOpenChat }: { userId: string; onOpenChat:(friend
     const fetchFriend = async () => {
       const ref = doc(db, "users", userId);
       const snap = await getDoc(ref);
-      if (snap.exists()) setFriendData(snap.data());
+      if (snap.exists()) setFriendData({ uid: userId, ...snap.data() });
     };
     fetchFriend();
   }, [userId]);

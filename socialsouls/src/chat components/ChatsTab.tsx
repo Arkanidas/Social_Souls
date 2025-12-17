@@ -2,7 +2,7 @@ import { useChat } from "../context/ChatContext";
 import Ghost from "../assets/ghosts.png";
 
 export const ChatTab = () => {
-  const { activeChatUser } = useChat();
+  const { activeChatUser, setActiveChatUser } = useChat();
 
   if (!activeChatUser) {
     return (

@@ -5,6 +5,8 @@ import { XIcon, SkullIcon } from 'lucide-react'
 import { auth, db } from '../firebase/firebaseConfig'
 import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore"
 import { toast } from 'react-hot-toast'
+import { useChat } from "../context/ChatContext";
+import Ghost from "../assets/ghosts.png"
 
 export const showAddFriendModal = () => {
   const event = new CustomEvent('showAddFriendModal')
@@ -13,7 +15,8 @@ export const showAddFriendModal = () => {
 
 
 export const ChatArea = () => {
-
+  
+  const { activeChatUser } = useChat();
   const [showAddFriend, setShowAddFriend] = useState(false)
   const addFriendInputRef = useRef<HTMLInputElement>(null)
 
@@ -120,11 +123,11 @@ try {
       <div className={`p-4 border-b backdrop-blur-sm ${isDark ? 'border-purple-900/30 bg-gray-900/95' : 'border-gray-200 bg-white/95'} flex items-center`}>
         <div className="flex items-center">
           <div className={`w-10 h-10 rounded-full overflow-hidden border-2 ${isDark ? 'border-purple-500' : 'border-purple-400'}`}>
-            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=800&auto=format&fit=crop" alt="Shadow Walker" className="w-full h-full object-cover" />
+            <img src={activeChatUser ? activeChatUser.profilePic : Ghost} alt="Shadow Walker" className="w-full h-full object-cover" />
           </div>
           <div className="ml-3">
             <h3 className={isDark ? 'text-white' : 'text-gray-900'}>
-              Shadow Walker
+              {activeChatUser ? activeChatUser.username : 'Select a friend to chat'}
             </h3>
             <p className="text-sm text-purple-500">Haunting Online</p>
           </div>
