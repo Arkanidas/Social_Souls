@@ -3,7 +3,7 @@ import { MessageInput } from './MessageInput';
 import { useTheme } from './ThemeContext';
 import { XIcon, SkullIcon } from 'lucide-react'
 import { auth, db } from '../firebase/firebaseConfig'
-import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore"
+import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, addDoc } from "firebase/firestore"
 import { toast } from 'react-hot-toast'
 import { useChat } from "../context/ChatContext";
 import Ghost from "../assets/ghosts.png"
@@ -17,8 +17,61 @@ export const showAddFriendModal = () => {
 export const ChatArea = () => {
   
   const { activeChatUser } = useChat();
+  const user = auth.currentUser;
+
   const [showAddFriend, setShowAddFriend] = useState(false)
   const addFriendInputRef = useRef<HTMLInputElement>(null)
+
+
+
+  const handleSendMessage = async (text: string) => {
+    if (!user) return;
+    if (!activeChatUser) return;
+    if (!text.trim()) return;
+
+    const { chatId } = activeChatUser;
+
+    const messagesRef = collection(db, "Chats", chatId, "messages");
+
+    // 1️⃣ Add message
+    await addDoc(messagesRef, {
+      text,
+      senderId: user.uid,
+      createdAt: serverTimestamp(),
+    });
+
+    // 2️⃣ Update chat metadata
+    const chatRef = doc(db, "Chats", chatId);
+    await updateDoc(chatRef, {
+      lastMessage: text,
+      lastMessageAt: serverTimestamp(),
+    });
+
+   console.log("Message sent:", text);
+
+if (!activeChatUser) {
+    return <div className="flex-1 flex items-center justify-center text-gray-400">
+      Select a chat 👻
+    </div>;
+  }
+ 
+  return (
+    <div className="flex flex-col h-full">
+      {/* messages list comes here later */}
+      <div className="flex-1 overflow-y-auto" />
+
+      <MessageInput onSend={handleSendMessage} />
+    </div>
+  );
+};
+
+
+
+
+
+
+
+
 
   useEffect(() => {
     const handleShowModal = () => setShowAddFriend(true)
@@ -193,6 +246,6 @@ try {
         </div>
       )}
 
-      <MessageInput />
+      <MessageInput onSend={handleSendMessage} />
     </div>;
 };
