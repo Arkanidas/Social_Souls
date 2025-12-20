@@ -37,6 +37,7 @@ export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
 const handleLogout = async () => {
   await signOut(auth);
   navigate("/");
+  localStorage.removeItem("activeChat");
 };
 
 

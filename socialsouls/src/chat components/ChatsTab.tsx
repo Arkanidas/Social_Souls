@@ -18,11 +18,11 @@ export const ChatTab = () => {
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-purple-600/20 hover:bg-purple-500/10 transition cursor-pointer">
         <img
-          src={activeChatUser.profilePic || Ghost}
+          src={activeChatUser.otherUser.profilePic || Ghost}
           className="w-10 h-10 rounded-full border border-purple-500"
         />
         <h2 className="text-gray-200 text-lg font-semibold">
-          {activeChatUser.username}
+          {activeChatUser.otherUser.username}
         </h2>
       </div>
 

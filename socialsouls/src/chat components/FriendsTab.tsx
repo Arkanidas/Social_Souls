@@ -26,20 +26,19 @@ export const FriendsTab = () => {
 
 
   const handleOpenChat = async (friend:any) => {
-   if (!user) return null;
+   if (!user) return;
 
-     const currentUser = user;
-     const currentUserId = currentUser.uid;
-     const friendId = friend.uid;
+  const currentUserId = user.uid;
+  const friendId = friend.uid;
 
-  
-
+  // 1️⃣ Deterministic chatId
   const chatId = [currentUserId, friendId].sort().join("_");
+
   const chatRef = doc(db, "Chats", chatId);
   const chatSnap = await getDoc(chatRef);
 
+  // 2️⃣ Create chat if it doesn't exist
   if (!chatSnap.exists()) {
-
     await setDoc(chatRef, {
       participants: [currentUserId, friendId],
       createdAt: serverTimestamp(),
@@ -47,11 +46,24 @@ export const FriendsTab = () => {
       lastMessageAt: serverTimestamp(),
     });
   }
- console.log("New chat created with ID:", chatId);
-  setActiveChatUser(friend);      
-  setActiveTab("chats");         
+
+  console.log("Chat opened with ID:", chatId);
+
+
+  setActiveChatUser({
+    chatId,
+    otherUser: {
+      uid: friend.uid,
+      username: friend.username,
+      profilePic: friend.profilePic,
+    },
+  });
+
+
+  setActiveTab("chats");
 };
  
+
 
   if (!user) {
   console.error("No user is logged in, Please log in again!");

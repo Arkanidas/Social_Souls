@@ -3,7 +3,7 @@ import { MessageInput } from './MessageInput';
 import { useTheme } from './ThemeContext';
 import { XIcon, SkullIcon } from 'lucide-react'
 import { auth, db } from '../firebase/firebaseConfig'
-import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, addDoc } from "firebase/firestore"
+import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, addDoc, orderBy, onSnapshot } from "firebase/firestore"
 import { toast } from 'react-hot-toast'
 import { useChat } from "../context/ChatContext";
 import Ghost from "../assets/ghosts.png"
@@ -14,7 +14,11 @@ export const showAddFriendModal = () => {
 }
 
 
+
 export const ChatArea = () => {
+
+  const [Usermessages, setUserMessages] = useState<any[]>([]);
+
   
   const { activeChatUser } = useChat();
   const user = auth.currentUser;
@@ -24,37 +28,45 @@ export const ChatArea = () => {
 
 
 
+
+
+
+
   const handleSendMessage = async (text: string) => {
     if (!user) return;
-    if (!activeChatUser) return;
+    
+  if (!activeChatUser || !activeChatUser.chatId) {
+    console.error("No active chat selected", activeChatUser);
+    return;
+  }
+
     if (!text.trim()) return;
 
-    const { chatId } = activeChatUser;
+  const chatId = activeChatUser.chatId;
 
-    const messagesRef = collection(db, "Chats", chatId, "messages");
+  console.log("Sending message to chat:", chatId);
 
-    // 1️⃣ Add message
-    await addDoc(messagesRef, {
-      text,
-      senderId: user.uid,
-      createdAt: serverTimestamp(),
-    });
+  const messagesRef = collection(db, "Chats", chatId, "messages");
 
-    // 2️⃣ Update chat metadata
-    const chatRef = doc(db, "Chats", chatId);
-    await updateDoc(chatRef, {
-      lastMessage: text,
-      lastMessageAt: serverTimestamp(),
-    });
+  await addDoc(messagesRef, {
+    text,
+    senderId: user.uid,
+    createdAt: serverTimestamp(),
+  });
+
+  const chatRef = doc(db, "Chats", chatId);
+  await updateDoc(chatRef, {
+    lastMessage: text,
+    lastMessageAt: serverTimestamp(),
+  });
+
+ await updateDoc(doc(db, "Chats", chatId), {
+    lastMessage: text,
+    lastMessageAt: serverTimestamp(),
+  });
 
    console.log("Message sent:", text);
 
-if (!activeChatUser) {
-    return <div className="flex-1 flex items-center justify-center text-gray-400">
-      Select a chat 👻
-    </div>;
-  }
- 
   return (
     <div className="flex flex-col h-full">
       {/* messages list comes here later */}
@@ -68,8 +80,32 @@ if (!activeChatUser) {
 
 
 
+useEffect(() => {
+  if (!activeChatUser?.chatId) {
+    setUserMessages([]);
+    return;
+  }
 
+  const messagesRef = collection(
+    db,
+    "Chats",
+    activeChatUser.chatId,
+    "messages"
+  );
 
+  const q = query(messagesRef, orderBy("createdAt", "asc"));
+
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    const msgs = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    setUserMessages(msgs);
+  });
+
+  return () => unsubscribe();
+}, [activeChatUser?.chatId]);
 
 
 
@@ -176,11 +212,11 @@ try {
       <div className={`p-4 border-b backdrop-blur-sm ${isDark ? 'border-purple-900/30 bg-gray-900/95' : 'border-gray-200 bg-white/95'} flex items-center`}>
         <div className="flex items-center">
           <div className={`w-10 h-10 rounded-full overflow-hidden border-2 ${isDark ? 'border-purple-500' : 'border-purple-400'}`}>
-            <img src={activeChatUser ? activeChatUser.profilePic : Ghost} alt="Shadow Walker" className="w-full h-full object-cover" />
+            <img src={activeChatUser ? activeChatUser.otherUser.profilePic : Ghost} alt="Shadow Walker" className="w-full h-full object-cover" />
           </div>
           <div className="ml-3">
             <h3 className={isDark ? 'text-white' : 'text-gray-900'}>
-              {activeChatUser ? activeChatUser.username : 'Select a friend to chat'}
+              {activeChatUser ? activeChatUser.otherUser.username : 'Select a friend to chat'}
             </h3>
             <p className="text-sm text-purple-500">Haunting Online</p>
           </div>
