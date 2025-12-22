@@ -1,11 +1,11 @@
 import {Sidebar} from './chat components/Sidebar';
-import {useTheme} from './chat components/ThemeContext'
 import {ChatArea} from './chat components/ChatArea';
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "./firebase/firebaseConfig"; 
 import { doc, getDoc } from "firebase/firestore";
 import { Toaster } from "react-hot-toast";
+import {useUserPresence} from './chat components/UserPresence';
 
 
 interface UserProfile {
@@ -21,15 +21,17 @@ interface UserProfile {
 
  const Chat = () => {
 
+
 const [user] = useAuthState(auth);
 const [profile, setProfile] = useState<UserProfile | null>(null);
 
+      useUserPresence();
 
 const fetchProfile = async () => {
       const CurrentUser = auth.currentUser;
       if (!CurrentUser) return null;
 
-      console.log("Welcome fellow soul! Your userID is" + CurrentUser.uid);
+      console.log("Welcome fellow soul!:" + user);
 
       try {
         const userDoc = await getDoc(doc(db, "users", CurrentUser.uid));
@@ -50,10 +52,7 @@ useEffect(() => {
 
 
 
-    const {
-      isDark
-    } = useTheme();
-    return <div className={`flex h-screen ${isDark ? 'bg-gray-900/95' : 'bg-gray-50/95'}`}>
+    return <div className="flex h-screen bg-gray-900/95">
 
         <Sidebar profile={profile ? {
           username: profile.username,
