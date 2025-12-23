@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast'
 import { useChat } from "../context/ChatContext";
 import Ghostly from "../assets/ghosts.png";
 import { Ghost as GhostIcon } from "lucide-react";
+import {formatChatTimestamp} from './DateUtils';
 
 export const showAddFriendModal = () => {
   const event = new CustomEvent('showAddFriendModal')
@@ -243,24 +244,21 @@ try {
         ref={bottomScroll}
       >
         <div
-          className={`max-w-[70%] p-4 rounded-lg ${
+          className={`max-w-[70%] p-4 rounded-lg animate-text-focus-in ${
             isOwnMessage
               ? "bg-purple-600 text-white ml-12"
               : "bg-white text-gray-900 shadow-sm mr-12"
           }`}
         >
-          <p className="mb-1 text-sm font-medium">
+          <p className="mb-1 text-base font-bold">
             {isOwnMessage ? "You" : activeChatUser?.otherUser.username}
           </p>
 
-          <p className="mb-2">{message.text}</p>
+          <p className="mb-2 font-[messageFont] text-lg ">{message.text}</p>
 
           {message.createdAt && (
             <p className="text-xs opacity-70">
-              {new Date(message.createdAt.seconds * 1000).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+               {formatChatTimestamp(message.createdAt.seconds)}
             </p>
           )}
         </div>

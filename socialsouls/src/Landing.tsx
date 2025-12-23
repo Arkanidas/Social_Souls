@@ -84,7 +84,7 @@ const HandleLogin = async (e:React.FormEvent) => {
     console.error("❌ Login failed:", error);
     setErrorMessage("Login failed. Please check your email and password.");
     toast.error("Password or email is incorrect, please try again", {
-    duration: 6000, 
+    duration: 4000, 
 });
   }
 };
