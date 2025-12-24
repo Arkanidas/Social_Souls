@@ -22,10 +22,11 @@ export const ChatArea = () => {
   const [otherUserStatus, setOtherUserStatus] = useState<"online" | "offline">("offline");
   const { activeChatUser } = useChat();
   const user = auth.currentUser;
-  const [showAddFriend, setShowAddFriend] = useState(false)
-  const addFriendInputRef = useRef<HTMLInputElement>(null)
+  const [showAddFriend, setShowAddFriend] = useState<boolean>(false);
+  const addFriendInputRef = useRef<HTMLInputElement>(null);
   const bottomScroll = useRef<HTMLDivElement>(null);
-
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
 
 useEffect(() => {
   bottomScroll.current?.scrollIntoView({ behavior: "smooth" });
@@ -172,7 +173,6 @@ try {
         return
       }
 
-
       const userRef = doc(db, "users", user.uid)
 
       await updateDoc(userRef, {
@@ -193,12 +193,26 @@ try {
       console.error("Error adding friend:", error)
       toast.error("Something went wrong!")
     }
+  }}
+
+  const MAX_FILES = 7;
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+
+const validateFiles = (files: File[]) => {
+  if (files.length + attachments.length > MAX_FILES) {
+    toast.error("Max 7 files allowed");
+    return [];
   }
 
-  }
-
-
-
+  return files.filter((file) => {
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(`${file.name} exceeds 10MB`);
+      return false;
+    }
+    return true;
+  });
+};
  
   
   return <div className="flex-1 flex flex-col relative z-10 bg-gray-900/95 ">
@@ -232,7 +246,7 @@ try {
 
       
      
-       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95">
+    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95">
 
   {Usermessages.map((message) => {
     const isOwnMessage = message.senderId === user?.uid;
@@ -272,23 +286,19 @@ try {
 
       {showAddFriend && (
         <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/40 ">
-          <div
-            className="add-friend-modal bg-purple-200 text-gray-200 border-purple-900/50 text-gray-800 border-purple-300/50 border-2 rounded-lg shadow-2xl p-6 w-full max-w-md "
-          >
+          <div className="add-friend-modal bg-purple-200 text-gray-200 border-purple-900/50 text-gray-800 border-purple-300/50 border-2 rounded-lg shadow-2xl p-6 w-full max-w-md ">
             <div className="flex justify-between items-center mb-4 ">
               <h2 className="text-2xl font-bold font-serif ">
                 <span className="text-purple-500 ">Summon</span> a Spirit
               </h2>
-              <button
-                onClick={() => setShowAddFriend(false)}
-                className="text-gray-600 hover:text-red-500 transition-colors cursor-pointer "
-              >
-                <XIcon className="h-6 w-6" />
+                <button
+                  onClick={() => setShowAddFriend(false)}
+                  className="text-gray-600 hover:text-red-500 transition-colors cursor-pointer">
+                  <XIcon className="h-6 w-6" />
               </button>
             </div>
-            <p className="mb-6 text-gray-600">
-              Search the ethereal plane for lost souls...
-            </p>
+
+            <p className="mb-6 text-gray-600">Search the void for lost souls...</p>
             
             <form onSubmit={handleAddFriendSubmit} className="relative ">
               <div className="relative flex items-center ">
@@ -296,9 +306,8 @@ try {
                   ref={addFriendInputRef}
                   type="text"
                   placeholder="Enter a username to summon..."
-                  className="w-full pl-10 pr-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border bg-gray-100 text-gray-900 border-purple-200 placeholder-purple-500/50"
-                />
-                <SkullIcon className="absolute left-3 text-purple-500 h-5 w-5 animate-pulse pointer-events-none " />
+                  className="w-full pl-10 pr-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border bg-gray-100 text-gray-900 border-purple-200 placeholder-purple-500/50"/>
+                <SkullIcon className="absolute left-3 text-purple-500 h-5 w-5 animate-pulse pointer-events-none"/>
               </div>
               <div className="mt-6 flex justify-end ">
                 <button
@@ -319,7 +328,17 @@ try {
           </div>
         </div>
       )}
-   
+   <input
+  type="file"
+  multiple
+  accept="image/*,.pdf,.doc,.docx,.zip"
+  className="hidden"
+  onChange={(e) => {
+    if (!e.target.files) return;
+    const validFiles = validateFiles(Array.from(e.target.files));
+    setAttachments((prev) => [...prev, ...validFiles]);
+  }}
+/>
       <MessageInput onSend={handleSendMessage} />
     </div>;
 };

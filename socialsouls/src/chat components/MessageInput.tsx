@@ -21,10 +21,7 @@ export const MessageInput = ({onSend}:MessageInputProps) => {
   const handleClickOutside = (event: MouseEvent) => {
     const target = event.target as Node;
 
-    if (
-      emojiPickerRef.current?.contains(target) ||
-      emojiButtonRef.current?.contains(target)
-    ) {
+    if (emojiPickerRef.current?.contains(target) || emojiButtonRef.current?.contains(target)) {
       return; 
     }
 
@@ -50,21 +47,13 @@ export const MessageInput = ({onSend}:MessageInputProps) => {
           <SmileIcon className="h-6 w-6 cursor-pointer"/>
         </button>
         <button className="text-gray-400 hover:text-purple-500">
-          <PaperclipIcon className="h-6 w-6" />
+          <PaperclipIcon className="h-6 w-6 cursor-pointer" />
         </button>
         <div className="flex-1">
       {showEmojiPicker && (
         <div ref={emojiPickerRef} className="absolute bottom-16 left-4 z-50">
-    <EmojiPicker
-         height={400}
-         emojiStyle={EmojiStyle.GOOGLE}
-         theme={Theme.DARK}
-        onEmojiClick={(emojiData) => {
-        setMessageText(prev => prev + emojiData.emoji);
-      }}
-    />
-  </div>
-)}
+           <EmojiPicker height={400} emojiStyle={EmojiStyle.GOOGLE} theme={Theme.DARK} onEmojiClick={(emojiData) => {setMessageText(prev => prev + emojiData.emoji);}}/>
+       </div>)}
           <input value={MessageText} onChange={(e) => setMessageText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSend()}
             type="text" placeholder="Send a message into the void..." className="w-full bg-gray-800 text-gray-300 border-gray-700 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600/80 border animation-ease-in duration-200" />
         </div>
