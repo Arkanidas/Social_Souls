@@ -59,17 +59,9 @@ useEffect(() => {
     lastMessage: text,
     lastMessageAt: serverTimestamp(),
   });
+  }
 
-   console.log("Message sent:", text);
-
-  return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto" />
-
-      <MessageInput onSend={handleSendMessage} />
-    </div>
-  );
-};
+  
 
 
 
@@ -195,9 +187,11 @@ try {
     }
   }}
 
-  const MAX_FILES = 7;
-  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+
+  const MAX_FILES = 7;
+  const MAX_FILE_SIZE = 10 * 1024 * 1024;//10Mb
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
 const validateFiles = (files: File[]) => {
   if (files.length + attachments.length > MAX_FILES) {
@@ -213,6 +207,24 @@ const validateFiles = (files: File[]) => {
     return true;
   });
 };
+
+const handleDragOver = (e: React.DragEvent) => {
+  e.preventDefault();
+  setIsDragging(true);
+};
+
+const handleDragLeave = () => setIsDragging(false);
+
+const handleDrop = (e: React.DragEvent) => {
+  e.preventDefault();
+  setIsDragging(false);
+
+  const droppedFiles = Array.from(e.dataTransfer.files);
+  const validFiles = validateFiles(droppedFiles);
+
+  setAttachments((prev) => [...prev, ...validFiles]);
+};
+
  
   
   return <div className="flex-1 flex flex-col relative z-10 bg-gray-900/95 ">
@@ -246,7 +258,7 @@ const validateFiles = (files: File[]) => {
 
       
      
-    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95">
+    <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95 ">
 
   {Usermessages.map((message) => {
     const isOwnMessage = message.senderId === user?.uid;
@@ -307,7 +319,7 @@ const validateFiles = (files: File[]) => {
                   type="text"
                   placeholder="Enter a username to summon..."
                   className="w-full pl-10 pr-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border bg-gray-100 text-gray-900 border-purple-200 placeholder-purple-500/50"/>
-                <SkullIcon className="absolute left-3 text-purple-500 h-5 w-5 animate-pulse pointer-events-none"/>
+                <SkullIcon className="absolute left-3 text-purple-500 h-5 w-5 animate-pulse pointer-events-none "/>
               </div>
               <div className="mt-6 flex justify-end ">
                 <button
@@ -333,12 +345,13 @@ const validateFiles = (files: File[]) => {
   multiple
   accept="image/*,.pdf,.doc,.docx,.zip"
   className="hidden"
+  ref={fileInputRef}
   onChange={(e) => {
     if (!e.target.files) return;
     const validFiles = validateFiles(Array.from(e.target.files));
     setAttachments((prev) => [...prev, ...validFiles]);
   }}
 />
-      <MessageInput onSend={handleSendMessage} />
+      <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments}setAttachments={setAttachments} isDragging={isDragging}/>
     </div>;
 };
