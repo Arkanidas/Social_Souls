@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { MessageInput } from './MessageInput';
-import { XIcon, SkullIcon } from 'lucide-react'
+import { XIcon, SkullIcon, PaperclipIcon } from 'lucide-react'
 import { auth, db } from '../firebase/firebaseConfig'
 import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, addDoc, orderBy, onSnapshot } from "firebase/firestore"
 import { toast } from 'react-hot-toast'
@@ -258,8 +258,16 @@ const handleDrop = (e: React.DragEvent) => {
 
       
      
-    <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95 ">
-
+    <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} 
+    className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95 border-2 border-purple-900/30">
+      
+{isDragging && (
+  <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center pointer-events-none">
+    <div className="border-4 border-dashed border-purple-500 rounded-xl p-16">
+      <PaperclipIcon className="h-20 w-20 text-purple-400" />
+    </div>
+  </div>
+)}
   {Usermessages.map((message) => {
     const isOwnMessage = message.senderId === user?.uid;
 
