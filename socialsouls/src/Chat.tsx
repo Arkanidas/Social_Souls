@@ -31,8 +31,6 @@ const fetchProfile = async () => {
       const CurrentUser = auth.currentUser;
       if (!CurrentUser) return null;
 
-      console.log("Welcome fellow soul!:" + user);
-
       try {
         const userDoc = await getDoc(doc(db, "users", CurrentUser.uid));
         if (userDoc.exists()) {

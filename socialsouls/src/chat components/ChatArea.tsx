@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { MessageInput } from './MessageInput';
-import { XIcon, SkullIcon, PaperclipIcon } from 'lucide-react'
-import { auth, db } from '../firebase/firebaseConfig'
+import { XIcon, SkullIcon, FileInput, PaperclipIcon } from 'lucide-react'
+import { auth, db, storage } from '../firebase/firebaseConfig'
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, addDoc, orderBy, onSnapshot } from "firebase/firestore"
 import { toast } from 'react-hot-toast'
 import { useChat } from "../context/ChatContext";
@@ -35,38 +36,57 @@ useEffect(() => {
 
 
   const handleSendMessage = async (text: string) => {
-
-    if (!user) return;
-    if (!activeChatUser || !activeChatUser.chatId) return;
-    if (!text.trim()) return;
+  if (!user) return;
+  if (!activeChatUser?.chatId) return;
+  if (!text.trim() && attachments.length === 0) return;
 
   const chatId = activeChatUser.chatId;
-  const messagesRef = collection(db, "Chats", chatId, "messages");
 
-  await addDoc(messagesRef, {
-    text,
+  let uploadedAttachments: any[] = [];
+
+  if (attachments.length > 0) {
+    uploadedAttachments = await Promise.all(
+      attachments.map(async (file) => {
+        const fileRef = ref(
+          storage,
+          `chats/${chatId}/${crypto.randomUUID()}-${file.name}`
+        );
+
+        await uploadBytes(fileRef, file);
+        const url = await getDownloadURL(fileRef);
+
+        return {
+          url,
+          name: file.name,
+          type: file.type,
+        };
+      })
+    );
+  }
+  
+
+  await addDoc(collection(db, "Chats", chatId, "messages"), {
+    text: text || "",
     senderId: user.uid,
     createdAt: serverTimestamp(),
+    attachments: uploadedAttachments,
   });
 
-  const chatRef = doc(db, "Chats", chatId);
-  await updateDoc(chatRef, {
-    lastMessage: text,
+  await updateDoc(doc(db, "Chats", chatId), {
+    lastMessage:
+      text || (uploadedAttachments.length > 0 ? "📎 Attachment" : ""),
     lastMessageAt: serverTimestamp(),
   });
 
- await updateDoc(doc(db, "Chats", chatId), {
-    lastMessage: text,
-    lastMessageAt: serverTimestamp(),
-  });
-  }
+
+  setAttachments([]);
+};
+
 
   
 
 
-
-
-useEffect(() => {
+ useEffect(() => {
   if (!activeChatUser?.chatId) {
     setUserMessages([]);
     return;
@@ -182,7 +202,6 @@ try {
       setShowAddFriend(false)
 
     } catch (error) {
-      console.error("Error adding friend:", error)
       toast.error("Something went wrong!")
     }
   }}
@@ -213,17 +232,7 @@ const handleDragOver = (e: React.DragEvent) => {
   setIsDragging(true);
 };
 
-const handleDragLeave = () => setIsDragging(false);
 
-const handleDrop = (e: React.DragEvent) => {
-  e.preventDefault();
-  setIsDragging(false);
-
-  const droppedFiles = Array.from(e.dataTransfer.files);
-  const validFiles = validateFiles(droppedFiles);
-
-  setAttachments((prev) => [...prev, ...validFiles]);
-};
 
  
   
@@ -258,16 +267,34 @@ const handleDrop = (e: React.DragEvent) => {
 
       
      
-    <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} 
-    className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95 border-2 border-purple-900/30">
-      
+    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95"
+  
+     onDragEnter={(e) => {
+      e.preventDefault();
+      setIsDragging(true);}}
+
+     onDragOver={handleDragOver}
+      onDragLeave={(e) => {
+       if (e.currentTarget === e.target) {
+         setIsDragging(false);}}}
+
+     onDrop={(e) => {
+      e.preventDefault();
+      setIsDragging(false);
+
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    const validFiles = validateFiles(droppedFiles);
+    setAttachments((prev) => [...prev, ...validFiles]);
+  }}>
+
 {isDragging && (
-  <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center pointer-events-none">
-    <div className="border-4 border-dashed border-purple-500 rounded-xl p-16">
-      <PaperclipIcon className="h-20 w-20 text-purple-400" />
+  <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center pointer-events-none border-dashed border-4 border-purple-500 rounded-xl">
+    <div className="rounded-xl p-16">
+      <FileInput className="h-20 w-20 text-white" />
     </div>
   </div>
 )}
+
   {Usermessages.map((message) => {
     const isOwnMessage = message.senderId === user?.uid;
 
@@ -278,7 +305,7 @@ const handleDrop = (e: React.DragEvent) => {
         ref={bottomScroll}
       >
         <div
-          className={`max-w-[70%] p-4 rounded-lg animate-text-focus-in ${
+          className={`max-w-[70%] p-4 rounded-lg ${
             isOwnMessage
               ? "bg-purple-600 text-white ml-12"
               : "bg-white text-gray-900 shadow-sm mr-12"
@@ -296,9 +323,43 @@ const handleDrop = (e: React.DragEvent) => {
             </p>
           )}
         </div>
+
+      {message.attachments?.length > 0 && (
+  <div className="flex gap-2 flex-wrap mt-2">
+    {message.attachments.map((file: any, i: number) => (
+      <div
+        key={i}
+        className="w-32 h-32 bg-gray-800 rounded overflow-hidden border"
+      >
+        {file.type.startsWith("image") ? (
+          <img
+            src={file.url}
+            className="w-full h-full object-cover cursor-pointer"
+          />
+        ) : (
+          <a
+            href={file.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center justify-center h-full text-white text-sm gap-1 hover:bg-gray-700"
+          >
+            <PaperclipIcon className="h-6 w-6" />
+            <span className="text-xs text-center px-1">
+              {file.name}
+            </span>
+          </a>
+        )}
       </div>
+    ))}
+  </div>
+)}
+
+      </div>
+      
     );
   })}
+
+
 </div>
       
 
@@ -333,14 +394,10 @@ const handleDrop = (e: React.DragEvent) => {
                 <button
                   type="button"
                   onClick={() => setShowAddFriend(false)}
-                  className="mr-2 px-4 py-2 rounded-md cursor-pointer bg-gray-200 text-gray-800 hover:bg-gray-300"
-                >
+                  className="mr-2 px-4 py-2 rounded-md cursor-pointer bg-gray-200 text-gray-800 hover:bg-gray-300">
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md cursor-pointer"
-                >
+                <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md cursor-pointer">
                   Summon
                 </button>
               </div>
@@ -348,18 +405,12 @@ const handleDrop = (e: React.DragEvent) => {
           </div>
         </div>
       )}
-   <input
-  type="file"
-  multiple
-  accept="image/*,.pdf,.doc,.docx,.zip"
-  className="hidden"
-  ref={fileInputRef}
-  onChange={(e) => {
-    if (!e.target.files) return;
-    const validFiles = validateFiles(Array.from(e.target.files));
-    setAttachments((prev) => [...prev, ...validFiles]);
-  }}
-/>
-      <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments}setAttachments={setAttachments} isDragging={isDragging}/>
+   <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.zip" className="hidden" ref={fileInputRef}
+      onChange={(e) => {
+        if (!e.target.files) return;
+      const validFiles = validateFiles(Array.from(e.target.files));
+      setAttachments((prev) => [...prev, ...validFiles]);}}/>
+
+      <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments}setAttachments={setAttachments}/>
     </div>;
 };
