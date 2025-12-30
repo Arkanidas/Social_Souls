@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { MessageInput } from './MessageInput';
-import { XIcon, SkullIcon, FileInput, PaperclipIcon } from 'lucide-react'
+import { XIcon, SkullIcon, FileInput, PaperclipIcon, X, Download, Copy } from 'lucide-react'
 import { auth, db, storage } from '../firebase/firebaseConfig'
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, addDoc, orderBy, onSnapshot } from "firebase/firestore"
@@ -28,6 +28,10 @@ export const ChatArea = () => {
   const bottomScroll = useRef<HTMLDivElement>(null);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [origin, setOrigin] = useState({ x: 50, y: 50 });
+
 
 useEffect(() => {
   bottomScroll.current?.scrollIntoView({ behavior: "smooth" });
@@ -146,6 +150,13 @@ useEffect(() => {
     }
   }, [showAddFriend])
 
+  useEffect(() => {
+  const onEsc = (e: KeyboardEvent) => {
+    if (e.key === "Escape") setPreviewImage(null);
+  };
+  window.addEventListener("keydown", onEsc);
+  return () => window.removeEventListener("keydown", onEsc);
+}, []);
 
 
   const handleAddFriendSubmit = async (e: React.FormEvent) => {
@@ -208,13 +219,13 @@ try {
 
 
 
-  const MAX_FILES = 7;
+  const MAX_FILES = 10;
   const MAX_FILE_SIZE = 10 * 1024 * 1024;//10Mb
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
 const validateFiles = (files: File[]) => {
   if (files.length + attachments.length > MAX_FILES) {
-    toast.error("Max 7 files allowed");
+    toast.error("Max 10 files allowed");
     return [];
   }
 
@@ -232,7 +243,26 @@ const handleDragOver = (e: React.DragEvent) => {
   setIsDragging(true);
 };
 
+const handleMouseMove = (e: React.MouseEvent<HTMLImageElement>) => {
+  if (!isZoomed) return;
 
+  const rect = e.currentTarget.getBoundingClientRect();
+  const x = ((e.clientX - rect.left) / rect.width) * 100;
+  const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+  setOrigin({ x, y });
+};
+
+const handleCopyImageUrl = async () => {
+  if (!previewImage) return;
+
+  try {
+    await navigator.clipboard.writeText(previewImage);
+    toast.success("Image copied to clipboard 📋");
+  } catch {
+    toast.error("Failed to copy image link");
+  }
+};
 
  
   
@@ -299,61 +329,61 @@ const handleDragOver = (e: React.DragEvent) => {
     const isOwnMessage = message.senderId === user?.uid;
 
     return (
-      <div
-        key={message.id}
-        className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
-        ref={bottomScroll}
-      >
+      <div key={message.id} className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`} ref={bottomScroll}>
+
+       <div className={`max-w-[50%]  p-4 rounded-lg ${
+        isOwnMessage
+      ? "bg-purple-600 text-white ml-12"
+      : "bg-white text-gray-900 shadow-sm mr-12"}`}>
+
+       <p className="mb-1 text-base font-bold text-lg">
+        {isOwnMessage ? "You" : activeChatUser?.otherUser.username}
+       </p>
+
+
+  {message.attachments?.length > 0 && (
+    <div className="flex flex-wrap gap-2 mb-2">
+      {message.attachments.map((file: any, i: number) => (
         <div
-          className={`max-w-[70%] p-4 rounded-lg ${
-            isOwnMessage
-              ? "bg-purple-600 text-white ml-12"
-              : "bg-white text-gray-900 shadow-sm mr-12"
-          }`}
+          key={i}
+          className="w-23 h-23 bg-black/20 rounded overflow-hidden flex items-center justify-center hover:scale-105 transition-transform"
         >
-          <p className="mb-1 text-base font-bold">
-            {isOwnMessage ? "You" : activeChatUser?.otherUser.username}
-          </p>
-
-          <p className="mb-2 font-[messageFont] text-lg ">{message.text}</p>
-
-          {message.createdAt && (
-            <p className="text-xs opacity-70">
-               {formatChatTimestamp(message.createdAt.seconds)}
-            </p>
+          {file.type.startsWith("image") ? (
+            <img 
+              onClick={() => setPreviewImage(file.url)}
+              src={file.url}
+              className="w-full h-full object-cover rounded cursor-pointer hover:opacity-90"
+            />
+          ) : (
+            <a
+              href={file.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center justify-center text-xs text-white gap-1 px-2 text-center"
+            >
+              <PaperclipIcon className="h-5 w-5" />
+              <span className="truncate w-full">{file.name}</span>
+            </a>
           )}
         </div>
+      ))}
+    </div>
+  )}
 
-      {message.attachments?.length > 0 && (
-  <div className="flex gap-2 flex-wrap mt-2">
-    {message.attachments.map((file: any, i: number) => (
-      <div
-        key={i}
-        className="w-32 h-32 bg-gray-800 rounded overflow-hidden border"
-      >
-        {file.type.startsWith("image") ? (
-          <img
-            src={file.url}
-            className="w-full h-full object-cover cursor-pointer"
-          />
-        ) : (
-          <a
-            href={file.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center justify-center h-full text-white text-sm gap-1 hover:bg-gray-700"
-          >
-            <PaperclipIcon className="h-6 w-6" />
-            <span className="text-xs text-center px-1">
-              {file.name}
-            </span>
-          </a>
-        )}
-      </div>
-    ))}
-  </div>
-)}
 
+  {message.text && (
+    <p className="mb-2 font-[messageFont] text-lg break-words">
+      {message.text}
+    </p>
+  )}
+
+
+  {message.createdAt && (
+    <p className="text-xs opacity-70">
+      {formatChatTimestamp(message.createdAt.seconds)}
+    </p>
+  )}
+</div>
       </div>
       
     );
@@ -361,8 +391,79 @@ const handleDragOver = (e: React.DragEvent) => {
 
 
 </div>
-      
 
+
+      
+{previewImage && (
+  <div
+    className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md"
+    onClick={() => setPreviewImage(null)}
+  >
+ 
+    <div
+      className="absolute top-6 right-6 flex items-center gap-2 bg-gray-900/80 backdrop-blur-lg rounded-xl p-2 shadow-lg"
+      onClick={(e) => e.stopPropagation()}
+    >
+ 
+      <button
+        className="p-2 rounded-lg hover:bg-white/10 transition cursor-pointer"
+        onClick={handleCopyImageUrl}
+        title="Copy image"
+      >
+        <Copy className="w-5 h-5 text-white" />
+      </button>
+
+   
+      <a
+        href={previewImage}
+        download
+        className="p-2 rounded-lg hover:bg-white/10 transition cursor-pointer"
+        title="Download"
+      >
+        <Download className="w-5 h-5 text-white" />
+      </a>
+
+  
+      <button
+        onClick={() => setPreviewImage(null)}
+        className="p-2 rounded-lg hover:bg-red-500/20 transition cursor-pointer"
+        title="Close"
+      >
+        <X className="w-5 h-5 text-white" />
+      </button>
+    </div>
+
+  
+    <div
+      className="flex items-center justify-center w-full h-full"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <img
+        id="preview-image"
+        src={previewImage}
+        onClick={(e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    setOrigin({ x, y });
+    setIsZoomed((prev) => !prev);
+  }}
+        onMouseMove={handleMouseMove}
+        className={`
+    max-w-[90vw]
+    max-h-[90vh]
+    rounded-xl
+    transition-transform duration-300 ease-out
+    ${isZoomed ? "cursor-zoom-out scale-200" : "cursor-zoom-in"}
+  `}
+  style={{
+    transformOrigin: `${origin.x}% ${origin.y}%`,
+  }}
+      />
+    </div>
+  </div>
+)}
       
 
       {showAddFriend && (
