@@ -22,7 +22,6 @@ export const ChatArea = () => {
   const [Usermessages, setUserMessages] = useState<any[]>([]);
   const [otherUserStatus, setOtherUserStatus] = useState<"online" | "offline">("offline");
   const { activeChatUser } = useChat();
-  const user = auth.currentUser;
   const [showAddFriend, setShowAddFriend] = useState<boolean>(false);
   const addFriendInputRef = useRef<HTMLInputElement>(null);
   const bottomScroll = useRef<HTMLDivElement>(null);
@@ -31,6 +30,9 @@ export const ChatArea = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isZoomed, setIsZoomed] = useState(false);
   const [origin, setOrigin] = useState({ x: 50, y: 50 });
+ const user = auth.currentUser;
+ const [PreviewImageName, setPreviewImageName] = useState<string | null>(null);
+ const [isUploading, setIsUploading] = useState<boolean>(false);
 
 
 useEffect(() => {
@@ -45,7 +47,10 @@ useEffect(() => {
   if (!text.trim() && attachments.length === 0) return;
 
   const chatId = activeChatUser.chatId;
+  setIsUploading(true);
 
+
+  try{
   let uploadedAttachments: any[] = [];
 
   if (attachments.length > 0) {
@@ -59,14 +64,9 @@ useEffect(() => {
         await uploadBytes(fileRef, file);
         const url = await getDownloadURL(fileRef);
 
-        return {
-          url,
-          name: file.name,
-          type: file.type,
-        };
-      })
-    );
-  }
+        return {url, name: file.name, type: file.type,};
+      }))
+     ;}
   
 
   await addDoc(collection(db, "Chats", chatId, "messages"), {
@@ -78,16 +78,19 @@ useEffect(() => {
 
   await updateDoc(doc(db, "Chats", chatId), {
     lastMessage:
-      text || (uploadedAttachments.length > 0 ? "📎 Attachment" : ""),
+      text || (uploadedAttachments.length > 0 ? "Attachment" : ""),
     lastMessageAt: serverTimestamp(),
   });
 
 
   setAttachments([]);
+  } catch (error) {
+    toast.error("Failed to send message. Please try again.");
+  } finally {
+    setIsUploading(false);
+  }
+
 };
-
-
-  
 
 
  useEffect(() => {
@@ -96,23 +99,14 @@ useEffect(() => {
     return;
   }
 
-  const messagesRef = collection(
-    db,
-    "Chats",
-    activeChatUser.chatId,
-    "messages"
-  );
-
+  const messagesRef = collection(db, "Chats", activeChatUser.chatId, "messages");
   const q = query(messagesRef, orderBy("createdAt", "asc"));
 
   const unsubscribe = onSnapshot(q, (snapshot) => {
-    const msgs = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const msgs = snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
 
     setUserMessages(msgs);
-  });
+});
 
   return () => unsubscribe();
 }, [activeChatUser?.chatId]);
@@ -220,7 +214,7 @@ try {
 
 
   const MAX_FILES = 10;
-  const MAX_FILE_SIZE = 10 * 1024 * 1024;//10Mb
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; //10Mb
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
 const validateFiles = (files: File[]) => {
@@ -264,6 +258,28 @@ const handleCopyImageUrl = async () => {
   }
 };
 
+const handleDownloadImage = async () => {
+  if (!previewImage || !PreviewImageName) return;
+
+  try {
+    const response = await fetch(previewImage);
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = PreviewImageName;
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+  } catch {
+    toast.error("Download failed");
+  }
+};
+
  
   
   return <div className="flex-1 flex flex-col relative z-10 bg-gray-900/95 ">
@@ -277,24 +293,38 @@ const handleCopyImageUrl = async () => {
             <h3 className="text-white">
               {activeChatUser ? activeChatUser.otherUser.username : 'Select a Soul to chat'}
             </h3>
-           <div className="flex items-center justify-end gap-2">
+          <div className="flex items-center justify-end gap-2">
   
-  <p className="text-sm text-purple-400">
-    {otherUserStatus === "online" ? "Haunting Online" : "Haunting Offline"}
-  </p>
-  <GhostIcon
-    size={14}
-    className={
-      otherUserStatus === "online"
+          <p className="text-sm text-purple-400"> {otherUserStatus === "online" ? "Haunting Online" : "Haunting Offline"} </p>
+           <GhostIcon size={16} className={
+            otherUserStatus === "online"
         ? "text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]"
-        : "text-red-400 drop-shadow-[0_0_1px_rgba(239,68,68,0.8)]"
-    }
-  />
-</div>
+        : "text-red-400 drop-shadow-[0_0_1px_rgba(239,68,68,0.8)]"}/>
+            </div>
           </div>
         </div>
       </div>
-
+      
+{isUploading && (
+  <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-md flex items-center justify-center">
+    <svg
+      aria-hidden="true"
+      className="w-12 h-12 animate-spin text-purple-400 fill-purple-600"
+      viewBox="0 0 100 101"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908Z"
+        fill="currentColor"
+      />
+      <path
+        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124"
+        fill="currentFill"
+      />
+    </svg>
+  </div>
+)}
       
      
     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95"
@@ -331,7 +361,7 @@ const handleCopyImageUrl = async () => {
     return (
       <div key={message.id} className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`} ref={bottomScroll}>
 
-       <div className={`max-w-[50%]  p-4 rounded-lg ${
+       <div className={`max-w-[50%] p-4 rounded-lg ${
         isOwnMessage
       ? "bg-purple-600 text-white ml-12"
       : "bg-white text-gray-900 shadow-sm mr-12"}`}>
@@ -350,7 +380,7 @@ const handleCopyImageUrl = async () => {
         >
           {file.type.startsWith("image") ? (
             <img 
-              onClick={() => setPreviewImage(file.url)}
+              onClick={() => {setPreviewImage(file.url), setPreviewImageName(file.name)}}
               src={file.url}
               className="w-full h-full object-cover rounded cursor-pointer hover:opacity-90"
             />
@@ -414,14 +444,13 @@ const handleCopyImageUrl = async () => {
       </button>
 
    
-      <a
-        href={previewImage}
-        download
+      <button
+        onClick={handleDownloadImage}
         className="p-2 rounded-lg hover:bg-white/10 transition cursor-pointer"
         title="Download"
       >
         <Download className="w-5 h-5 text-white" />
-      </a>
+      </button>
 
   
       <button
