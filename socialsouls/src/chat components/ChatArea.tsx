@@ -8,7 +8,7 @@ import { toast } from 'react-hot-toast'
 import { useChat } from "../context/ChatContext";
 import Ghostly from "../assets/ghosts.png";
 import { Ghost as GhostIcon } from "lucide-react";
-import {formatChatTimestamp} from './DateUtils';
+import {formatChatTimestamp, formatLastSeen} from './DateUtils';
 
 export const showAddFriendModal = () => {
   const event = new CustomEvent('showAddFriendModal')
@@ -33,7 +33,7 @@ export const ChatArea = () => {
  const user = auth.currentUser;
  const [PreviewImageName, setPreviewImageName] = useState<string | null>(null);
  const [isUploading, setIsUploading] = useState<boolean>(false);
-
+const [lastSeen, setLastSeen] = useState<number | null>(null);
 
 useEffect(() => {
   bottomScroll.current?.scrollIntoView({ behavior: "smooth" });
@@ -128,10 +128,17 @@ useEffect(() => {
 
   const unsub = onSnapshot(userRef, (snap) => {
     const data = snap.data();
+
     if (data?.status?.state) {
       setOtherUserStatus(data.status.state);
     }
+
+    if (data?.status?.lastChanged?.seconds) {
+      setLastSeen(data.status.lastChanged.seconds);
+    }
+
   });
+
 
   return () => unsub();
 }, [activeChatUser?.otherUser?.uid]);
@@ -293,13 +300,19 @@ const handleDownloadImage = async () => {
             <h3 className="text-white">
               {activeChatUser ? activeChatUser.otherUser.username : 'Select a Soul to chat'}
             </h3>
-          <div className="flex items-center justify-end gap-2">
+          <div className="relative group flex items-center justify-end gap-2">
   
           <p className="text-sm text-purple-400"> {otherUserStatus === "online" ? "Haunting Online" : "Haunting Offline"} </p>
            <GhostIcon size={16} className={
             otherUserStatus === "online"
         ? "text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]"
         : "text-red-400 drop-shadow-[0_0_1px_rgba(239,68,68,0.8)]"}/>
+
+        {otherUserStatus === "offline" && lastSeen && (
+    <div className="absolute top-full left-0 mt-1 px-2 py-1 rounded-md text-xs bg-black/80 text-gray-300 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+      Last seen {formatLastSeen(lastSeen)}
+    </div>
+  )}
             </div>
           </div>
         </div>
