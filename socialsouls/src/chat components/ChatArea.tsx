@@ -19,6 +19,8 @@ export const showAddFriendModal = () => {
 
 export const ChatArea = () => {
 
+
+
   const [Usermessages, setUserMessages] = useState<any[]>([]);
   const [otherUserStatus, setOtherUserStatus] = useState<"online" | "offline">("offline");
   const { activeChatUser } = useChat();
@@ -309,7 +311,7 @@ const handleDownloadImage = async () => {
         : "text-red-400 drop-shadow-[0_0_1px_rgba(239,68,68,0.8)]"}/>
 
         {otherUserStatus === "offline" && lastSeen && (
-    <div className="absolute top-full left-0 mt-1 px-2 py-1 rounded-md text-xs bg-black/80 text-gray-300 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+    <div className="absolute top-full left-0 mt-1 px-2 py-1 rounded-md text-xs bg-gray-50 text-black  opacity-0 group-hover:opacity-100 transition pointer-events-none">
       Last seen {formatLastSeen(lastSeen)}
     </div>
   )}

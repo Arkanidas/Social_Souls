@@ -18,7 +18,7 @@ interface SettingsPopupProps {
 }
 export const SettingsPopup = ({ isOpen, onClose, UserName, Bio, onProfileUpdated, profilepic }: SettingsPopupProps) => {
 
-
+  const InputFieldChar = 130;
 
   const { isDark } = useTheme()
   const [username, setUsername] = useState(UserName)
@@ -88,7 +88,7 @@ if(isOpen) {
      
       {/* Settings popup */}
       <div
-        className={`relative w-full h-full max-w-md ${isDark ? 'bg-gray-900 border-none text-gray-200' : 'bg-gray-100 border-purple-300/50 text-gray-800'} border-2 rounded-lg shadow-2xl overflow-hidden z-10 animate-ghost-appear`}
+        className="relative w-full h-full max-w-md bg-gray-900 border-none text-gray-200 border-2 rounded-lg shadow-2xl overflow-hidden z-10 animate-ghost-appear"
         onClick={(e) => e.stopPropagation()}
       >
       
@@ -97,7 +97,7 @@ if(isOpen) {
         </div>
        
         <div
-          className={`p-6 border-b ${isDark ? 'border-purple-900/30' : 'border-purple-200'}`}
+          className="p-6 border-b border-purple-900/30"
         >
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold font-serif">
@@ -120,7 +120,7 @@ if(isOpen) {
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
               <div
-                className={`w-34 h-34 rounded-full relative top-5 overflow-hidden border-2 ${isDark ? 'border-purple-500' : 'border-purple-400'}`}
+                className="w-34 h-34 rounded-full relative top-5 overflow-hidden border-2 border-purple-500"
               >
                 <img
                   src={profilePicture}
@@ -157,13 +157,14 @@ if(isOpen) {
           <div>
             <label
               htmlFor="username"
-              className={`flex items-center gap-2 text-sm font-medium relative bottom-7 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+              className="flex items-center gap-2 text-sm font-medium relative bottom-7 text-gray-300">
               <UserIcon className="h-4 w-4 text-purple-500" />
               Spirit Name
             </label>
             <input
               id="username"
               type="text"
+              maxLength={15}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border relative bottom-5 ${isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}
@@ -182,28 +183,24 @@ if(isOpen) {
             <textarea
               id="bio"
               value={bio}
+              maxLength={130}
               onChange={(e) => setBio(e.target.value)}
               rows={3}
               className={`w-full px-4 py-2 h-24 resize-none rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border ${isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}
               placeholder="Describe your spectral essence..."
             />
+             <span className="absolute bottom-1 right-2 text-xs text-gray-400">
+              {InputFieldChar - bio.length}
+             </span>
           </div>
         </div>
+        
         {/* Footer */}
-
-        <div
-          className={`p-6 ${isDark ? 'border-purple-900/30' : 'border-purple-200'} flex justify-center gap-5 mt-8`}
-        >
-          <button
-            onClick={onClose}
-            className={`px-4 py-2 rounded-md font-medium transition-colors ${isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'} mr-2`}
-          >
+        <div className="p-6 border-purple-900/30 flex justify-center gap-5 mt-15">
+          <button onClick={onClose} className="px-4 py-2 rounded-md font-medium transition-colors bg-gray-800 text-gray-300 hover:bg-gray-700 mr-2 cursor-pointer">
             Cancel
           </button>
-          <button
-            onClick={SaveData}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
-          >
+          <button onClick={SaveData} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md font-medium transition-colors cursor-pointer disabled:opacity-50" disabled={isSaving}>
             Save Changes
           </button>
         </div>

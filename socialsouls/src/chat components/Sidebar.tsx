@@ -10,7 +10,7 @@ import { FriendsTab } from './FriendsTab';
 import { ChatTab } from '../chat components/ChatsTab'
 import ghost from "../assets/ghosts.png"
 import { useSidebar } from "../context/SidebarContext";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import { Ghost as GhostIcon } from "lucide-react";
 
 
@@ -33,6 +33,10 @@ export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { activeTab, setActiveTab } = useSidebar(); 
   const [myStatus, setMyStatus] = useState<"online" | "offline">("offline");
+  const [searchValue, setSearchValue] = useState("");
+  const [friends, setFriends] = useState<any[]>([]);
+  const [filteredFriends, setFilteredFriends] = useState<any[]>([]);
+  const [showSearchModal, setShowSearchModal] = useState(false);
 
 
   const navigate = useNavigate();
@@ -46,26 +50,82 @@ const handleLogout = async () => {
 
    
 
-  const {
-    isDark,
-    toggleTheme
-  } = useTheme();
-
+ 
 useEffect(() => {
   const user = auth.currentUser;
   if (!user) return;
 
   const userRef = doc(db, "users", user.uid);
 
-  const unsub = onSnapshot(userRef, (snap) => {
+  const unsub = onSnapshot(userRef, async (snap) => {
     const data = snap.data();
-    if (data?.status?.state) {
+    if (!data) return;
+
+    // Status
+    if (data.status?.state) {
       setMyStatus(data.status.state);
+    }
+
+    // Friends
+    if (!data.friends || data.friends.length === 0) {
+      setFriends([]);
+      return;
+    }
+
+    try {
+      const profiles = await Promise.all(
+        data.friends.map(async (friendId: string) => {
+          const friendSnap = await getDoc(doc(db, "users", friendId));
+          if (!friendSnap.exists()) return null;
+
+          const data = friendSnap.data();
+
+          return {
+           uid: friendSnap.id,
+           username: data.username || data.displayName || data.name || "",
+           profilepic: data.profilepic || ghost,
+          };
+        })
+      );
+
+      setFriends(profiles.filter(Boolean));
+     
+
+    } catch (err) {
+      console.error("Failed to load friends", err);
     }
   });
 
   return () => unsub();
 }, []);
+
+const TempModal = () => {
+  if (searchValue.trim() === "") return null;
+  else {
+    setShowSearchModal(true);
+  }
+};
+
+
+useEffect(() => {
+  if (!searchValue.trim()) {
+    setShowSearchModal(false);
+    return;
+  }
+
+  const filtered = friends.filter((friend) =>
+    friend.username
+      .toLowerCase()
+      .startsWith(searchValue.toLowerCase())
+  );
+
+   
+
+  setFilteredFriends(filtered);
+  setShowSearchModal(true);
+}, [searchValue, friends]);
+  
+
 
 
   
@@ -79,19 +139,15 @@ useEffect(() => {
           </div>
 
           <div>
-            <h3 className={isDark ? 'text-white' : 'text-gray-900'}>
+            <h3 className="text-white">
               {profile? profile.username : 'unknown ghost'}
             </h3>
-            <p className="text-sm text-purple-500"> {myStatus === "online" ? "Haunting Online" : "Haunting Offline"}
 
-                     <GhostIcon
-    size={14}
-    className={
-      myStatus === "online"
-        ? "text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.8)] relative top-1 float-right left-1"
-        : "text-red-400 drop-shadow-[0_0_1px_rgba(239,68,68,0.8)]"
-    }
-  />
+            <p className="text-sm text-purple-500"> {myStatus === "online" ? "Haunting Online" : "Haunting Offline"}
+            <GhostIcon size={14} className={
+             myStatus === "online"
+             ? "text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.8)] relative top-1 float-right left-1"
+             : "text-red-400 drop-shadow-[0_0_1px_rgba(239,68,68,0.8)]"}/>
             </p>
      
           </div>
@@ -108,9 +164,43 @@ useEffect(() => {
       <div className="p-4">
         <div className="relative">
           <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
-          <input type="text" placeholder="Search the void..." className="w-full bg-gray-800 text-gray-300 border-gray-700 pl-10 pr-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border animation-ease-in duration-200"/>
+          <input type="text" placeholder="Search the void..." onChange={(e) => setSearchValue(e.target.value)} value={searchValue} onClick={TempModal}
+          className="w-full bg-gray-800 text-gray-300 border-gray-700 pl-10 pr-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border animation-ease-in duration-200"/>
         </div>
       </div>
+
+      {showSearchModal && (
+  <div className="fixed inset-0 z-40">
+    {/* Backdrop */}
+    <div
+      className="absolute inset-0 bg-black/40"
+      onClick={() => setShowSearchModal(false)}
+    />
+
+    {/* Modal */}
+    <div className="absolute top-34 left-4 right-4 z-50 bg-gray-900/95 border border-purple-900/30 rounded-b-lg shadow-xl p-2 max-h-80 overflow-y-auto hover:bg-gray-800 transition cursor-pointer">
+      {filteredFriends.length === 0 ? (
+        <p className="text-sm text-gray-400 text-center py-4">
+          No spirits found 👻
+        </p>
+      ) : (
+        filteredFriends.map((friend) => (
+          <div
+            key={friend.uid}
+            className="flex items-center gap-3 p-2 rounded-lg cursor-pointer"
+          >
+            <img
+              src={friend.profilepic || ghost}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <span className="text-white">{friend.username}</span>
+          </div>
+        ))
+      )}
+    </div>
+  </div>
+)}
+
     
       <div className="flex border-b border-purple-900/30"
           >
@@ -138,7 +228,7 @@ useEffect(() => {
         </button>
 
 
-        <button className="text-gray-400 hover:text-purple-500 p-2" onClick={toggleTheme}>
+        <button className="text-gray-400 hover:text-purple-500 p-2">
           <SunIcon className="h-6 w-6" /> 
         </button>
         <button  onClick={()=> handleLogout()} className="text-gray-400 hover:text-purple-500 p-2">
