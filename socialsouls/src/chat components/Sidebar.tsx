@@ -1,6 +1,5 @@
 import { useState, useEffect} from 'react';
 import { Users2Icon, MessageSquareIcon, SettingsIcon, SearchIcon, SunIcon, LogOutIcon, UserPlusIcon } from 'lucide-react';
-import { useTheme } from './ThemeContext';
 import { signOut } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import { auth, db} from '../firebase/firebaseConfig'; 
@@ -124,8 +123,24 @@ useEffect(() => {
   setFilteredFriends(filtered);
   setShowSearchModal(true);
 }, [searchValue, friends]);
-  
 
+  
+const openChatWithFriend = (friend: any) => {
+
+  localStorage.setItem(
+    "activeChat",
+    JSON.stringify({
+      uid: friend.uid,
+      username: friend.username,
+      profilepic: friend.profilepic || ghost,
+    })
+  );
+
+
+  setActiveTab("chats");
+  setShowSearchModal(false);
+  setSearchValue("");
+};
 
 
   
@@ -178,20 +193,21 @@ useEffect(() => {
     />
 
     {/* Modal */}
-    <div className="absolute top-34 left-4 right-4 z-50 bg-gray-900/95 border border-purple-900/30 rounded-b-lg shadow-xl p-2 max-h-80 overflow-y-auto hover:bg-gray-800 transition cursor-pointer">
+    <div className="absolute top-36 left-4 right-4 z-50 bg-gray-900/95 border border-purple-900/30 rounded-md shadow-xl p-2 max-h-80 overflow-y-auto hover:bg-gray-800 transition cursor-pointer">
       {filteredFriends.length === 0 ? (
         <p className="text-sm text-gray-400 text-center py-4">
-          No spirits found 👻
+          No spirits found...
         </p>
       ) : (
         filteredFriends.map((friend) => (
           <div
             key={friend.uid}
             className="flex items-center gap-3 p-2 rounded-lg cursor-pointer"
+            onClick={() => openChatWithFriend(friend)}
           >
             <img
               src={friend.profilepic || ghost}
-              className="w-8 h-8 rounded-full object-cover"
+              className="w-9 h-9 rounded-full object-cover border-gray border"
             />
             <span className="text-white">{friend.username}</span>
           </div>
@@ -221,7 +237,7 @@ useEffect(() => {
      </div>
    
    
-      <div className="p-4 border-t border-purple-900/30 flex justify-around fixed top-198 w-full">
+      <div className="p-4 border-t border-purple-900/30 flex justify-around fixed top-189 w-full">
 
         <button onClick={() => setIsSettingsOpen(true)} className="text-gray-400 hover:text-purple-500 p-2">
           <SettingsIcon className="h-6 w-6 cursor-pointer" />

@@ -186,7 +186,7 @@ if(isOpen) {
               maxLength={130}
               onChange={(e) => setBio(e.target.value)}
               rows={3}
-              className={`w-full px-4 py-2 h-24 resize-none rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border ${isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}
+              className="w-full px-4 py-2 h-24 resize-none rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border bg-gray-800 text-gray-300 border-gray-700"
               placeholder="Describe your spectral essence..."
             />
              <span className="absolute bottom-1 right-2 text-xs text-gray-400">
@@ -194,9 +194,15 @@ if(isOpen) {
              </span>
           </div>
         </div>
+
+        <label className="relative inline-flex items-center cursor-pointer">
+  <input className="sr-only peer" value="" type="checkbox"/>
+    <div className="peer ring-2 ring-gray-500 bg-gradient-to-r from-rose-400 to-red-900 rounded-full outline-none duration-500 after:duration-300 w-20 h-8  shadow-inner peer-checked:bg-gradient-to-r peer-checked:from-emerald-500 peer-checked:to-emerald-900 shadow-gray-900 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-500  after:content-[''] after:rounded-full after:absolute after:outline-none after:h-12 after:w-12 after:bg-gray-900 after:-top-2 after:-left-2 after:flex after:justify-center after:items-center after:border-4 after:border-gray-500  peer-checked:after:translate-x-14">
+  </div>
+</label>
         
         {/* Footer */}
-        <div className="p-6 border-purple-900/30 flex justify-center gap-5 mt-15">
+        <div className="p-6 border-purple-900/30 flex justify-center gap-5 mt-8">
           <button onClick={onClose} className="px-4 py-2 rounded-md font-medium transition-colors bg-gray-800 text-gray-300 hover:bg-gray-700 mr-2 cursor-pointer">
             Cancel
           </button>

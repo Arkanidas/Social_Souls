@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { faLock, faUser, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { doc,setDoc, getDoc } from "firebase/firestore";
@@ -7,9 +7,12 @@ import { auth, db} from './firebase/firebaseConfig'; // auth: connects app to fi
 import './index.css'
 import { useNavigate } from 'react-router-dom';
 import {Toaster, toast} from 'react-hot-toast';
+import { Eye, EyeClosed} from 'lucide-react';
 
 
 function Landing() {
+
+const [allowRedirect, setAllowRedirect] = useState(true);
 
   const navigate = useNavigate();
 
@@ -17,7 +20,7 @@ function Landing() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
 
-      if (user) {
+      if (user && allowRedirect) {
         navigate('/chat'); 
         console.log("👤 User is logged in:", user.email);
       }
@@ -26,19 +29,19 @@ function Landing() {
     return () => unsubscribe(); 
 
     
-  }, [navigate]);
+  }, [navigate, allowRedirect]);
   
  
 
-const [username, setUsername] = useState('');
-const [email, setEmail] = useState('');
-const [password, setPassword] = useState('');
+const [username, setUsername] = useState<string>('');
+const [email, setEmail] = useState<string>('');
+const [password, setPassword] = useState<string>('');
 const [ErrorMessage, setErrorMessage] = useState('');
-
+const [showPassword, setShowPassword] = useState<boolean>(false);
 
 const HandleSignup = async (e: React.FormEvent) => {
   e.preventDefault();
-
+  setAllowRedirect(false);
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -49,7 +52,15 @@ const HandleSignup = async (e: React.FormEvent) => {
       createdAt: new Date()
 
     });
-    console.log( user + " signed up!");
+
+    toast.success("Your Soul was created successfully! Please sign in.", {
+      duration: 4000,
+    });
+
+    setUsername("");
+    setEmail("");
+    setPassword("");
+
   } catch (error) {
     console.error("❌ Sign-up failed:", ErrorMessage);
     toast.error("Please enter a valid email, password and username", {
@@ -62,6 +73,7 @@ const HandleSignup = async (e: React.FormEvent) => {
 const HandleLogin = async (e:React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(''); 
+    setAllowRedirect(true); 
 
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -89,10 +101,15 @@ const HandleLogin = async (e:React.FormEvent) => {
   }
 };
 
+
+const togglePassword = () => {
+  setShowPassword(prev => !prev);
+};
+
   return (
     <>
    <div><Toaster   
-  position="bottom-center"
+  position="top-center"
   reverseOrder={false}
   />
   </div>
@@ -121,7 +138,7 @@ const HandleLogin = async (e:React.FormEvent) => {
 
 
           {/* Sign In */}
-  <form className="w-1/2 flex flex-col justify-center items-center gap-12" onSubmit={HandleLogin}>
+  <form className="w-1/2 flex flex-col justify-center items-center gap-12 mt-4" onSubmit={HandleLogin}>
   <h2 className="text-4xl font-bold text-[#ffeedd] font-[spook1] relative bottom-2">Sign In</h2>
 
   <div className="relative w-[250px]">
@@ -156,7 +173,7 @@ const HandleLogin = async (e:React.FormEvent) => {
 
 <div className="relative w-[250px]">
   <input
-  type="password"
+  type={showPassword ? "text" : "password"}
   id="password"
   value={password}
   required
@@ -180,10 +197,15 @@ const HandleLogin = async (e:React.FormEvent) => {
    >
     Password
               </label>
-              <FontAwesomeIcon icon={faLock} className="absolute right-0 top-2 -translate-y-1/2 text-gray-400 text-lg"/>
+              {password.length === 0 ? (
+              <FontAwesomeIcon icon={faLock} className="absolute right-0 top-2 -translate-y-1/2 text-gray-400 text-lg"/>) 
+              : showPassword ? (
+              <Eye className="absolute bottom-5 right-0 translate-y-1/2 text-gray-400 text-lg cursor-pointer" onClick={togglePassword}/>) 
+              : (
+              <EyeClosed className="absolute bottom-5 right-0 translate-y-1/2 text-gray-400 text-lg cursor-pointer" onClick={togglePassword}/>)}
             </div>
 
-            <button onClick={HandleLogin} type="submit" className="w-[250px] h-[45px] bg-gradient-to-r from-[#e5e5e5] via-[#ff8c19] to-[#f34040] bg-[length:250%] bg-left rounded-[10px] relative text-[#ffd277] font-bold text-[16px] flex justify-center items-center transition-all duration-1000 hover:bg-right active:scale-95 overflow-hidden">
+            <button onClick={HandleLogin} type="submit" className="w-[250px] cursor-pointer h-[45px] bg-gradient-to-r from-[#e5e5e5] via-[#ff8c19] to-[#f34040] bg-[length:300%] bg-left rounded-[10px] relative text-[#ffd277] font-bold text-[16px] flex justify-center items-center transition-all duration-1200 hover:bg-right active:scale-95 active:duration-50 overflow-hidden">
               <span className="absolute w-[97%] h-[90%] bg-[rgba(0,0,0,0.84)] text-[#ffc042] flex justify-center items-center rounded-[10px]">
                 Login
               </span>
@@ -193,6 +215,13 @@ const HandleLogin = async (e:React.FormEvent) => {
               Don't have an account?{" "}
               <label htmlFor="register_toggle" className="underline font-bold cursor-pointer">
                 Sign Up
+              </label>
+            </span>
+
+             <span className="text-xs text-gray-400 font-[sawarabi] relative top-5 italic">
+              Forgot your soul Password?{" "}
+              <label htmlFor="register_toggle" className="underline font-bold cursor-pointer">
+                Reset password
               </label>
             </span>
           </form>
@@ -264,7 +293,7 @@ const HandleLogin = async (e:React.FormEvent) => {
 
             <div className="relative w-[250px]">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -285,21 +314,30 @@ const HandleLogin = async (e:React.FormEvent) => {
  htmlFor="password">
                 Password
               </label>
-              <FontAwesomeIcon icon={faLock} className="absolute right-0 top-2 -translate-y-1/2 text-gray-400 text-lg" />
+              
+
+             {password.length === 0 ? (
+              <FontAwesomeIcon icon={faLock} className="absolute right-0 top-2 -translate-y-1/2 text-gray-400 text-lg"/>) 
+              : showPassword ? (
+              <Eye className="absolute bottom-5 right-0 translate-y-1/2 text-gray-400 text-lg cursor-pointer" onClick={togglePassword}/>) 
+              : (
+              <EyeClosed className="absolute bottom-5 right-0 translate-y-1/2 text-gray-400 text-lg cursor-pointer" onClick={togglePassword}/>)}
             </div>
 
-            <button onClick={HandleSignup} className="w-[250px] h-[45px] bg-gradient-to-r from-[#e5e5e5] via-[#ff8c19] to-[#f34040] bg-[length:250%] bg-left rounded-[10px] relative text-[#ffd277] font-bold text-[16px] flex justify-center items-center transition-all duration-1000 hover:bg-right active:scale-95 overflow-hidden">
-              <span className="absolute w-[97%] h-[90%] bg-[rgba(0,0,0,0.84)] text-[#ffc042] flex justify-center items-center rounded-[10px]">
+            <button onClick={HandleSignup} className="w-[250px] h-[45px] bg-gradient-to-r from-[#e5e5e5] via-[#ff8c19] to-[#f34040] bg-[length:350%] bg-left rounded-[10px] relative text-[#ffd277] font-bold text-[16px] flex justify-center items-center transition-all duration-1200 hover:bg-right active:scale-95 overflow-hidden cursor-pointer active:duration-50">
+              <span className="absolute w-[97%] h-[90%] bg-[rgba(0,0,0,0.84)] text-[#ffc042] flex justify-center items-center rounded-[10px] ">
                 Register
               </span>
             </button>
 
-            <span className="text-sm text-[#d5d4d4] font-[sawarabi]">
+            <span className="text-sm text-[#d5d4d4] font-[sawarabi] relative bottom-4">
               Already have an account?{" "}
               <label htmlFor="register_toggle" className="underline font-bold cursor-pointer">
                 Sign In
               </label>
             </span>
+
+           
 
             
           </form>
