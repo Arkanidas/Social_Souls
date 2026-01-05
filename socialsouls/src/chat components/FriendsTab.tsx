@@ -18,7 +18,6 @@ export const FriendsTab = () => {
   const [friends, setFriends] = useState<any[]>([]);
   const [friendRequests, setFriendRequests] = useState<any[]>([]);
   const [sentRequests, setSentRequests] = useState<any[]>([]);
-
   const { setActiveChatUser } = useChat();
   const { setActiveTab } = useSidebar();
   
@@ -94,35 +93,23 @@ export const FriendsTab = () => {
 
 
 
-
-
-
-
-
-  
-
-
   const handleCancelSentRequest = async (friendId: string) => {
   const userRef = doc(db, "users", user.uid);
   const friendRef = doc(db, "users", friendId);
 
-  // Remove the request from your sent list
   await updateDoc(userRef, {
     sentRequests: arrayRemove(friendId)
   });
 
-  // Remove YOU from their incoming requests
   await updateDoc(friendRef, {
     friendRequests: arrayRemove(user.uid)
   });
 
-  // Update UI instantly
   setSentRequests(prev => prev.filter(id => id !== friendId));
 };
 
   
 
-// Hnadle Accept and Decline for Friendrequests
   const handleAccept = async (friendId: string) => {
     const userRef = doc(db, "users", user.uid);
     const friendRef = doc(db, "users", friendId);
@@ -194,12 +181,28 @@ const FriendItem = ({ userId, onOpenChat }: { userId: string; onOpenChat:(friend
   const [friendData, setFriendData] = useState<any>(null);
 
   useEffect(() => {
-    const fetchFriend = async () => {
-      const ref = doc(db, "users", userId);
-      const snap = await getDoc(ref);
-      if (snap.exists()) setFriendData({ uid: userId, ...snap.data() });
-    };
-    fetchFriend();
+
+    const ref = doc(db, "users", userId);
+
+    
+
+   
+   const unsub = onSnapshot(ref, (snap) => {
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+    setFriendData({
+      uid: snap.id,
+      username: data.username,
+      profilePic: data.profilePic || Ghost,
+      status: data.status?.state || "offline",
+      lastSeen: data.status?.lastSeen,
+    });
+  });
+
+   
+
+      return () => unsub();
   }, [userId]);
 
   if (!friendData) return null;
@@ -208,12 +211,25 @@ const FriendItem = ({ userId, onOpenChat }: { userId: string; onOpenChat:(friend
 
   return (
     <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="flex items-center gap-3 p-3 hover:bg-purple-500/10 rounded-md cursor-pointer">
+  
       <img
         src={friendData.profilePic || Ghost}
         className="w-10 h-10 rounded-full border border-purple-500"
       />
       <div>
         <p className="text-gray-200">{friendData.username}</p>
+        <div className="flex items-center gap-2">
+  <span
+    className={`w-2 h-2 rounded-full ${
+      friendData.status === "online" ? "bg-green-500" : friendData.status === "idle" ? "bg-yellow-500" : "bg-gray-500"
+    }`}
+  />
+  <p className="text-xs text-gray-400">
+    {friendData.status === "online" ? "Active now" : friendData.status === "idle" ? "Idle" : "Offline"}
+  </p>
+
+</div>
+
       </div>
     </div>
   );

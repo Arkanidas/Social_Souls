@@ -22,7 +22,7 @@ export const ChatTab = () => {
           className="w-10 h-10 rounded-full border border-purple-500"
         />
         <h2 className="text-gray-200 text-lg font-semibold">
-          {activeChatUser.otherUser.username}
+          {activeChatUser.otherUser.username || "Unknown Soul"}
         </h2>
       </div>
 

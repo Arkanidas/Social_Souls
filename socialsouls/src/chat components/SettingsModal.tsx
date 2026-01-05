@@ -151,7 +151,7 @@ if(isOpen) {
                 />
               </label>
             </div>
-            <p className="text-s text-purple-500 mt-7">Change your spectral soul</p>
+            <p className="text-s text-purple-500 mt-7">Change your Soul projection</p>
           </div>
           {/* Username */}
           <div>

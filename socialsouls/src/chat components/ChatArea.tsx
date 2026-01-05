@@ -22,7 +22,7 @@ export const ChatArea = () => {
 
 
   const [Usermessages, setUserMessages] = useState<any[]>([]);
-  const [otherUserStatus, setOtherUserStatus] = useState<"online" | "offline">("offline");
+  const [otherUserStatus, setOtherUserStatus] = useState<"online" | "idle"| "offline">("offline");
   const { activeChatUser } = useChat();
   const [showAddFriend, setShowAddFriend] = useState<boolean>(false);
   const addFriendInputRef = useRef<HTMLInputElement>(null);
@@ -32,10 +32,15 @@ export const ChatArea = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isZoomed, setIsZoomed] = useState(false);
   const [origin, setOrigin] = useState({ x: 50, y: 50 });
- const user = auth.currentUser;
- const [PreviewImageName, setPreviewImageName] = useState<string | null>(null);
- const [isUploading, setIsUploading] = useState<boolean>(false);
-const [lastSeen, setLastSeen] = useState<number | null>(null);
+  const user = auth.currentUser;
+  const [PreviewImageName, setPreviewImageName] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [lastSeen, setLastSeen] = useState<number | null>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+
+
 
 useEffect(() => {
   bottomScroll.current?.scrollIntoView({ behavior: "smooth" });
@@ -303,11 +308,13 @@ const handleDownloadImage = async () => {
               {activeChatUser ? activeChatUser.otherUser.username : 'Select a Soul to chat'}
             </h3>
           <div className="relative group flex items-center justify-end gap-2">
-  
-          <p className="text-sm text-purple-400"> {otherUserStatus === "online" ? "Haunting Online" : "Haunting Offline"} </p>
+
+          <p className="text-sm text-purple-400"> {otherUserStatus === "online" ? "Haunting Online" : otherUserStatus === "idle" ? "Haunting Idle" : "Haunting Offline"} </p>
            <GhostIcon size={16} className={
             otherUserStatus === "online"
         ? "text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]"
+        : otherUserStatus === "idle"
+        ? "text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]"
         : "text-red-400 drop-shadow-[0_0_1px_rgba(239,68,68,0.8)]"}/>
 
         {otherUserStatus === "offline" && lastSeen && (

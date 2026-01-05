@@ -3,9 +3,8 @@ import {ChatArea} from './chat components/ChatArea';
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "./firebase/firebaseConfig"; 
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { Toaster } from "react-hot-toast";
-import {useUserPresence} from './chat components/UserPresence';
 
 
 interface UserProfile {
@@ -22,12 +21,59 @@ interface UserProfile {
  const Chat = () => {
 
 
+
 const [user] = useAuthState(auth);
 const [profile, setProfile] = useState<UserProfile | null>(null);
 
+const useUserPresence = () => {
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const userRef = doc(db, "users", user.uid);
+
+    // Online when Chat opens
+    updateDoc(userRef, {
+      status: {
+        state: "online",
+        lastSeen: serverTimestamp(),
+      },
+    });
+
+    // Idle when tab not visible
+    const handleVisibility = () => {
+      updateDoc(userRef, {
+        status: {
+          state: document.hidden ? "idle" : "online",
+          lastSeen: serverTimestamp(),
+        },
+      });
+    };
+
+    // offline on close / refresh
+    const handleOffline = () => {
+      updateDoc(userRef, {
+        status: {
+          state: "offline",
+          lastSeen: serverTimestamp(),
+        },
+      });
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("beforeunload", handleOffline);
+
+    return () => {
+      handleOffline();
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("beforeunload", handleOffline);
+    };
+  }, []);
+};
+
       useUserPresence();
 
-const fetchProfile = async () => {
+    const fetchProfile = async () => {
       const CurrentUser = auth.currentUser;
       if (!CurrentUser) return null;
 
@@ -45,7 +91,8 @@ const fetchProfile = async () => {
 
 
 useEffect(() => {
-        fetchProfile();
+  fetchProfile();
+        
   }, []);
 
 
