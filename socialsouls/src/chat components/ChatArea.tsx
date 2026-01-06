@@ -43,7 +43,9 @@ export const ChatArea = () => {
 
 
 useEffect(() => {
-  bottomScroll.current?.scrollIntoView({ behavior: "smooth" });
+ if (!showScrollToBottom) {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
 }, [Usermessages]);
 
 
@@ -349,8 +351,20 @@ const handleDownloadImage = async () => {
 )}
       
      
-    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95"
-  
+    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95" ref={messagesContainerRef}
+     onScroll={() => {
+    const scroller = messagesContainerRef.current;
+    if (!scroller) return;
+
+    const isNearBottom =
+      scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight <550;
+
+    setShowScrollToBottom(!isNearBottom);
+  }}
+
+
+
+
      onDragEnter={(e) => {
       e.preventDefault();
       setIsDragging(true);}}
@@ -377,6 +391,32 @@ const handleDownloadImage = async () => {
   </div>
 )}
 
+{showScrollToBottom && (
+  <button
+    onClick={() =>
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
+    className="
+      absolute
+      bottom-20
+      left-1/2
+      -translate-x-1/2
+      z-50
+      bg-purple-600
+      hover:bg-purple-700
+      text-white
+      p-3
+      rounded-full
+      shadow-lg
+      animate-bounce
+      transition
+    "
+    title="Scroll to latest"
+  >
+    ↓
+  </button>
+)}
+
   {Usermessages.map((message) => {
     const isOwnMessage = message.senderId === user?.uid;
 
@@ -391,7 +431,7 @@ const handleDownloadImage = async () => {
        <p className="mb-1 text-base font-bold text-lg">
         {isOwnMessage ? "You" : activeChatUser?.otherUser.username}
        </p>
-
+    <div ref={bottomRef} />
 
   {message.attachments?.length > 0 && (
     <div className="flex flex-wrap gap-2 mb-2">
@@ -435,7 +475,7 @@ const handleDownloadImage = async () => {
       {formatChatTimestamp(message.createdAt.seconds)}
     </p>
   )}
-</div>
+       </div>
       </div>
       
     );
@@ -474,7 +514,6 @@ const handleDownloadImage = async () => {
         <Download className="w-5 h-5 text-white" />
       </button>
 
-  
       <button
         onClick={() => setPreviewImage(null)}
         className="p-2 rounded-lg hover:bg-red-500/20 transition cursor-pointer"
