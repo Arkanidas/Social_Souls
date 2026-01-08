@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import sound from "../assets/sound.mp3";
+import sound from "../assets/notification.mp3";
 
 export const useNotificationSound = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -7,7 +7,7 @@ export const useNotificationSound = () => {
 
   useEffect(() => {
     audioRef.current = new Audio(sound);
-    audioRef.current.volume = 0.6;
+    audioRef.current.volume = 0.8;
 
     const unlockAudio = () => {
       unlockedRef.current = true;

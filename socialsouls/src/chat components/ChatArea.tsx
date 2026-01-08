@@ -9,19 +9,33 @@ import { useChat } from "../context/ChatContext";
 import Ghostly from "../assets/ghosts.png";
 import { Ghost as GhostIcon } from "lucide-react";
 import {formatChatTimestamp, formatLastSeen} from './DateUtils';
+import { useNotificationSound } from "../Hooks/Notification";
+
 
 export const showAddFriendModal = () => {
   const event = new CustomEvent('showAddFriendModal')
   window.dispatchEvent(event)
 }
-
-
+interface ChatMessage {
+  id: string;
+  senderId: string;
+  text?: string;
+  createdAt?: {
+    seconds: number;
+    nanoseconds: number;
+  };
+  attachments?: {
+    url: string;
+    name: string;
+    type: string;
+  }[];
+}
 
 export const ChatArea = () => {
 
 
 
-  const [Usermessages, setUserMessages] = useState<any[]>([]);
+  const [Usermessages, setUserMessages] = useState<ChatMessage[]>([]);
   const [otherUserStatus, setOtherUserStatus] = useState<"online" | "idle"| "offline">("offline");
   const { activeChatUser } = useChat();
   const [showAddFriend, setShowAddFriend] = useState<boolean>(false);
@@ -39,8 +53,11 @@ export const ChatArea = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
-
-
+  const { play } = useNotificationSound();
+  const prevMessageCountRef = useRef<number>(0);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const lastMessageIdRef = useRef<string | null>(null);
+  const BASE_TITLE = "Social Souls";
 
 useEffect(() => {
  if (!showScrollToBottom) {
@@ -101,6 +118,33 @@ useEffect(() => {
 
 };
 
+useEffect(() => {
+  if (unreadCount > 0) {
+    document.title = `(${unreadCount}) New message${unreadCount > 1 ? "s" : ""} – ${BASE_TITLE}`;
+  } else {
+    document.title = BASE_TITLE;
+  }
+}, [unreadCount]);
+
+useEffect(() => {
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === "visible") {
+      setUnreadCount(0);
+    }
+  };
+
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+  return () =>
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+}, []);
+
+useEffect(() => {
+  if (activeChatUser?.chatId) {
+    setUnreadCount(0);
+  }
+}, [activeChatUser?.chatId]);
+
+
 
  useEffect(() => {
   if (!activeChatUser?.chatId) {
@@ -112,13 +156,49 @@ useEffect(() => {
   const q = query(messagesRef, orderBy("createdAt", "asc"));
 
   const unsubscribe = onSnapshot(q, (snapshot) => {
-    const msgs = snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
+    const msgs = snapshot.docs.map((doc) => ({id: doc.id, ...doc.data() as Omit<ChatMessage, "id">}));
+
+    const lastMsg = msgs[msgs.length - 1];
+
+if (
+  lastMsg &&
+  lastMsg.id !== lastMessageIdRef.current &&
+  lastMsg.senderId !== user?.uid
+) {
+  const isTabHidden = document.visibilityState !== "visible";
+
+  if (isTabHidden) {
+    setUnreadCount((prev) => prev + 1);
+  }
+}
+
+lastMessageIdRef.current = lastMsg?.id || null;
 
     setUserMessages(msgs);
 });
 
   return () => unsubscribe();
 }, [activeChatUser?.chatId]);
+
+
+
+
+useEffect(() => {
+  if (!activeChatUser) return;
+  if (!Usermessages.length) return;
+
+  const lastMessage = Usermessages[Usermessages.length - 1];
+  const currentUserId = auth.currentUser?.uid;
+
+  if (
+    Usermessages.length > prevMessageCountRef.current &&
+    lastMessage.senderId !== currentUserId
+  ) {
+    play();
+  }
+
+  prevMessageCountRef.current = Usermessages.length;
+}, [Usermessages, activeChatUser, play]);
 
 
 
@@ -433,7 +513,7 @@ const handleDownloadImage = async () => {
        </p>
     <div ref={bottomRef} />
 
-  {message.attachments?.length > 0 && (
+  {message.attachments && message.attachments.length > 0 && (
     <div className="flex flex-wrap gap-2 mb-2">
       {message.attachments.map((file: any, i: number) => (
         <div
