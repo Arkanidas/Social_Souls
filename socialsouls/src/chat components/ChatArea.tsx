@@ -57,6 +57,10 @@ export const ChatArea = () => {
   const prevMessageCountRef = useRef<number>(0);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const lastMessageIdRef = useRef<string | null>(null);
+  const [messageTimestamps, setMessageTimestamps] = useState<number[]>([]);
+  const [isSpamBlocked, setIsSpamBlocked] = useState(false);
+  const [spamCountdown, setSpamCountdown] = useState(0);
+
   const BASE_TITLE = "Social Souls";
 
 useEffect(() => {
@@ -71,6 +75,12 @@ useEffect(() => {
   if (!user) return;
   if (!activeChatUser?.chatId) return;
   if (!text.trim() && attachments.length === 0) return;
+
+  if (isSpamBlocked) return;
+
+  // 🚨 Spam check
+  const isSpamming = checkSpam();
+  if (isSpamming) return;
 
   const chatId = activeChatUser.chatId;
   setIsUploading(true);
@@ -248,6 +258,44 @@ useEffect(() => {
   return () => window.removeEventListener("keydown", onEsc);
 }, []);
 
+
+const checkSpam = () => {
+  const now = Date.now();
+
+ 
+  const recent = messageTimestamps.filter(
+    (t) => now - t < 5000
+  );
+
+  recent.push(now);
+  setMessageTimestamps(recent);
+
+
+  if (recent.length >= 4) {
+    triggerSpamCooldown();
+    return true;
+  }
+
+  return false;
+};
+
+const triggerSpamCooldown = () => {
+  setIsSpamBlocked(true);
+  setSpamCountdown(10);
+
+  let seconds = 10;
+
+  const interval = setInterval(() => {
+    seconds -= 1;
+    setSpamCountdown(seconds);
+
+    if (seconds <= 0) {
+      clearInterval(interval);
+      setIsSpamBlocked(false);
+      setMessageTimestamps([]);
+    }
+  }, 1000);
+};
 
   const handleAddFriendSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -476,16 +524,7 @@ const handleDownloadImage = async () => {
     onClick={() =>
       bottomRef.current?.scrollIntoView({ behavior: "smooth" })
     }
-    className="
-      absolute
-      bottom-20
-      left-1/2
-      -translate-x-1/2
-      z-50
-      bg-purple-600
-      hover:bg-purple-700
-      text-white
-      p-3
+    className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 bg-purple-600 hover:bg-purple-700 text-white p-3
       rounded-full
       shadow-lg
       animate-bounce
@@ -544,7 +583,7 @@ const handleDownloadImage = async () => {
 
 
   {message.text && (
-    <p className="mb-2 font-[messageFont] text-lg break-words">
+    <p className="mb-2 font-[messageFont] text-lg break-words break-all whitespace-pre-wrap max-w-full">
       {message.text}
     </p>
   )}
@@ -682,6 +721,6 @@ const handleDownloadImage = async () => {
       const validFiles = validateFiles(Array.from(e.target.files));
       setAttachments((prev) => [...prev, ...validFiles]);}}/>
 
-      <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments}setAttachments={setAttachments}/>
+      <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments} setAttachments={setAttachments} isSpamBlocked={isSpamBlocked} spamCountdown={spamCountdown} />
     </div>;
 };

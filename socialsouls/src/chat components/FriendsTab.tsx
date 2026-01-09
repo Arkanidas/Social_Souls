@@ -1,7 +1,7 @@
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
 import { useEffect, useState } from "react";
-import { XIcon } from "lucide-react";
+import { XIcon, MoreVertical } from "lucide-react";
 import  Ghost  from "../assets/ghosts.png";
 import { useChat } from '../context/ChatContext';
 import { useSidebar } from "../context/SidebarContext";
@@ -137,7 +137,9 @@ export const FriendsTab = () => {
   };
 
 
-
+const handleFriendMenuClick = (friend: any) => {
+  console.log("Kebab clicked for:", friend.username);
+};
 
 
   return (
@@ -209,6 +211,10 @@ const FriendItem = ({ userId, onOpenChat }: { userId: string; onOpenChat:(friend
 
   
 
+  const handleFriendMenuClick = () => {
+    console.log("Menu opened for:");
+  };
+
   return (
     <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="flex items-center gap-3 p-3 hover:bg-purple-500/10 rounded-md cursor-pointer">
   
@@ -227,6 +233,28 @@ const FriendItem = ({ userId, onOpenChat }: { userId: string; onOpenChat:(friend
   <p className="text-xs text-gray-400">
     {friendData.status === "online" ? "Active now" : friendData.status === "idle" ? "Idle" : "Offline"}
   </p>
+
+   <button
+    onClick={(e) => {
+      e.stopPropagation(); 
+      handleFriendMenuClick();
+    }}
+    className="
+      p-2
+      cursor-pointer
+      rounded-full
+      text-gray-400
+      hover:text-white
+      hover:bg-gray-700
+      transition
+     
+     
+      
+    "
+    title="More options"
+  >
+    <MoreVertical className="" size={18} />
+  </button>
 
 </div>
 

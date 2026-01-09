@@ -60,12 +60,12 @@ useEffect(() => {
     const data = snap.data();
     if (!data) return;
 
-    // Status
+   
     if (data.status?.state) {
       setMyStatus(data.status.state);
     }
 
-    // Friends
+   
     if (!data.friends || data.friends.length === 0) {
       setFriends([]);
       return;
@@ -186,7 +186,7 @@ const openChatWithFriend = (friend: any) => {
 
       {showSearchModal && (
   <div className="fixed inset-0 z-40">
-    {/* Backdrop */}
+    
     <div
       className="absolute inset-0 bg-black/40"
       onClick={() => setShowSearchModal(false)}

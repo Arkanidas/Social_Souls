@@ -8,12 +8,14 @@ type MessageInputProps = {
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   attachments: File[];
   setAttachments: React.Dispatch<React.SetStateAction<File[]>>;
+  isSpamBlocked: boolean;
+  spamCountdown: number;
 
 };
 
 
 
-export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments}:MessageInputProps) => {
+export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments, isSpamBlocked, spamCountdown,}:MessageInputProps) => {
 
  const [MessageText, setMessageText] = useState<string>("");
  const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
@@ -55,6 +57,7 @@ export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments}
 }, []);
 
  const handleSend = () => {
+    if (isSpamBlocked) return;
     if (!MessageText.trim() && attachments.length === 0) return;
     onSend(MessageText);
     setMessageText("");
@@ -115,17 +118,30 @@ export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments}
            <EmojiPicker height={400} emojiStyle={EmojiStyle.GOOGLE} theme={Theme.DARK} onEmojiClick={(emojiData) => {setMessageText(prev => prev + emojiData.emoji);}}/>
        </div>)}
           <div className={`flex flex-col ${attachments.length > 0 ? "pt-2": ""}`}> 
-            <input value={MessageText} onChange={(e) => setMessageText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            type="text" placeholder="Send a message into the void..." className= {`flex flex-col w-full bg-gray-800 text-gray-300 border-gray-700 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600/80 border animation-ease-in duration-200${attachments.length > 0 ? "pt-2": ""}`}/>
+            <input value={MessageText} onChange={(e) => setMessageText(e.target.value)}  disabled={isSpamBlocked} onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            type="text" placeholder={isSpamBlocked
+        ? `You are sent to the human world due to spamming. Wait ${spamCountdown}s`
+        : "Send a message into the void..."
+    }
+            className= {`flex flex-col w-full bg-gray-800 text-gray-300 border-gray-700 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600/80 border animation-ease-in duration-200 ${
+            isSpamBlocked
+        ? "border-red-500 cursor-not-allowed placeholder-red-400"
+        : "border-gray-700 focus:ring-2 focus:ring-purple-600/80"
+    }${attachments.length > 0 ? "pt-2": ""}`}/>
          </div>
         </div>
-        <button onClick={handleSend} className="text-purple-500 hover:text-purple-600">
-          <SendIcon className="h-6 w-6 cursor-pointer"/>
+        <button onClick={handleSend} disabled={isSpamBlocked} className={`transition text-purple-500 hover:text-purple-600 ${
+         isSpamBlocked
+            ? "text-gray-600 cursor-not-allowed"
+            : "text-purple-500 hover:text-purple-600"}`}>
+         <SendIcon className={`h-6 w-6 cursor-pointer ${isSpamBlocked
+            ? "text-gray-600 cursor-wait"
+            : "text-purple-500 hover:text-purple-600"}`}/>
         </button>
       </div>
 
 
-  
+ 
     </div>;
 
     
