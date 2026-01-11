@@ -5,7 +5,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "./firebase/firebaseConfig"; 
 import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { Toaster } from "react-hot-toast";
-
+import { UserProfileModal } from "../src/chat components/ProfileModal";
 
 interface UserProfile {
   profilePic: string;
@@ -106,6 +106,7 @@ useEffect(() => {
         } : undefined}
         onProfileUpdated={fetchProfile}
         />
+         <UserProfileModal />
         <ChatArea />
          <Toaster position="top-center" reverseOrder={false} />
       </div>;
