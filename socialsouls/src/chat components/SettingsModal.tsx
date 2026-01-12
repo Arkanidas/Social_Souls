@@ -105,12 +105,12 @@ if(isOpen) {
             </h2>
             <button
               onClick={onClose}
-              className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-purple-500 transition-colors z-10 cursor-pointer`}>
+              className="text-gray-400 hover:text-purple-500 transition-colors z-10 cursor-pointer">
               <X className="h-6 w-6 hover:text-purple-500 hover:drop-shadow-[0_0_1px_rgba(168,85,247,0.8)] transition duration-300 focus:text-gray-500 " />
             </button>
           </div>
           <p className={`mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            Modify your ethereal presence...
+            Modify your ghostly presence...
           </p>
         </div>
         {/* Settings form */}
@@ -130,7 +130,7 @@ if(isOpen) {
               </div>
               <label
                 htmlFor="profile-upload"
-                className={`absolute top-25 left-25 p-2 rounded-full cursor-pointer ${isDark ? 'bg-gray-800 text-purple-400 hover:bg-gray-700' : 'bg-white text-purple-500 hover:bg-gray-100'} border ${isDark ? 'border-purple-900/30' : 'border-gray-200'}`}
+                className="absolute top-25 left-25 p-2 rounded-full cursor-pointer bg-gray-800 text-purple-400 hover:bg-gray-700 border border-purple-900/30"
               >
                 <Upload className="h-6 w-6" />
                 <input
@@ -153,13 +153,14 @@ if(isOpen) {
             </div>
             <p className="text-s text-purple-500 mt-7">Change your Soul projection</p>
           </div>
+
           {/* Username */}
           <div>
             <label
               htmlFor="username"
               className="flex items-center gap-2 text-sm font-medium relative bottom-7 text-gray-300">
               <UserIcon className="h-4 w-4 text-purple-500" />
-              Spirit Name
+              Soul Name
             </label>
             <input
               id="username"
@@ -167,7 +168,7 @@ if(isOpen) {
               maxLength={15}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className={`w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border relative bottom-5 ${isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-gray-900 border-gray-200'}`}
+              className="w-full px-4 py-2 rounded-md duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 border relative bottom-5 bg-gray-800 text-gray-300 border-gray-700"
               placeholder="Enter your spectral name"
             />
           </div>
@@ -175,10 +176,10 @@ if(isOpen) {
           <div className="flex flex-col gap-2 relative bottom-15">
             <label
               htmlFor="bio"
-              className={`flex items-center gap-2 text-sm font-medium  ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+              className="flex items-center gap-2 text-sm font-medium text-gray-300"
             >
               <FileTextIcon className="h-4 w-4 text-purple-500" />
-              Ethereal Description
+             Soul Description
             </label>
             <textarea
               id="bio"
@@ -186,7 +187,7 @@ if(isOpen) {
               maxLength={130}
               onChange={(e) => setBio(e.target.value)}
               rows={3}
-              className="w-full px-4 py-2 h-24 resize-none rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border bg-gray-800 text-gray-300 border-gray-700"
+              className="w-full px-4 py-2 h-30 resize-none rounded-md focus:outline-none duration-200 focus:ring-2 focus:ring-purple-500 border bg-gray-800 text-gray-300 border-gray-700"
               placeholder="Describe your spectral essence..."
             />
              <span className="absolute bottom-1 right-2 text-xs text-gray-400">
@@ -195,11 +196,7 @@ if(isOpen) {
           </div>
         </div>
 
-        <label className="relative inline-flex items-center cursor-pointer">
-  <input className="sr-only peer" value="" type="checkbox"/>
-    <div className="peer ring-2 ring-gray-500 bg-gradient-to-r from-rose-400 to-red-900 rounded-full outline-none duration-500 after:duration-300 w-20 h-8  shadow-inner peer-checked:bg-gradient-to-r peer-checked:from-emerald-500 peer-checked:to-emerald-900 shadow-gray-900 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-500  after:content-[''] after:rounded-full after:absolute after:outline-none after:h-12 after:w-12 after:bg-gray-900 after:-top-2 after:-left-2 after:flex after:justify-center after:items-center after:border-4 after:border-gray-500  peer-checked:after:translate-x-14">
-  </div>
-</label>
+  
         
         {/* Footer */}
         <div className="p-6 border-purple-900/30 flex justify-center gap-5 mt-8">

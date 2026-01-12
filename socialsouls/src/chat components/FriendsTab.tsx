@@ -90,9 +90,6 @@ export const FriendsTab = () => {
 
 
 
-
-
-
   const handleCancelSentRequest = async (friendId: string) => {
   const userRef = doc(db, "users", user.uid);
   const friendRef = doc(db, "users", friendId);
@@ -234,7 +231,13 @@ const FriendItem = ({ userId, onOpenChat }: { userId: string; onOpenChat:(friend
     {friendData.status === "online" ? "Active now" : friendData.status === "idle" ? "Idle" : "Offline"}
   </p>
 
-   <button
+
+
+</div>
+ 
+
+      </div>
+        <button
     onClick={(e) => {
       e.stopPropagation(); 
       handleFriendMenuClick();
@@ -247,18 +250,14 @@ const FriendItem = ({ userId, onOpenChat }: { userId: string; onOpenChat:(friend
       hover:text-white
       hover:bg-gray-700
       transition
-     
-     
-      
+     float-right
+     absolute
+    right-3
     "
     title="More options"
   >
     <MoreVertical className="" size={18} />
   </button>
-
-</div>
-
-      </div>
     </div>
   );
 };

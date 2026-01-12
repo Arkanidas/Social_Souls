@@ -26,9 +26,6 @@ export const ChatTab = () => {
         </h2>
       </div>
 
-    
-     
-     
     </div>
   );
 };
