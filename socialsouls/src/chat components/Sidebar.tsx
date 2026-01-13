@@ -7,7 +7,7 @@ import { SettingsPopup } from '../chat components/SettingsModal';
 import { showAddFriendModal } from './ChatArea'
 import { FriendsTab } from './FriendsTab';
 import { ChatTab } from '../chat components/ChatsTab'
-import ghost from "../assets/ghosts.png"
+import Ghost from "../assets/ghosts.png"
 import { useSidebar } from "../context/SidebarContext";
 import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import { Ghost as GhostIcon } from "lucide-react";
@@ -83,7 +83,7 @@ useEffect(() => {
           return {
            uid: friendSnap.id,
            username: data.username || data.displayName || data.name || "",
-           profilepic: data.profilepic || ghost,
+           profilepic: data.profilepic || Ghost,
           };
         })
       );
@@ -120,7 +120,6 @@ useEffect(() => {
   );
 
    
-
   setFilteredFriends(filtered);
   setShowSearchModal(true);
 }, [searchValue, friends]);
@@ -133,7 +132,7 @@ const openChatWithFriend = (friend: any) => {
     JSON.stringify({
       uid: friend.uid,
       username: friend.username,
-      profilepic: friend.profilepic || ghost,
+      profilepic: friend.profilepic || Ghost,
     })
   );
 
@@ -151,7 +150,7 @@ const openChatWithFriend = (friend: any) => {
       <div className="p-4 border-b border-purple-900/30">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-500 cursor-pointer" onClick={showUserProfileModal}>
-            <img src={profile? profile.profilepic : ghost} alt="Profile" className="w-full h-full object-cover" />
+            <img src={profile? profile.profilepic : Ghost} alt="Profile" className="w-full h-full object-cover" />
           </div>
 
           <div>
@@ -207,7 +206,7 @@ const openChatWithFriend = (friend: any) => {
             onClick={() => openChatWithFriend(friend)}
           >
             <img
-              src={friend.profilepic || ghost}
+              src={friend.profilepic || Ghost}
               className="w-9 h-9 rounded-full object-cover border-gray border"
             />
             <span className="text-white">{friend.username}</span>

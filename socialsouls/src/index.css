@@ -46,6 +46,11 @@
   }
 }
 
+html, body {
+  @apply bg-zinc-800 m-0 p-0;
+}
+
+
 @keyframes ghost-fade-in {
           0% {
             opacity: 0;

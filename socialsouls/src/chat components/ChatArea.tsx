@@ -435,24 +435,39 @@ const handleDownloadImage = async () => {
 
           <div className="ml-3 ">
             <h3 className="text-white">
-              {activeChatUser ? activeChatUser.otherUser.username : 'Select a Soul to chat'}
+              {activeChatUser ? activeChatUser.otherUser.username : 'Select a Soul to Chat'}
             </h3>
-          <div className="relative group flex items-center justify-end gap-2">
 
-          <p className="text-sm text-purple-400"> {otherUserStatus === "online" ? "Haunting Online" : otherUserStatus === "idle" ? "Haunting Idle" : "Haunting Offline"} </p>
-           <GhostIcon size={16} className={
-            otherUserStatus === "online"
-        ? "text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]"
+        {activeChatUser && (
+  <div className="relative group flex items-center gap-2">
+
+    <p className="text-sm text-purple-400">
+      {otherUserStatus === "online"
+        ? "Haunting Online"
         : otherUserStatus === "idle"
-        ? "text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]"
-        : "text-red-400 drop-shadow-[0_0_1px_rgba(239,68,68,0.8)]"}/>
+        ? "Haunting Idle"
+        : "Haunting Offline"}
+    </p>
 
-        {otherUserStatus === "offline" && lastSeen && (
-    <div className="absolute top-full left-0 mt-1 px-2 py-1 rounded-md text-xs bg-gray-50 text-black  opacity-0 group-hover:opacity-100 transition pointer-events-none">
-      Last seen {formatLastSeen(lastSeen)}
-    </div>
-  )}
-            </div>
+    <GhostIcon
+      size={16}
+      className={
+        otherUserStatus === "online"
+          ? "text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]"
+          : otherUserStatus === "idle"
+          ? "text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]"
+          : "text-red-400 drop-shadow-[0_0_1px_rgba(239,68,68,0.8)]"
+      }
+    />
+
+    {otherUserStatus === "offline" && lastSeen && (
+      <div className="absolute top-full left-0 mt-1 px-2 py-1 rounded-md text-xs bg-gray-50 text-black opacity-0 group-hover:opacity-100 transition pointer-events-none">
+        Last seen {formatLastSeen(lastSeen)}
+      </div>
+    )}
+  </div>
+)}
+
           </div>
         </div>
       </div>

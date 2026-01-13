@@ -143,8 +143,10 @@ const handleFriendMenuClick = (friend: any) => {
 
 <div className="flex flex-col">
   {sentRequests.length > 0 && (
-    <div className="mb-2">
-      <h3 className="text-purple-400 mt-2 ml-2">💌 Sent Soulmate Requests</h3>
+    <div className="">
+      <div className="bg-gray-800 p-2">
+      <h3 className="text-white relative left-17"> Sent Soulmate Requests</h3>
+      </div>
       {sentRequests.map((id) => (
         <SentRequestItem key={id} userId={id} onCancel={handleCancelSentRequest}/>
       ))}
@@ -213,7 +215,7 @@ const FriendItem = ({ userId, onOpenChat }: { userId: string; onOpenChat:(friend
   };
 
   return (
-    <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="flex items-center gap-3 p-3 hover:bg-purple-500/10 rounded-md cursor-pointer">
+    <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="flex items-center gap-3 p-3 hover:bg-purple-500/10  cursor-pointer mt-0">
   
       <img
         src={friendData.profilePic || Ghost}
@@ -324,7 +326,7 @@ const SentRequestItem = ({ userId, onCancel }: { userId: string; onCancel:(id: s
   if (!friendData) return null;
 
   return (
-    <div className="group flex items-center justify-between gap-3 p-5 hover:bg-purple-500/10 rounded-md transition">
+    <div className="group flex items-center justify-between gap-3 p-5 hover:bg-purple-500/10 transition border-gray-800 border-dashed border-b-2">
       <img
         src={friendData.profilePic || Ghost}
         className="w-10 h-10 rounded-full border border-purple-500"
