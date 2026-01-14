@@ -1,7 +1,7 @@
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
-import { useEffect, useState } from "react";
-import { XIcon, MoreVertical } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { XIcon, MoreVertical, User, VolumeX, Skull  } from "lucide-react";
 import  Ghost  from "../assets/ghosts.png";
 import { useChat } from '../context/ChatContext';
 import { useSidebar } from "../context/SidebarContext";
@@ -20,6 +20,23 @@ export const FriendsTab = () => {
   const [sentRequests, setSentRequests] = useState<any[]>([]);
   const { setActiveChatUser } = useChat();
   const { setActiveTab } = useSidebar();
+  const [openMenuUid, setOpenMenuUid] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      setOpenMenuUid(null);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, []);
+
+
+
+
   
   const user = auth.currentUser;
 
@@ -134,9 +151,7 @@ export const FriendsTab = () => {
   };
 
 
-const handleFriendMenuClick = (friend: any) => {
-  console.log("Kebab clicked for:", friend.username);
-};
+
 
 
   return (
@@ -144,8 +159,10 @@ const handleFriendMenuClick = (friend: any) => {
 <div className="flex flex-col">
   {sentRequests.length > 0 && (
     <div className="">
-      <div className="bg-gray-800 p-2">
-      <h3 className="text-white relative left-17"> Sent Soulmate Requests</h3>
+      <div className="p-2 mt-2">
+      <h3 className="text-white relative left-15 text-md"> Sent Soulmate Requests 
+       <span className="text-sm text-purple-400"> ({sentRequests.length})</span>
+      </h3>
       </div>
       {sentRequests.map((id) => (
         <SentRequestItem key={id} userId={id} onCancel={handleCancelSentRequest}/>
@@ -170,7 +187,9 @@ const handleFriendMenuClick = (friend: any) => {
   
       {friends.length === 0 ? (
         <p  className="text-gray-500 text-sm overflow-y-scroll">No friends yet 👻</p>
-      ) : (friends.map((id) => (<FriendItem key={id} userId={id} onOpenChat={handleOpenChat} /> ))
+      ) : (friends.map((id) => (<FriendItem key={id} userId={id} onOpenChat={handleOpenChat} openMenuUid={openMenuUid}
+    setOpenMenuUid={setOpenMenuUid}
+    menuRef={menuRef}/> ))
       )}
     </div>
   );
@@ -178,17 +197,18 @@ const handleFriendMenuClick = (friend: any) => {
 
 
 
-const FriendItem = ({ userId, onOpenChat }: { userId: string; onOpenChat:(friend:any) => void }) => {
+
+
+const FriendItem = ({ userId, onOpenChat, openMenuUid, menuRef, setOpenMenuUid }: { userId: string; onOpenChat:(friend:any) => void; openMenuUid: string | null;
+  setOpenMenuUid: React.Dispatch<React.SetStateAction<string | null>>;
+  menuRef: React.RefObject<HTMLDivElement | null>}) => {
   const [friendData, setFriendData] = useState<any>(null);
 
   useEffect(() => {
 
     const ref = doc(db, "users", userId);
 
-    
-
-   
-   const unsub = onSnapshot(ref, (snap) => {
+    const unsub = onSnapshot(ref, (snap) => {
     if (!snap.exists()) return;
 
     const data = snap.data();
@@ -210,57 +230,80 @@ const FriendItem = ({ userId, onOpenChat }: { userId: string; onOpenChat:(friend
 
   
 
-  const handleFriendMenuClick = () => {
-    console.log("Menu opened for:");
+
+  const handleFriendMenuClick = (uid: string) => {
+    setOpenMenuUid(prev => (prev === uid ? null : uid));
   };
 
   return (
-    <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="flex items-center gap-3 p-3 hover:bg-purple-500/10  cursor-pointer mt-0">
+    <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="flex items-center gap-3 p-3 hover:bg-purple-500/10 cursor-pointer mt-0">
   
       <img
         src={friendData.profilePic || Ghost}
         className="w-10 h-10 rounded-full border border-purple-500"
       />
+
       <div>
         <p className="text-gray-200">{friendData.username}</p>
+
         <div className="flex items-center gap-2">
-  <span
-    className={`w-2 h-2 rounded-full ${
-      friendData.status === "online" ? "bg-green-500" : friendData.status === "idle" ? "bg-yellow-500" : "bg-gray-500"
-    }`}
-  />
+  <span className={`w-2 h-2 rounded-full ${ friendData.status === "online" ? "bg-green-500" : friendData.status === "idle" ? "bg-yellow-500" : "bg-gray-500"}`}/>
   <p className="text-xs text-gray-400">
     {friendData.status === "online" ? "Active now" : friendData.status === "idle" ? "Idle" : "Offline"}
   </p>
 
-
-
-</div>
- 
-
+       </div>
       </div>
-        <button
-    onClick={(e) => {
-      e.stopPropagation(); 
-      handleFriendMenuClick();
-    }}
-    className="
-      p-2
-      cursor-pointer
-      rounded-full
-      text-gray-400
-      hover:text-white
-      hover:bg-gray-700
-      transition
-     float-right
-     absolute
-    right-3
-    "
-    title="More options"
-  >
-    <MoreVertical className="" size={18} />
+
+  <button onClick={(e) => {e.stopPropagation(); handleFriendMenuClick(friendData.uid);}}
+    className="p-2 cursor-pointer rounded-full text-gray-400 hover:text-white transition duration-100 loat-right absolute right-3"
+    title="More options">
+    <MoreVertical size={21} />
   </button>
+
+{openMenuUid === friendData.uid && (
+    <div
+      ref={menuRef}
+      className="absolute right-14 top-1/2 -translate-y-1/2 w-48 rounded-md bg-black/90 border border-white/10 shadow-xl z-50"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <MenuItem icon={<User size={16} />} text="View Profile" />
+      <MenuItem icon={<VolumeX size={16} />} text="Mute Soul" />
+      <MenuItem
+        icon={<Skull size={16} />}
+        text="Perish Soul"
+        danger
+      />
     </div>
+  )}
+
+    </div>
+  );
+};
+
+
+
+const MenuItem = ({
+  text,
+  icon,
+  danger = false,
+}: {
+  text: string;
+  icon: React.ReactNode;
+  danger?: boolean;
+}) => {
+  return (
+    <button
+      className={`w-full flex items-center justify-between px-3 py-2 text-sm transition
+        ${
+          danger
+            ? "text-red-400 hover:bg-red-500/10"
+            : "text-gray-200 hover:bg-white/10"
+        }`}
+    >
+      <span>{text}</span>
+      <span className="opacity-80">{icon}</span>
+    </button>
   );
 };
 
@@ -294,16 +337,10 @@ const FriendRequestItem = ({ userId, onAccept, onDecline }: FriendRequestItemPro
       </div>
 
       <div className="opacity-0 group-hover:opacity-100 flex gap-2 transition-opacity">
-        <button
-          onClick={() => onAccept(userId)}
-          className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700"
-        >
+        <button onClick={() => onAccept(userId)} className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700">
           Accept
         </button>
-        <button
-          onClick={() => onDecline(userId)}
-          className="bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700"
-        >
+        <button onClick={() => onDecline(userId)} className="bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700">
           Decline
         </button>
       </div>
@@ -326,19 +363,19 @@ const SentRequestItem = ({ userId, onCancel }: { userId: string; onCancel:(id: s
   if (!friendData) return null;
 
   return (
-    <div className="group flex items-center justify-between gap-3 p-5 hover:bg-purple-500/10 transition border-gray-800 border-dashed border-b-2">
+    <div className="group flex items-center justify-between gap-3 p-3 hover:bg-purple-500/10 transition border-gray-800 border-dashed border-b-3">
       <img
         src={friendData.profilePic || Ghost}
         className="w-10 h-10 rounded-full border border-purple-500"
       />
-      <div>
-        <p className="text-gray-200">{friendData.username}</p>
+      <div className="flex items-start  flex-col relative right-6 p-1">
+        <p className="text-gray-200 ">{friendData.username}</p>
         <p className="text-xs mt-1 text-purple-300 italic">awaiting their response</p>
       </div>
 
      
-    <button onClick={() => onCancel(userId)} className="opacity-0 group-hover:opacity-100 bg-gray-500 text-white px-3 py-1 rounded-md text-sm transition-opacity duration-200 cursor-pointer">
-      <XIcon className="h-3 w-3" />
+    <button onClick={() => onCancel(userId)} className="opacity-0 group-hover:opacity-100 hover:text-purple-400 text-gray-400 px-3 py-1 text-sm cursor-pointer">
+      <XIcon className="h-5 w-5" />
     </button>
     </div>
   );
