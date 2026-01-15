@@ -102,10 +102,8 @@ useEffect(() => {
         <Sidebar profile={profile ? {
           username: profile.username,
           profilepic: profile.profilePic,
-          bio: profile.bio
-        } : undefined}
-        onProfileUpdated={fetchProfile}
-        />
+          bio: profile.bio} : undefined}
+          onProfileUpdated={fetchProfile}/>
          <UserProfileModal />
         <ChatArea />
          <Toaster position="top-center" reverseOrder={false} />

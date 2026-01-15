@@ -200,10 +200,7 @@ useEffect(() => {
   const lastMessage = Usermessages[Usermessages.length - 1];
   const currentUserId = auth.currentUser?.uid;
 
-  if (
-    Usermessages.length > prevMessageCountRef.current &&
-    lastMessage.senderId !== currentUserId
-  ) {
+  if (Usermessages.length > prevMessageCountRef.current && lastMessage.senderId !== currentUserId) {
     play();
   }
 

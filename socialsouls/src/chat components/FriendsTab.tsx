@@ -21,19 +21,9 @@ export const FriendsTab = () => {
   const { setActiveChatUser } = useChat();
   const { setActiveTab } = useSidebar();
   const [openMenuUid, setOpenMenuUid] = useState<string | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
+  
 
-  useEffect(() => {
-  const handleClickOutside = (e: MouseEvent) => {
-    if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-      setOpenMenuUid(null);
-    }
-  };
-
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => document.removeEventListener("mousedown", handleClickOutside);
-}, []);
-
+  
 
 
 
@@ -63,7 +53,6 @@ export const FriendsTab = () => {
     });
   }
 
-  console.log("Chat opened with ID:", chatId);
 
 
   setActiveChatUser({
@@ -77,6 +66,30 @@ export const FriendsTab = () => {
 
 
   setActiveTab("chats");
+};
+
+const handlePerishSoul = async (friendId: string) => {
+  if (!user) return;
+
+  const userRef = doc(db, "users", user.uid);
+  const friendRef = doc(db, "users", friendId);
+
+  try {
+    // Remove each other from friends lists
+    await Promise.all([
+      updateDoc(userRef, {
+        friends: arrayRemove(friendId),
+      }),
+      updateDoc(friendRef, {
+        friends: arrayRemove(user.uid),
+      }),
+    ]);
+
+    console.log("Soul perished:", friendId);
+    setOpenMenuUid(null);
+  } catch (err) {
+    console.error("Failed to perish soul:", err);
+  }
 };
  
 
@@ -188,8 +201,7 @@ export const FriendsTab = () => {
       {friends.length === 0 ? (
         <p  className="text-gray-500 text-sm overflow-y-scroll">No friends yet 👻</p>
       ) : (friends.map((id) => (<FriendItem key={id} userId={id} onOpenChat={handleOpenChat} openMenuUid={openMenuUid}
-    setOpenMenuUid={setOpenMenuUid}
-    menuRef={menuRef}/> ))
+    setOpenMenuUid={setOpenMenuUid} onPerishSoul={handlePerishSoul}/> ))
       )}
     </div>
   );
@@ -199,10 +211,24 @@ export const FriendsTab = () => {
 
 
 
-const FriendItem = ({ userId, onOpenChat, openMenuUid, menuRef, setOpenMenuUid }: { userId: string; onOpenChat:(friend:any) => void; openMenuUid: string | null;
+const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishSoul, }: { userId: string; onOpenChat:(friend:any) => void; openMenuUid: string | null;
   setOpenMenuUid: React.Dispatch<React.SetStateAction<string | null>>;
-  menuRef: React.RefObject<HTMLDivElement | null>}) => {
+  onPerishSoul: (friendId: string) => void;}) => {
+
   const [friendData, setFriendData] = useState<any>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      setOpenMenuUid(null);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, []);
+
 
   useEffect(() => {
 
@@ -235,6 +261,9 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, menuRef, setOpenMenuUid }
     setOpenMenuUid(prev => (prev === uid ? null : uid));
   };
 
+
+  
+
   return (
     <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="flex items-center gap-3 p-3 hover:bg-purple-500/10 cursor-pointer mt-0">
   
@@ -258,7 +287,8 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, menuRef, setOpenMenuUid }
   <button onClick={(e) => {e.stopPropagation(); handleFriendMenuClick(friendData.uid);}}
     className="p-2 cursor-pointer rounded-full text-gray-400 hover:text-white transition duration-100 loat-right absolute right-3"
     title="More options">
-    <MoreVertical size={21} />
+    <MoreVertical size={21}
+/>
   </button>
 
 {openMenuUid === friendData.uid && (
@@ -267,13 +297,33 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, menuRef, setOpenMenuUid }
       className="absolute right-14 top-1/2 -translate-y-1/2 w-48 rounded-md bg-black/90 border border-white/10 shadow-xl z-50"
       onClick={(e) => e.stopPropagation()}
     >
-      <MenuItem icon={<User size={16} />} text="View Profile" />
-      <MenuItem icon={<VolumeX size={16} />} text="Mute Soul" />
       <MenuItem
-        icon={<Skull size={16} />}
-        text="Perish Soul"
-        danger
-      />
+      icon={<User size={16} />}
+      text="View Profile"
+      onClick={() => {
+        console.log("View profile:", friendData.uid);
+        setOpenMenuUid(null);
+      }}
+    />
+
+    <MenuItem
+      icon={<VolumeX size={16} />}
+      text="Mute Soul"
+      onClick={() => {
+        console.log("Mute soul:", friendData.uid);
+        setOpenMenuUid(null);
+      }}
+    />
+
+    <MenuItem
+      icon={<Skull size={16} />}
+      text="Perish Soul"
+      danger
+      onClick={() => {
+        onPerishSoul(friendData.uid);
+        setOpenMenuUid(null);
+      }}
+    />
     </div>
   )}
 
@@ -287,13 +337,16 @@ const MenuItem = ({
   text,
   icon,
   danger = false,
+  onClick
 }: {
   text: string;
   icon: React.ReactNode;
   danger?: boolean;
+  onClick?: () => void;
 }) => {
   return (
     <button
+    onClick={onClick}
       className={`w-full flex items-center justify-between px-3 py-2 text-sm transition
         ${
           danger

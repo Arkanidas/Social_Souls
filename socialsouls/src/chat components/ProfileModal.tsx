@@ -84,7 +84,9 @@ const statusColor =
         ? "border-yellow-400 shadow-[-1px_0px_45px_11px_rgba(234,_179,_8,_0.5)]"
         : "border-red-400 shadow-[-1px_0px_45px_11px_rgba(232, 55, 55)]"}`}/>
         </div>
-  
+       <span className="text-green-400 mt-2 px-2 py-1 rounded-full text-xs font-medium">
+        {statusText}
+       </span>
 
         {/* Username */}
         <h2 className="mt-4 text-4xl font-[Scary] text-white ">
