@@ -5,6 +5,8 @@ import { XIcon, MoreVertical, User, VolumeX, Skull  } from "lucide-react";
 import  Ghost  from "../assets/ghosts.png";
 import { useChat } from '../context/ChatContext';
 import { useSidebar } from "../context/SidebarContext";
+import { showUserProfileModal } from "../chat components/ProfileModal";
+
 
 type FriendRequestItemProps = {
   userId: string;
@@ -294,16 +296,16 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
 {openMenuUid === friendData.uid && (
     <div
       ref={menuRef}
-      className="absolute right-14 top-1/2 -translate-y-1/2 w-48 rounded-md bg-black/90 border border-white/10 shadow-xl z-50"
+      className="absolute right-14 top-1/3 -translate-y-1/2 w-48 rounded-md bg-black/90 border border-white/10 shadow-xl z-50"
       onClick={(e) => e.stopPropagation()}
     >
       <MenuItem
       icon={<User size={16} />}
       text="View Profile"
       onClick={() => {
-        console.log("View profile:", friendData.uid);
-        setOpenMenuUid(null);
-      }}
+       showUserProfileModal(friendData.uid);
+       setOpenMenuUid(null);
+  }}
     />
 
     <MenuItem

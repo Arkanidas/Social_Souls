@@ -26,6 +26,7 @@ const [user] = useAuthState(auth);
 const [profile, setProfile] = useState<UserProfile | null>(null);
 
 const useUserPresence = () => {
+
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
@@ -105,7 +106,7 @@ useEffect(() => {
           bio: profile.bio} : undefined}
           onProfileUpdated={fetchProfile}/>
          <UserProfileModal />
-        <ChatArea />
+         <ChatArea />
          <Toaster position="top-center" reverseOrder={false} />
       </div>;
   };

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { auth, db } from "../firebase/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { X } from "lucide-react";
+import Ghost from "../assets/ghosts.png";
 
 type UserProfile = {
   username: string;
@@ -13,30 +14,47 @@ type UserProfile = {
   };
 };
 
-export const showUserProfileModal = () => {
-  const event = new CustomEvent("showUserProfileModal");
+export const showUserProfileModal = (userId?: string) => {
+  const event = new CustomEvent("showUserProfileModal", {
+    detail: { userId }
+  });
   window.dispatchEvent(event);
 };
+
+
 
 
 export const UserProfileModal = () => {
   const [open, setOpen] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
-  
+   const closeModal = () => {
+  setOpen(false);
+  setProfile(null);
+};
 
   useEffect(() => {
-    const handler = async () => {
-      setOpen(true);
+    const handler = async (e: any) => {
 
-      const user = auth.currentUser;
-      if (!user) return;
+ 
+  setOpen(true);
+  setProfile(null); 
 
-      const snap = await getDoc(doc(db, "users", user.uid));
-      if (snap.exists()) {
-        setProfile(snap.data() as UserProfile);
-      }
-    };
+  
+
+  const passedUserId = e.detail?.userId;
+  const userIdToLoad = passedUserId || auth.currentUser?.uid;
+
+  if (!userIdToLoad) return;
+
+  const snap = await getDoc(doc(db, "users", userIdToLoad));
+  if (snap.exists()) {
+    setProfile(snap.data() as UserProfile);
+  }
+  
+};
+
+
 
     window.addEventListener("showUserProfileModal", handler);
     return () => window.removeEventListener("showUserProfileModal", handler);
@@ -61,30 +79,27 @@ const statusColor =
     ? "yellow"
     : "red";
 
+ 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm ">
       <div className="relative w-[340px] h-[460px] rounded-3xl bg-purple-800 p-6 shadow-2xl text-center UserProfileModal shadow-[4px_4px_0px_0px_rgba(255,_105,_180,_0.8)]">
 
-    
-        <button onClick={() => setOpen(false)} className="absolute top-4 right-4 text-white/80 hover:text-white cursor-pointer">
-          <X />
+        <button onClick={closeModal} className="absolute top-4 right-4 text-white/80 hover:text-white cursor-pointer">
+          <X/>
         </button>
 
 
-        <div className="
-    w-36 h-36 rounded-full p-1 flex justify-center mx-auto mt-4">
+        <div className="w-36 h-36 rounded-full p-1 flex justify-center mx-auto mt-4">
           <img
-            src={profile.profilePic}
-            className=
-            {`
-     w-full h-full rounded-full border-3 object-cover
-    ${ statusColor === "green"
-        ? "border-green-400 shadow-[-1px_0px_45px_11px_rgba(34,_197,_94,_0.5)]"
+            src={profile.profilePic || Ghost} 
+            className={`w-full h-full rounded-full border-3 object-cover
+       ${statusColor === "green"
+        ? "border-green-400 shadow-[0px_0px_24px_0px_rgba(0,255,0,1)]"
         : statusColor === "yellow"
-        ? "border-yellow-400 shadow-[-1px_0px_45px_11px_rgba(234,_179,_8,_0.5)]"
-        : "border-red-400 shadow-[-1px_0px_45px_11px_rgba(232, 55, 55)]"}`}/>
+        ? "border-yellow-400 shadow-[0px_0px_24px_0px_rgba(255,255,0,1)]"
+        : "border-red-600 shadow-[0px_0px_24px_0px_rgba(255,10,0,0.7)]"}`}/>
         </div>
-       <span className="text-green-400 mt-2 px-2 py-1 rounded-full text-xs font-medium">
+       <span className={`mt-2 px-2 py-1 rounded-full text-xs font-medium ${statusState === "online" ? "text-green-300" : statusState === "idle" ? "text-yellow-500" : "text-red-500"}`}>
         {statusText}
        </span>
 
@@ -96,7 +111,7 @@ const statusColor =
    
         {/* Bio */}
         <p className="mt-4 text-white/90 text-md leading-relaxed px-2">
-          {profile.bio || "No bio set yet."}
+          {profile.bio || "No bio set yet...."}
         </p>
       </div>
     </div>

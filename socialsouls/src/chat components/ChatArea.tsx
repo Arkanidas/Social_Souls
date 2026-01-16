@@ -10,6 +10,7 @@ import Ghostly from "../assets/ghosts.png";
 import { Ghost as GhostIcon } from "lucide-react";
 import {formatChatTimestamp, formatLastSeen} from './DateUtils';
 import { useNotificationSound } from "../Hooks/Notification";
+import { showUserProfileModal } from "../chat components/ProfileModal";
 
 
 export const showAddFriendModal = () => {
@@ -78,7 +79,7 @@ useEffect(() => {
 
   if (isSpamBlocked) return;
 
-  // 🚨 Spam check
+
   const isSpamming = checkSpam();
   if (isSpamming) return;
 
@@ -130,7 +131,7 @@ useEffect(() => {
 
 useEffect(() => {
   if (unreadCount > 0) {
-    document.title = `(${unreadCount}) New message${unreadCount > 1 ? "s" : ""} – ${BASE_TITLE}`;
+    document.title = `(${unreadCount}) New message${unreadCount > 1 ? "s" : ""} ${BASE_TITLE}`;
   } else {
     document.title = BASE_TITLE;
   }
@@ -343,7 +344,7 @@ try {
        sentRequests: arrayRemove(user.uid)
 });
 
-      toast.success(`${friendUsername} has been summoned successfully! 🪄`)
+      toast.success(`${friendUsername} has been summoned successfully!`)
       input.value = ''
       setShowAddFriend(false)
 
@@ -393,7 +394,7 @@ const handleCopyImageUrl = async () => {
 
   try {
     await navigator.clipboard.writeText(previewImage);
-    toast.success("Image copied to clipboard 📋");
+    toast.success("Image copied to clipboard");
   } catch {
     toast.error("Failed to copy image link");
   }
@@ -426,8 +427,8 @@ const handleDownloadImage = async () => {
   return <div className="flex-1 flex flex-col relative z-10 bg-gray-900/95 ">
       <div className="p-4 border-b backdrop-blur-sm border-purple-900/30 bg-gray-900/95 flex items-center ">
         <div className="flex items-center ">
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400 ">
-            <img src={activeChatUser ? activeChatUser.otherUser.profilePic : Ghostly} alt="Shadow Walker" className="w-full h-full object-cover" />
+          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400 cursor-pointer" onClick={() => showUserProfileModal(activeChatUser?.otherUser?.uid)}>
+            <img src={activeChatUser ? activeChatUser.otherUser.profilePic : Ghostly} alt="Unknown Ghost" className="w-full h-full object-cover" />
           </div>
 
           <div className="ml-3 ">
@@ -503,8 +504,6 @@ const handleDownloadImage = async () => {
   }}
 
 
-
-
      onDragEnter={(e) => {
       e.preventDefault();
       setIsDragging(true);}}
@@ -540,8 +539,7 @@ const handleDownloadImage = async () => {
       rounded-full
       shadow-lg
       animate-bounce
-      transition
-    "
+      transition"
     title="Scroll to latest"
   >
     ↓
