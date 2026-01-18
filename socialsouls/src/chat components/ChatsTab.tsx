@@ -7,7 +7,7 @@ export const ChatTab = () => {
   if (!activeChatUser) {
     return (
       <div className="flex items-center justify-center h-full text-gray-400">
-        👻 Select a friend to start chatting
+         Select a friend to start chatting
       </div>
     );
   }
