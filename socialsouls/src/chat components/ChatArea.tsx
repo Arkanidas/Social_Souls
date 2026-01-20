@@ -38,7 +38,6 @@ export const ChatArea = () => {
 
   const [Usermessages, setUserMessages] = useState<ChatMessage[]>([]);
   const [otherUserStatus, setOtherUserStatus] = useState<"online" | "idle"| "offline">("offline");
-  const { activeChatUser } = useChat();
   const [showAddFriend, setShowAddFriend] = useState<boolean>(false);
   const addFriendInputRef = useRef<HTMLInputElement>(null);
   const bottomScroll = useRef<HTMLDivElement>(null);
@@ -61,6 +60,12 @@ export const ChatArea = () => {
   const [messageTimestamps, setMessageTimestamps] = useState<number[]>([]);
   const [isSpamBlocked, setIsSpamBlocked] = useState(false);
   const [spamCountdown, setSpamCountdown] = useState(0);
+  const { openChats, activeChatId } = useChat();
+
+  const activeChatUser = openChats.find(
+  (chat) => chat.chatId === activeChatId
+);
+
 
   const BASE_TITLE = "Social Souls";
 

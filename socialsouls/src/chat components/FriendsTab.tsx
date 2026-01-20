@@ -20,7 +20,7 @@ export const FriendsTab = () => {
   const [friends, setFriends] = useState<any[]>([]);
   const [friendRequests, setFriendRequests] = useState<any[]>([]);
   const [sentRequests, setSentRequests] = useState<any[]>([]);
-  const { setActiveChatUser } = useChat();
+  const { openChat } = useChat();
   const { setActiveTab } = useSidebar();
   const [openMenuUid, setOpenMenuUid] = useState<string | null>(null);
   
@@ -39,7 +39,6 @@ export const FriendsTab = () => {
   const currentUserId = user.uid;
   const friendId = friend.uid;
 
-  // 1️⃣ Deterministic chatId
   const chatId = [currentUserId, friendId].sort().join("_");
 
   const chatRef = doc(db, "Chats", chatId);
@@ -55,9 +54,7 @@ export const FriendsTab = () => {
     });
   }
 
-
-
-  setActiveChatUser({
+  openChat({
     chatId,
     otherUser: {
       uid: friend.uid,

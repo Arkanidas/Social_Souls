@@ -1,31 +1,27 @@
 import { useChat } from "../context/ChatContext";
-import Ghost from "../assets/ghosts.png";
+import { ChatItem } from "./ChatItem";
 
 export const ChatTab = () => {
-  const { activeChatUser, setActiveChatUser } = useChat();
+  const { openChats, activeChatId } = useChat();
+  
 
-  if (!activeChatUser) {
+  if (openChats.length === 0) {
     return (
       <div className="flex items-center justify-center h-full text-gray-400">
-         Select a friend to start chatting
+        No open chats
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full">
-      
-      {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-purple-600/20 hover:bg-purple-500/10 transition cursor-pointer">
-        <img
-          src={activeChatUser.otherUser.profilePic || Ghost}
-          className="w-10 h-10 rounded-full border border-purple-500"
+    <div className="flex flex-col gap-1 p-2">
+      {openChats.map(chat => (
+        <ChatItem
+          key={chat.chatId}
+          chat={chat}
+          isActive={chat.chatId === activeChatId}
         />
-        <h2 className="text-gray-200 text-lg font-semibold">
-          {activeChatUser.otherUser.username || "Unknown Soul"}
-        </h2>
-      </div>
-
+      ))}
     </div>
   );
 };

@@ -1,47 +1,77 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
+
+
+
 const ChatContext = createContext<{
-  activeChatUser: ActiveChat;
-  setActiveChatUser: (chat: ActiveChat) => void;
+  openChats: OpenChat[];
+  activeChatId: string | null;
+  openChat: (chat: OpenChat) => void;
+  closeChat: (chatId: string) => void;
+  setActiveChatId: (chatId: string) => void;
 }>({
-  activeChatUser: null,
-  setActiveChatUser: () => {},
+  openChats: [],
+  activeChatId: null,
+  openChat: () => {},
+  closeChat: () => {},
+  setActiveChatId: () => {},
 });
 
 
-
-type ActiveChat = {
+type OpenChat = {
   chatId: string;
   otherUser: {
     uid: string;
     username: string;
     profilePic: string;
   };
-} | null;
+};
+
 
 export function ChatProvider({ children }: any) {
-  const [activeChatUser, setActiveChatUserState] = useState<ActiveChat>(null);
+
+const [openChats, setOpenChats] = useState<OpenChat[]>([]);
+const [activeChatId, setActiveChatId] = useState<string | null>(null);
+
+
 
   useEffect(() => {
-    const savedChat = localStorage.getItem("activeChat");
-    if (savedChat) {
-     setActiveChatUserState(JSON.parse(savedChat));
-    }
-  }, []);
+  const saved = localStorage.getItem("chatState");
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    setOpenChats(parsed.openChats || []);
+    setActiveChatId(parsed.activeChatId || null);
+  }
+}, []);
 
-   const setActiveChatUser = (chat: ActiveChat) => {
-    setActiveChatUserState(chat);
+useEffect(() => {
+  localStorage.setItem(
+    "chatState",
+    JSON.stringify({ openChats, activeChatId })
+  );
+}, [openChats, activeChatId]);
 
-    if (chat) {
-      localStorage.setItem("activeChat", JSON.stringify(chat));
-    } else {
-      localStorage.removeItem("activeChat");
-    }
-  };
+const openChat = (chat: OpenChat) => {
+  setOpenChats(prev => {
+    const exists = prev.some(c => c.chatId === chat.chatId);
+      if (exists) return prev;    
+    return [...prev, chat]; 
+  });
+
+  setActiveChatId(chat.chatId);
+};
+
+const closeChat = (chatId: string) => {
+  setOpenChats(prev => prev.filter(c => c.chatId !== chatId));
+
+  setActiveChatId(prev =>
+    prev === chatId ? null : prev
+  );
+};
 
 
   return (
-    <ChatContext.Provider value={{ activeChatUser, setActiveChatUser }}>
+    <ChatContext.Provider value={{openChats, activeChatId, openChat, closeChat, setActiveChatId}}>
       {children}
     </ChatContext.Provider>
   );
