@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { auth, db } from "../firebase/firebaseConfig";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 
 
 
@@ -6,14 +8,14 @@ import { createContext, useContext, useState, useEffect } from "react";
 const ChatContext = createContext<{
   openChats: OpenChat[];
   activeChatId: string | null;
-  openChat: (chat: OpenChat) => void;
-  closeChat: (chatId: string) => void;
+  openChat: (chat: OpenChat) => Promise<void>;
+  closeChat: (chatId: string) => Promise<void>;
   setActiveChatId: (chatId: string) => void;
 }>({
   openChats: [],
   activeChatId: null,
-  openChat: () => {},
-  closeChat: () => {},
+  openChat: async () => {},
+  closeChat: async () => {},
   setActiveChatId: () => {},
 });
 
@@ -34,39 +36,63 @@ const [openChats, setOpenChats] = useState<OpenChat[]>([]);
 const [activeChatId, setActiveChatId] = useState<string | null>(null);
 
 
-
-  useEffect(() => {
-  const saved = localStorage.getItem("chatState");
-  if (saved) {
-    const parsed = JSON.parse(saved);
-    setOpenChats(parsed.openChats || []);
-    setActiveChatId(parsed.activeChatId || null);
-  }
-}, []);
+const [user, setUser] = useState(() => auth.currentUser);
 
 useEffect(() => {
-  localStorage.setItem(
-    "chatState",
-    JSON.stringify({ openChats, activeChatId })
-  );
-}, [openChats, activeChatId]);
+  const unsub = auth.onAuthStateChanged(u => {
+    setUser(u);
+    if (!u) {
+      setOpenChats([]);
+      setActiveChatId(null);
+    }
+  });
+  return unsub;
+}, []);
 
-const openChat = (chat: OpenChat) => {
-  setOpenChats(prev => {
-    const exists = prev.some(c => c.chatId === chat.chatId);
-      if (exists) return prev;    
-    return [...prev, chat]; 
+
+useEffect(() => {
+  if (!user) return;
+
+  const ref = doc(db, "users", user.uid);
+
+  const unsub = onSnapshot(ref, snap => {
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+    setOpenChats(data.openChats || []);
+    setActiveChatId(data.activeChatId || null);
   });
 
-  setActiveChatId(chat.chatId);
+  return unsub;
+}, [user]);
+
+
+
+const openChat = async (chat: OpenChat): Promise<void> => {
+  if (!user) return;
+
+  const exists = openChats.some(c => c.chatId === chat.chatId);
+  const updatedChats = exists ? openChats : [...openChats, chat];
+
+  await updateDoc(doc(db, "users", user.uid), {
+    openChats: updatedChats,
+    activeChatId: chat.chatId,
+  });
 };
 
-const closeChat = (chatId: string) => {
-  setOpenChats(prev => prev.filter(c => c.chatId !== chatId));
 
-  setActiveChatId(prev =>
-    prev === chatId ? null : prev
-  );
+
+const closeChat = async (chatId: string): Promise<void> => {
+  if (!user) return;
+
+  const updated = openChats.filter(c => c.chatId !== chatId);
+  const nextActive =
+    activeChatId === chatId ? updated[0]?.chatId || null : activeChatId;
+
+  await updateDoc(doc(db, "users", user.uid), {
+    openChats: updated,
+    activeChatId: nextActive,
+  });
 };
 
 

@@ -14,7 +14,7 @@ export const ChatTab = () => {
   }
 
   return (
-    <div className="flex flex-col gap-1 p-2">
+    <div className="flex flex-col ">
       {openChats.map(chat => (
         <ChatItem
           key={chat.chatId}

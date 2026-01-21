@@ -218,12 +218,12 @@ const openChatWithFriend = (friend: any) => {
 )}
 
     
-      <div className="flex border-b border-purple-900/30"
-          >
+      <div className="flex border-b border-purple-900/30">
         <button onClick={() => setActiveTab('chats')} className={`flex-1 p-4 text-sm font-medium cursor-pointer ${activeTab === 'chats' ? 'text-purple-500 border-b-2 border-purple-500' : 'text-gray-400 hover:text-purple-500'}`}>
           <MessageSquareIcon className="h-5 w-5 mx-auto mb-1" />
           Chats
         </button>
+        
         <button onClick={() => setActiveTab('friends')} className={`flex-1 p-4 text-sm font-medium cursor-pointer ${activeTab === 'friends' ? 'text-purple-500 border-b-2 border-purple-500' : 'text-gray-400 hover:text-purple-500 '}`}>
           <Users2Icon className="h-5 w-5 mx-auto mb-1" />
           Friends
@@ -231,9 +231,9 @@ const openChatWithFriend = (friend: any) => {
       </div>
     
         
-  <div className="flex flex-col">
-     {activeTab === "friends" && <FriendsTab/>}
-     {activeTab === "chats" && <ChatTab/>}
+     <div className="flex flex-col">
+      {activeTab === "friends" && <FriendsTab/>}
+      {activeTab === "chats" && <ChatTab/>}
      </div>
    
    
@@ -243,15 +243,14 @@ const openChatWithFriend = (friend: any) => {
           <SettingsIcon className="h-6 w-6 cursor-pointer" />
         </button>
 
-
         <button className="text-gray-400 hover:text-purple-500 p-2">
           <SunIcon className="h-6 w-6" /> 
         </button>
+
         <button  onClick={()=> handleLogout()} className="text-gray-400 hover:text-purple-500 p-2">
           <LogOutIcon className="h-6 w-6 cursor-pointer"/>
         </button>
       </div>
-
 
         <SettingsPopup
         isOpen={isSettingsOpen}
@@ -259,10 +258,6 @@ const openChatWithFriend = (friend: any) => {
         UserName={profile?.username ?? ""}
         Bio={profile?.bio ?? ""}
         profilepic={profile?.profilepic ?? ""}
-        onProfileUpdated={onProfileUpdated} 
-      />
-
-     
-
+        onProfileUpdated={onProfileUpdated}/>
     </div>;
 };

@@ -54,7 +54,7 @@ export const FriendsTab = () => {
     });
   }
 
-  openChat({
+  await openChat({
     chatId,
     otherUser: {
       uid: friend.uid,
@@ -264,11 +264,11 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
   
 
   return (
-    <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="flex items-center gap-3 p-3 hover:bg-purple-500/10 cursor-pointer mt-0">
+    <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="flex items-center gap-3 p-3 hover:bg-purple-500/10 cursor-pointer mt-0 border-b border-gray-800/50 border-1">
   
       <img
         src={friendData.profilePic || Ghost}
-        className="w-10 h-10 rounded-full border border-purple-500"
+        className="w-10 h-10 rounded-full border border-purple-500 object-cover"
       />
 
       <div>
@@ -284,7 +284,7 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
       </div>
 
   <button onClick={(e) => {e.stopPropagation(); handleFriendMenuClick(friendData.uid);}}
-    className="p-2 cursor-pointer rounded-full text-gray-400 hover:text-white transition duration-100 loat-right absolute right-3"
+    className="p-2 cursor-pointer rounded-full text-gray-400 hover:text-white transition duration-100 absolute right-3"
     title="More options">
     <MoreVertical size={21}
 />
