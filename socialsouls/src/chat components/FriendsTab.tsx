@@ -44,7 +44,7 @@ export const FriendsTab = () => {
   const chatRef = doc(db, "Chats", chatId);
   const chatSnap = await getDoc(chatRef);
 
-  // 2️⃣ Create chat if it doesn't exist
+
   if (!chatSnap.exists()) {
     await setDoc(chatRef, {
       participants: [currentUserId, friendId],
@@ -74,7 +74,7 @@ const handlePerishSoul = async (friendId: string) => {
   const friendRef = doc(db, "users", friendId);
 
   try {
-    // Remove each other from friends lists
+   
     await Promise.all([
       updateDoc(userRef, {
         friends: arrayRemove(friendId),
@@ -272,11 +272,11 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
       />
 
       <div>
-        <p className="text-gray-200">{friendData.username}</p>
+        <p className="text-gray-200 font-[ChatFont] text-xl">{friendData.username}</p>
 
         <div className="flex items-center gap-2">
   <span className={`w-2 h-2 rounded-full ${ friendData.status === "online" ? "bg-green-500" : friendData.status === "idle" ? "bg-yellow-500" : "bg-gray-500"}`}/>
-  <p className="text-xs text-gray-400">
+  <p className="text-xs text-gray-400 ">
     {friendData.status === "online" ? "Active now" : friendData.status === "idle" ? "Idle" : "Offline"}
   </p>
 
@@ -420,8 +420,8 @@ const SentRequestItem = ({ userId, onCancel }: { userId: string; onCancel:(id: s
         src={friendData.profilePic || Ghost}
         className="w-10 h-10 rounded-full border border-purple-500"
       />
-      <div className="flex items-start  flex-col relative right-6 p-1">
-        <p className="text-gray-200 ">{friendData.username}</p>
+      <div className="flex items-start flex-col relative right-6 p-1">
+        <p className="text-gray-200">{friendData.username}</p>
         <p className="text-xs mt-1 text-purple-300 italic">awaiting their response</p>
       </div>
 

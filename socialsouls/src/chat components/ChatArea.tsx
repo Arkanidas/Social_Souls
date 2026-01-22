@@ -84,13 +84,11 @@ useEffect(() => {
 
   if (isSpamBlocked) return;
 
-
   const isSpamming = checkSpam();
   if (isSpamming) return;
 
   const chatId = activeChatUser.chatId;
   setIsUploading(true);
-
 
   try{
   let uploadedAttachments: any[] = [];
@@ -432,7 +430,9 @@ const handleDownloadImage = async () => {
   return <div className="flex-1 flex flex-col relative z-10 bg-gray-900/95 ">
       <div className="p-4 border-b backdrop-blur-sm border-purple-900/30 bg-gray-900/95 flex items-center ">
         <div className="flex items-center ">
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400 cursor-pointer" onClick={() => showUserProfileModal(activeChatUser?.otherUser?.uid)}>
+          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400 cursor-pointer" onClick={() => {
+    if (!activeChatUser) return;
+    showUserProfileModal(activeChatUser.otherUser.uid);}}>
             <img src={activeChatUser ? activeChatUser.otherUser.profilePic : Ghostly} alt="Unknown Ghost" className="w-full h-full object-cover" />
           </div>
 
@@ -440,6 +440,8 @@ const handleDownloadImage = async () => {
             <h3 className="text-white">
               {activeChatUser ? activeChatUser.otherUser.username : 'Select a Soul to Chat'}
             </h3>
+
+
 
         {activeChatUser && (
   <div className="relative group flex items-center gap-2">
@@ -503,7 +505,7 @@ const handleDownloadImage = async () => {
     if (!scroller) return;
 
     const isNearBottom =
-      scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight <550;
+      scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 550;
 
     setShowScrollToBottom(!isNearBottom);
   }}

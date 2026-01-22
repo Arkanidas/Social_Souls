@@ -1,6 +1,9 @@
 import Ghost from "../assets/ghosts.png";
 import { useChat } from "../context/ChatContext";
 import { X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 
 type UserProps = {
   chat: {
@@ -12,10 +15,30 @@ type UserProps = {
     };
   };
   isActive: boolean;
+
+  
 };
 
 export const ChatItem = ({ chat, isActive }: UserProps) => {
+
+
   const { setActiveChatId, closeChat } = useChat();
+  const [status, setStatus] = useState<"online" | "idle" | "offline">("offline");
+
+  
+useEffect(() => {
+  const userRef = doc(db, "users", chat.otherUser.uid);
+
+  const unsub = onSnapshot(userRef, (snap) => {
+    const data = snap.data();
+    if (data?.status?.state) {
+      setStatus(data.status.state);
+    }
+  });
+
+  return () => unsub();
+}, [chat.otherUser.uid]);
+
 
   return (
     <div
@@ -32,6 +55,16 @@ export const ChatItem = ({ chat, isActive }: UserProps) => {
       <span className="text-xl font-[ChatFont] text-gray-200 truncate">
         {chat.otherUser.username}
       </span>
+
+      <span
+    className={`w-2 h-2 rounded-full shrink-0 relative right-1
+      ${status === "online"
+        ? "bg-green-500"
+        : status === "idle"
+        ? "bg-yellow-500"
+        : "bg-gray-500"}
+    `}
+  />
 
        <button
         onClick={(e) => {
