@@ -1,7 +1,7 @@
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
 import { useEffect, useState, useRef } from "react";
-import { XIcon, MoreVertical, User, VolumeX, Skull  } from "lucide-react";
+import { XIcon, MoreVertical, User, VolumeX, Skull, Check  } from "lucide-react";
 import  Ghost  from "../assets/ghosts.png";
 import { useChat } from '../context/ChatContext';
 import { useSidebar } from "../context/SidebarContext";
@@ -167,10 +167,9 @@ const handlePerishSoul = async (friendId: string) => {
 
 
   return (
-
 <div className="flex flex-col">
   {sentRequests.length > 0 && (
-    <div className="">
+    <div>
       <div className="p-2 mt-2">
       <h3 className="text-white relative left-15 text-md"> Sent Soulmate Requests 
        <span className="text-sm text-purple-400"> ({sentRequests.length})</span>
@@ -183,8 +182,12 @@ const handlePerishSoul = async (friendId: string) => {
   )}
     
       {friendRequests.length > 0 && (
-        <div className="mb-4">
-          <h3 className="text-purple-400 mb-2">👻 New Soulmate Requests</h3>
+        <div>
+        <div className=" mt-2 mb-2">
+          <h3 className="text-white relative left-15 text-md"> New Soulmate Requests!
+             <span className="text-sm text-purple-400"> ({friendRequests.length})</span>
+          </h3>
+           </div>
           {friendRequests.map((id) => (
             <FriendRequestItem
               key={id}
@@ -193,12 +196,12 @@ const handlePerishSoul = async (friendId: string) => {
               onDecline={handleDecline}
             />
           ))}
-          
+         
         </div>
       )}
   
       {friends.length === 0 ? (
-        <p  className="text-gray-500 text-sm overflow-y-scroll">No friends yet 👻</p>
+        <p  className="text-gray-500 text-sm overflow-y-scroll relative left-[30%] top-4">No friends yet...</p>
       ) : (friends.map((id) => (<FriendItem key={id} userId={id} onOpenChat={handleOpenChat} openMenuUid={openMenuUid}
     setOpenMenuUid={setOpenMenuUid} onPerishSoul={handlePerishSoul}/> ))
       )}
@@ -376,24 +379,24 @@ const FriendRequestItem = ({ userId, onAccept, onDecline }: FriendRequestItemPro
   if (!friendData) return null;
 
   return (
-    <div className="relative group flex items-center justify-between gap-3 p-3 hover:bg-purple-500/10 rounded-md transition">
+    <div className="relative group flex items-center justify-between gap-3 p-3 hover:bg-purple-500/10 transition border-gray-800 border-dashed border-b-2">
       <div className="flex items-center gap-3">
         <img
           src={friendData.profilePic || Ghost}
-          className="w-10 h-10 rounded-full border border-purple-500"
+          className="w-10 h-10 rounded-full border border-purple-500 object-cover"
         />
         <div>
           <p className="text-gray-200">{friendData.username}</p>
-          <p className="text-sm mt-1 text-purple-300 italic">wants to be your soulmate 💌</p>
+          <p className="text-sm mt-1 text-purple-300 italic">wants to be your soulmate</p>
         </div>
       </div>
 
-      <div className="opacity-0 group-hover:opacity-100 flex gap-2 transition-opacity">
-        <button onClick={() => onAccept(userId)} className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700">
-          Accept
+      <div className="opacity-0 group-hover:opacity-100 flex gap-2 transition-opacity duration-500">
+        <button onClick={() => onAccept(userId)}>
+          <Check className="w-5 h-5 text-gray-500 hover:text-white cursor-pointer" />
         </button>
-        <button onClick={() => onDecline(userId)} className="bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700">
-          Decline
+        <button onClick={() => onDecline(userId)}>
+           <XIcon className="w-5 h-5 text-gray-500 hover:text-white cursor-pointer duration-500" />
         </button>
       </div>
     </div>
@@ -415,7 +418,7 @@ const SentRequestItem = ({ userId, onCancel }: { userId: string; onCancel:(id: s
   if (!friendData) return null;
 
   return (
-    <div className="group flex items-center justify-between gap-3 p-3 hover:bg-purple-500/10 transition border-gray-800 border-dashed border-b-3">
+    <div className=" relative group flex items-center justify-between gap-3 p-3 hover:bg-purple-500/10 transition border-gray-800 border-dashed border-b-3">
       <img
         src={friendData.profilePic || Ghost}
         className="w-10 h-10 rounded-full border border-purple-500"

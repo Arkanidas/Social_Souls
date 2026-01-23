@@ -63,14 +63,14 @@ if(isOpen) {
       })
 
       onProfileUpdated?.(); 
-       toast.success("Your spectral soul has been successfully updated 👻", {
+       toast.success("Your spectral soul has been successfully updated", {
       duration: 4000,
     });
       console.log("Profile updated successfully ✅")
       onClose() 
     } catch (error) {
       console.error("Error updating profile:", error)
-      toast.error("Failed to update your spectral soul, Please try again later!💀");
+      toast.error("Failed to update your spectral soul, Please try again later!");
     } finally {
       setIsSaving(false)
    
