@@ -267,7 +267,7 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
   
 
   return (
-    <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="flex items-center gap-3 p-3 hover:bg-purple-500/10 cursor-pointer mt-0 border-b border-gray-800/50 border-1">
+    <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="relative flex items-center gap-3 p-3 hover:bg-purple-500/10 cursor-pointer mt-0 border-b border-gray-800/50 border-1">
   
       <img
         src={friendData.profilePic || Ghost}
@@ -287,7 +287,7 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
       </div>
 
   <button onClick={(e) => {e.stopPropagation(); handleFriendMenuClick(friendData.uid);}}
-    className="p-2 cursor-pointer rounded-full text-gray-400 hover:text-white transition duration-100 absolute right-3"
+    className="ml-auto p-2 cursor-pointer rounded-full text-gray-400 hover:text-white transition duration-100"
     title="More options">
     <MoreVertical size={21}
 />
@@ -296,7 +296,7 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
 {openMenuUid === friendData.uid && (
     <div
       ref={menuRef}
-      className="absolute right-18 top-1/3 -translate-y-1/2 w-48 rounded-md bg-black/90 border border-white/10 shadow-xl z-50"
+      className="absolute right-12 top-1/2 -translate-y-1/2 w-48 rounded-md bg-black/90 border border-white/10 shadow-xl z-50"
       onClick={(e) => e.stopPropagation()}
     >
       <MenuItem

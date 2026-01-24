@@ -143,9 +143,9 @@ html, body {
 }
 
 .UserProfileModal {
+  
           animation: modalanimation 0.5s ease-out forwards;
    
-        
       
         }
         @keyframes modalanimation {

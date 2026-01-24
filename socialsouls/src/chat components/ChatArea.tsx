@@ -428,7 +428,7 @@ const handleDownloadImage = async () => {
  
   
   return <div className="flex-1 flex flex-col relative z-10 bg-gray-900/95 ">
-      <div className="p-4 border-b backdrop-blur-sm border-purple-900/30 bg-gray-900/95 flex items-center shadow-[inset_0px_0px_100px_-3px_rgba(0,_0,_0,_0.8)]">
+      <div className="p-4 border-b backdrop-blur-sm border-purple-900/30 bg-gray-900/95 flex items-center shadow-[inset_0px_0px_100px_-12px_rgba(0,_0,_0,_0.8)]">
         <div className="flex items-center ">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400 cursor-pointer" onClick={() => {
              if (!activeChatUser) return;
