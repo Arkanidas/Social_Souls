@@ -77,7 +77,7 @@ const statusColor =
     ? "green"
     : statusState === "idle"
     ? "yellow"
-    : "red";
+    : "gray";
 
  
   return (
@@ -97,9 +97,9 @@ const statusColor =
         ? "border-green-400 shadow-[0px_0px_24px_0px_rgba(0,255,0,1)]"
         : statusColor === "yellow"
         ? "border-yellow-400 shadow-[0px_0px_24px_0px_rgba(255,255,0,1)]"
-        : "border-red-600 shadow-[0px_0px_24px_0px_rgba(255,10,0,0.7)]"}`}/>
+        : "border-gray-500 shadow-[-1px_0px_23px_15px_rgba(0,_0,_0,_0.3)]"}`}/>
         </div>
-       <span className={`mt-2 px-2 py-1 rounded-full text-xs font-medium ${statusState === "online" ? "text-green-300" : statusState === "idle" ? "text-yellow-500" : "text-red-500"}`}>
+       <span className={`mt-2 px-2 py-1 rounded-full text-xs font-medium ${statusState === "online" ? "text-green-300" : statusState === "idle" ? "text-yellow-500" : "text-gray-300"}`}>
         {statusText}
        </span>
 

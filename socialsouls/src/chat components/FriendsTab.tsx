@@ -296,7 +296,7 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
 {openMenuUid === friendData.uid && (
     <div
       ref={menuRef}
-      className="absolute right-14 top-1/3 -translate-y-1/2 w-48 rounded-md bg-black/90 border border-white/10 shadow-xl z-50"
+      className="absolute right-18 top-1/3 -translate-y-1/2 w-48 rounded-md bg-black/90 border border-white/10 shadow-xl z-50"
       onClick={(e) => e.stopPropagation()}
     >
       <MenuItem
@@ -386,8 +386,8 @@ const FriendRequestItem = ({ userId, onAccept, onDecline }: FriendRequestItemPro
           className="w-10 h-10 rounded-full border border-purple-500 object-cover"
         />
         <div>
-          <p className="text-gray-200">{friendData.username}</p>
-          <p className="text-sm mt-1 text-purple-300 italic">wants to be your soulmate</p>
+          <p className="text-gray-200 font-[Chatfont] text-xl">{friendData.username}</p>
+          <p className="text-sm text-purple-300 italic">wants to be your soulmate</p>
         </div>
       </div>
 

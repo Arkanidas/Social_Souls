@@ -98,7 +98,7 @@ useEffect(() => {
 
 
 
-    return <div className="flex h-screen bg-gray-900/95">
+    return <div className="flex h-screen bg-black">
 
         <Sidebar profile={profile ? {
           username: profile.username,

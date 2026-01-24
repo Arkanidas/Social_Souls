@@ -322,7 +322,7 @@ try {
       const querySnapshot = await getDocs(q)
 
       if (querySnapshot.empty) {
-        toast.error("Spirit not found 👻")
+        toast.error("Spirit not found...")
         return
       }
 
@@ -331,7 +331,7 @@ try {
 
 
       if (friendId === user.uid) {
-        toast.error("You cannot summon yourself 😅")
+        toast.error("You cannot summon yourself")
         return
       }
 
@@ -421,18 +421,18 @@ const handleDownloadImage = async () => {
 
     URL.revokeObjectURL(url);
   } catch {
-    toast.error("Download failed");
+    toast.error("Download failed, Please try again!");
   }
 };
 
  
   
   return <div className="flex-1 flex flex-col relative z-10 bg-gray-900/95 ">
-      <div className="p-4 border-b backdrop-blur-sm border-purple-900/30 bg-gray-900/95 flex items-center ">
+      <div className="p-4 border-b backdrop-blur-sm border-purple-900/30 bg-gray-900/95 flex items-center shadow-[inset_0px_0px_100px_-3px_rgba(0,_0,_0,_0.8)]">
         <div className="flex items-center ">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400 cursor-pointer" onClick={() => {
-    if (!activeChatUser) return;
-    showUserProfileModal(activeChatUser.otherUser.uid);}}>
+             if (!activeChatUser) return;
+                showUserProfileModal(activeChatUser.otherUser.uid);}}>
             <img src={activeChatUser ? activeChatUser.otherUser.profilePic : Ghostly} alt="Unknown Ghost" className="w-full h-full object-cover" />
           </div>
 
@@ -443,11 +443,11 @@ const handleDownloadImage = async () => {
 
 
 
-        {activeChatUser && (
-  <div className="relative group flex items-center gap-2">
+  {activeChatUser && (
+        <div className="relative group flex items-center gap-2">
 
-    <p className="text-sm text-purple-400">
-      {otherUserStatus === "online"
+        <p className="text-sm text-purple-400">
+        {otherUserStatus === "online"
         ? "Haunting Online"
         : otherUserStatus === "idle"
         ? "Haunting Idle"
@@ -461,7 +461,7 @@ const handleDownloadImage = async () => {
           ? "text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]"
           : otherUserStatus === "idle"
           ? "text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]"
-          : "text-red-400 drop-shadow-[0_0_1px_rgba(239,68,68,0.8)]"
+          : "text-gray-400 shadow-[-1px_0px_23px_15px_rgba(0,_0,_0,_0.3)]"
       }
     />
 
@@ -497,9 +497,10 @@ const handleDownloadImage = async () => {
     </svg>
   </div>
 )}
-      
+
+
      
-    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95" ref={messagesContainerRef}
+    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95 shadow-[inset_0px_0px_100px_50px_rgba(0,_0,_0,_0.8)]" ref={messagesContainerRef}
      onScroll={() => {
     const scroller = messagesContainerRef.current;
     if (!scroller) return;
@@ -511,6 +512,7 @@ const handleDownloadImage = async () => {
   }}
 
 
+  
      onDragEnter={(e) => {
       e.preventDefault();
       setIsDragging(true);}}

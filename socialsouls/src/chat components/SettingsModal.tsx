@@ -3,9 +3,11 @@ import { X, Upload, UserIcon, FileTextIcon, GhostIcon } from 'lucide-react'
 import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
 import { useTheme } from '../chat components/ThemeContext'
 import { auth, db } from '../firebase/firebaseConfig'
-import { doc, updateDoc } from "firebase/firestore"
+import { doc, updateDoc, collection, query, where, getDocs } from "firebase/firestore"
 import {toast} from 'react-hot-toast';
 import ghost from "../assets/ghosts.png"
+
+
 
 interface SettingsPopupProps {
   isOpen: boolean
@@ -40,43 +42,69 @@ if(isOpen) {
  if (!isOpen) return null
 
  const SaveData = async () => {
+  try {
+    setIsSaving(true);
 
-    try {
-      setIsSaving(true)
-      const user = auth.currentUser
-      if (!user) throw new Error("No authenticated user found")
+    const user = auth.currentUser;
+    if (!user) throw new Error("No authenticated user found");
 
-      const userRef = doc(db, "users", user.uid)
-      let photoURL = profilePicture;
+    const userRef = doc(db, "users", user.uid);
 
-        if (profilePicture.startsWith("data:image")) {
+    // Normalize username (optional but recommended)
+    const trimmedUsername = username.trim();
+
+    // 🔍 Check if username already exists (except self)
+    const usernameQuery = query(
+      collection(db, "users"),
+      where("username", "==", trimmedUsername)
+    );
+
+    const usernameSnapshot = await getDocs(usernameQuery);
+
+    const usernameTaken = usernameSnapshot.docs.some(
+      (doc) => doc.id !== user.uid
+    );
+
+    if (usernameTaken) {
+      toast.error("Username already exists 👀");
+      setIsSaving(false);
+      return;
+    }
+
+    let photoURL = profilePicture;
+
+
+    if (profilePicture.startsWith("data:image")) {
       const storage = getStorage();
       const fileRef = ref(storage, `profilePics/${user.uid}.jpg`);
+
       await uploadString(fileRef, profilePicture, "data_url");
       photoURL = await getDownloadURL(fileRef);
-     
     }
-      await updateDoc(userRef, {
-        username: username,
-        bio: bio,
-        profilePic: photoURL
-      })
 
-      onProfileUpdated?.(); 
-       toast.success("Your spectral soul has been successfully updated", {
-      duration: 4000,
+    // Save user data
+    await updateDoc(userRef, {
+      username: trimmedUsername,
+      bio: bio,
+      profilePic: photoURL
     });
-      console.log("Profile updated successfully ✅")
-      onClose() 
-    } catch (error) {
-      console.error("Error updating profile:", error)
-      toast.error("Failed to update your spectral soul, Please try again later!");
-    } finally {
-      setIsSaving(false)
-   
-      
-    }
+
+    onProfileUpdated?.();
+
+    toast.success("Your spectral soul has been successfully updated 👻", {
+      duration: 4000
+    });
+
+    console.log("Profile updated successfully ✅");
+    onClose();
+
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    toast.error("Failed to update your spectral soul 💀 Please try again!");
+  } finally {
+    setIsSaving(false);
   }
+};
 
 
   return (
