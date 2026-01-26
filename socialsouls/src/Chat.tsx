@@ -1,11 +1,12 @@
 import {Sidebar} from './chat components/Sidebar';
 import {ChatArea} from './chat components/ChatArea';
 import { useEffect, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "./firebase/firebaseConfig"; 
 import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { Toaster } from "react-hot-toast";
 import { UserProfileModal } from "../src/chat components/ProfileModal";
+import { getDatabase, ref, set, onDisconnect } from "firebase/database";
+import { onAuthStateChanged } from "firebase/auth";
 
 interface UserProfile {
   profilePic: string;
@@ -22,55 +23,93 @@ interface UserProfile {
 
 
 
-const [user] = useAuthState(auth);
+
 const [profile, setProfile] = useState<UserProfile | null>(null);
 
 const useUserPresence = () => {
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (!user) return;
+    
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (!user) return;
 
-    const userRef = doc(db, "users", user.uid);
+      const rtdb = getDatabase();
+      const presenceRef = ref(rtdb, `status/${user.uid}`);
+      const userDocRef = doc(db, "users", user.uid);
 
-    // Online when Chat opens
-    updateDoc(userRef, {
-      status: {
+      // Set online instantly
+      set(presenceRef, {
         state: "online",
-        lastSeen: serverTimestamp(),
-      },
+        lastChanged: Date.now(),
+      });
+
+      updateDoc(userDocRef, {
+        status: {
+          state: "online",
+          lastSeen: serverTimestamp(),
+        },
+      });
+
+      const heartbeat = setInterval(() => {
+  set(presenceRef, {
+    state: "online",
+    lastChanged: Date.now(),
+  });
+
+  updateDoc(userDocRef, {
+    status: {
+      state: "online",
+      lastSeen: serverTimestamp(),
+    },
+  });
+}, 15000);
+
+
+      // Auto offline if connection drops
+      onDisconnect(presenceRef).set({
+        state: "offline",
+        lastChanged: Date.now(),
+      });
+
+      const handleVisibility = () => {
+        const state = document.hidden ? "idle" : "online";
+
+        set(presenceRef, { state, lastChanged: Date.now() });
+
+        updateDoc(userDocRef, {
+          status: {
+            state,
+            lastSeen: serverTimestamp(),
+          },
+        });
+      };
+
+      document.addEventListener("visibilitychange", handleVisibility);
+
+      // CLEANUP when logout happens
+      return () => {
+        set(presenceRef, {
+          state: "offline",
+          lastChanged: Date.now(),
+        });
+
+        updateDoc(userDocRef, {
+          status: {
+            state: "offline",
+            lastSeen: serverTimestamp(),
+          },
+        });
+
+        document.removeEventListener("visibilitychange", handleVisibility);
+        clearInterval(heartbeat);
+      };
     });
 
-    // Idle when tab not visible
-    const handleVisibility = () => {
-      updateDoc(userRef, {
-        status: {
-          state: document.hidden ? "idle" : "online",
-          lastSeen: serverTimestamp(),
-        },
-      });
-    };
-
-    // offline on close / refresh
-    const handleOffline = () => {
-      updateDoc(userRef, {
-        status: {
-          state: "offline",
-          lastSeen: serverTimestamp(),
-        },
-      });
-    };
-
-    document.addEventListener("visibilitychange", handleVisibility);
-    window.addEventListener("beforeunload", handleOffline);
-
-    return () => {
-      handleOffline();
-      document.removeEventListener("visibilitychange", handleVisibility);
-      window.removeEventListener("beforeunload", handleOffline);
-    };
+    return () => unsubscribeAuth();
   }, []);
 };
+
+
 
       useUserPresence();
 

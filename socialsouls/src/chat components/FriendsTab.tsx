@@ -421,7 +421,7 @@ const SentRequestItem = ({ userId, onCancel }: { userId: string; onCancel:(id: s
     <div className=" relative group flex items-center justify-between gap-3 p-3 hover:bg-purple-500/10 transition border-gray-800 border-dashed border-b-3">
       <img
         src={friendData.profilePic || Ghost}
-        className="w-10 h-10 rounded-full border border-purple-500"
+        className="w-10 h-10 rounded-full border border-purple-500 object-cover"
       />
       <div className="flex items-start flex-col relative right-6 p-1">
         <p className="text-gray-200">{friendData.username}</p>
