@@ -50,10 +50,10 @@ if(isOpen) {
 
     const userRef = doc(db, "users", user.uid);
 
-    // Normalize username (optional but recommended)
+  
     const trimmedUsername = username.trim();
 
-    // 🔍 Check if username already exists (except self)
+  
     const usernameQuery = query(
       collection(db, "users"),
       where("username", "==", trimmedUsername)
@@ -82,7 +82,7 @@ if(isOpen) {
       photoURL = await getDownloadURL(fileRef);
     }
 
-    // Save user data
+  
     await updateDoc(userRef, {
       username: trimmedUsername,
       bio: bio,
@@ -91,16 +91,16 @@ if(isOpen) {
 
     onProfileUpdated?.();
 
-    toast.success("Your spectral soul has been successfully updated 👻", {
+    toast.success("Your spectral soul has been successfully updated", {
       duration: 4000
     });
 
-    console.log("Profile updated successfully ✅");
+    console.log("Profile updated successfully ");
     onClose();
 
   } catch (error) {
     console.error("Error updating profile:", error);
-    toast.error("Failed to update your spectral soul 💀 Please try again!");
+    toast.error("Failed to update your spectral soul, Please try again!");
   } finally {
     setIsSaving(false);
   }

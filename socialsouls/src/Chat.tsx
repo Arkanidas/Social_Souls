@@ -26,12 +26,39 @@ interface UserProfile {
 
 const [profile, setProfile] = useState<UserProfile | null>(null);
 
+
 const useUserPresence = () => {
+
+let lastUid: string | null = null;
 
   useEffect(() => {
     
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (!user) return;
+      if (!user) {
+ 
+  if (lastUid) {
+    const rtdb = getDatabase();
+    const presenceRef = ref(rtdb, `status/${lastUid}`);
+    const userDocRef = doc(db, "users", lastUid);
+
+    set(presenceRef, {
+      state: "offline",
+      lastChanged: Date.now(),
+    });
+
+    updateDoc(userDocRef, {
+      status: {
+        state: "offline",
+        lastSeen: serverTimestamp(),
+      },
+    });
+
+    lastUid = null;
+  }
+
+  return;
+}
+  lastUid = user.uid;
 
       const rtdb = getDatabase();
       const presenceRef = ref(rtdb, `status/${user.uid}`);
