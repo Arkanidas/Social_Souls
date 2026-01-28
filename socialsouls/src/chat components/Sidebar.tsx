@@ -39,17 +39,8 @@ export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
 
 
-const navigate = useNavigate();
 
-const handleLogout = async () => {
-  await signOut(auth);
-  navigate("/");
-  localStorage.removeItem("activeChat");
-};
-
-
-   
-
+  
  
 useEffect(() => {
   const user = auth.currentUser;

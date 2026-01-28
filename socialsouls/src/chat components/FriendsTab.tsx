@@ -6,7 +6,7 @@ import  Ghost  from "../assets/ghosts.png";
 import { useChat } from '../context/ChatContext';
 import { useSidebar } from "../context/SidebarContext";
 import { showUserProfileModal } from "../chat components/ProfileModal";
-
+import { getDatabase, ref, onValue } from "firebase/database";
 
 type FriendRequestItemProps = {
   userId: string;
@@ -221,6 +221,25 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+  const rtdb = getDatabase();
+  const statusRef = ref(rtdb, `status/${userId}`);
+
+  const unsub = onValue(statusRef, (snap) => {
+    if (!snap.exists()) return;
+
+    const statusData = snap.val();
+
+    setFriendData((prev: any) => ({
+      ...prev,
+      status: statusData.state || "offline",
+    }));
+  });
+
+  return () => unsub();
+}, [userId]);
+
+
+  useEffect(() => {
   const handleClickOutside = (e: MouseEvent) => {
     if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
       setOpenMenuUid(null);
@@ -244,8 +263,7 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
       uid: snap.id,
       username: data.username,
       profilePic: data.profilePic || Ghost,
-      status: data.status?.state || "offline",
-      lastSeen: data.status?.lastSeen,
+     
     });
   });
 
@@ -278,7 +296,7 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
         <p className="text-gray-200 font-[ChatFont] text-xl">{friendData.username}</p>
 
         <div className="flex items-center gap-2">
-  <span className={`w-2 h-2 rounded-full ${ friendData.status === "online" ? "bg-green-500" : friendData.status === "idle" ? "bg-yellow-500" : "bg-gray-500"}`}/>
+  <span className={`w-2 h-2 rounded-full ${friendData.status === "online" ? "bg-green-500" : friendData.status === "idle" ? "bg-yellow-500" : "bg-gray-500"}`}/>
   <p className="text-xs text-gray-400 ">
     {friendData.status === "online" ? "Active now" : friendData.status === "idle" ? "Idle" : "Offline"}
   </p>

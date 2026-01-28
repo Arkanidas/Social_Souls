@@ -28,47 +28,16 @@ const [profile, setProfile] = useState<UserProfile | null>(null);
 
 
 const useUserPresence = () => {
-
-let lastUid: string | null = null;
-
   useEffect(() => {
-    
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (!user) {
- 
-  if (lastUid) {
-    const rtdb = getDatabase();
-    const presenceRef = ref(rtdb, `status/${lastUid}`);
-    const userDocRef = doc(db, "users", lastUid);
-
-    set(presenceRef, {
-      state: "offline",
-      lastChanged: Date.now(),
-    });
-
-    updateDoc(userDocRef, {
-      status: {
-        state: "offline",
-        lastSeen: serverTimestamp(),
-      },
-    });
-
-    lastUid = null;
-  }
-
-  return;
-}
-  lastUid = user.uid;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) return;
 
       const rtdb = getDatabase();
       const presenceRef = ref(rtdb, `status/${user.uid}`);
       const userDocRef = doc(db, "users", user.uid);
 
-      // Set online instantly
-      set(presenceRef, {
-        state: "online",
-        lastChanged: Date.now(),
-      });
+      // ✅ ONLINE when app opens
+      set(presenceRef, { state: "online", lastChanged: Date.now() });
 
       updateDoc(userDocRef, {
         status: {
@@ -77,27 +46,13 @@ let lastUid: string | null = null;
         },
       });
 
-      const heartbeat = setInterval(() => {
-  set(presenceRef, {
-    state: "online",
-    lastChanged: Date.now(),
-  });
-
-  updateDoc(userDocRef, {
-    status: {
-      state: "online",
-      lastSeen: serverTimestamp(),
-    },
-  });
-}, 15000);
-
-
-      // Auto offline if connection drops
+      // ✅ OFFLINE automatically if tab closes / connection drops
       onDisconnect(presenceRef).set({
         state: "offline",
         lastChanged: Date.now(),
       });
 
+      // ✅ IDLE when tab hidden
       const handleVisibility = () => {
         const state = document.hidden ? "idle" : "online";
 
@@ -113,12 +68,9 @@ let lastUid: string | null = null;
 
       document.addEventListener("visibilitychange", handleVisibility);
 
-      // CLEANUP when logout happens
+      // ✅ OFFLINE when user logs out
       return () => {
-        set(presenceRef, {
-          state: "offline",
-          lastChanged: Date.now(),
-        });
+        set(presenceRef, { state: "offline", lastChanged: Date.now() });
 
         updateDoc(userDocRef, {
           status: {
@@ -128,11 +80,10 @@ let lastUid: string | null = null;
         });
 
         document.removeEventListener("visibilitychange", handleVisibility);
-        clearInterval(heartbeat);
       };
     });
 
-    return () => unsubscribeAuth();
+    return () => unsubscribe();
   }, []);
 };
 
