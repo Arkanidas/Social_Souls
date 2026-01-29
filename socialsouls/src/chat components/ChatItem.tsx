@@ -2,7 +2,8 @@ import Ghost from "../assets/ghosts.png";
 import { useChat } from "../context/ChatContext";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getDatabase, ref, onValue } from "firebase/database";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 
 
 type UserProps = {
@@ -27,17 +28,13 @@ export const ChatItem = ({ chat, isActive }: UserProps) => {
 
   
 useEffect(() => {
-  const rtdb = getDatabase();
-  const statusRef = ref(rtdb, `status/${chat.otherUser.uid}`);
+  const userRef = doc(db, "users", chat.otherUser.uid);
 
-  const unsub = onValue(statusRef, (snap) => {
-    if (!snap.exists()) {
-      setStatus("offline");
-      return;
+  const unsub = onSnapshot(userRef, (snap) => {
+    const data = snap.data();
+    if (data?.status?.state) {
+      setStatus(data.status.state);
     }
-
-    const data = snap.val();
-    setStatus(data.state || "offline");
   });
 
   return () => unsub();

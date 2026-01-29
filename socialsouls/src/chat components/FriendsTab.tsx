@@ -6,7 +6,6 @@ import  Ghost  from "../assets/ghosts.png";
 import { useChat } from '../context/ChatContext';
 import { useSidebar } from "../context/SidebarContext";
 import { showUserProfileModal } from "../chat components/ProfileModal";
-import { getDatabase, ref, onValue } from "firebase/database";
 
 type FriendRequestItemProps = {
   userId: string;
@@ -219,25 +218,7 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
 
   const [friendData, setFriendData] = useState<any>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-  const rtdb = getDatabase();
-  const statusRef = ref(rtdb, `status/${userId}`);
-
-  const unsub = onValue(statusRef, (snap) => {
-    if (!snap.exists()) return;
-
-    const statusData = snap.val();
-
-    setFriendData((prev: any) => ({
-      ...prev,
-      status: statusData.state || "offline",
-    }));
-  });
-
-  return () => unsub();
-}, [userId]);
-
+  
 
   useEffect(() => {
   const handleClickOutside = (e: MouseEvent) => {
@@ -258,13 +239,20 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
     const unsub = onSnapshot(ref, (snap) => {
     if (!snap.exists()) return;
 
+
     const data = snap.data();
-    setFriendData({
+
+const lastSeen = data.status?.lastSeen?.toDate?.()?.getTime() || 0;
+const now = Date.now();
+const AFK = now - lastSeen > 30000;
+
+  setFriendData((prev:any) => ({
+      ...prev,
       uid: snap.id,
       username: data.username,
       profilePic: data.profilePic || Ghost,
-     
-    });
+      status: AFK ? "offline" : data.status?.state || "offline",
+    }));
   });
 
    
