@@ -183,7 +183,7 @@ const openChatWithFriend = (friend: any) => {
       onClick={() => setShowSearchModal(false)}
     />
 
-    {/* Modal */}
+    {/* Search Modal */}
     <div className="absolute top-36 left-4 right-4 z-50 bg-gray-900/95 border border-purple-900/30 rounded-md shadow-xl p-2 max-h-80 overflow-y-auto hover:bg-gray-800 transition cursor-pointer">
       {filteredFriends.length === 0 ? (
         <p className="text-sm text-gray-400 text-center py-4">

@@ -270,7 +270,6 @@ const AFK = now - lastSeen > 30000;
   };
 
 
-  
 
   return (
     <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="relative flex items-center gap-3 p-3 hover:bg-purple-500/10 cursor-pointer mt-0 border-b border-gray-800/50 border-1">

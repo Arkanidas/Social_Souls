@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { XIcon } from "lucide-react";
 import { auth } from "../firebase/firebaseConfig";
 import { signOut } from "firebase/auth";
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 
 export const showLogoutModal = () => {
   window.dispatchEvent(new CustomEvent("showLogoutModal"));
@@ -17,6 +19,23 @@ export const LogoutConfirmModal = () => {
   }, []);
 
   const handleLogout = async () => {
+
+  const user = auth.currentUser;
+
+if (user) {
+    const userRef = doc(db, "users", user.uid);
+
+    // ✅ Force Offline BEFORE logout
+    await updateDoc(userRef, {
+      status: {
+        state: "offline",
+        lastSeen: serverTimestamp(),
+      },
+    });
+  }
+
+
+
     await signOut(auth);
     window.location.reload();
   };

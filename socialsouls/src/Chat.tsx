@@ -65,6 +65,9 @@ const useUserPresence = () => {
 
     window.addEventListener("beforeunload", handleUnload);
 
+   
+
+
     // Set Offline on logout or disconnect 
     return () => {
       handleUnload();
@@ -74,6 +77,8 @@ const useUserPresence = () => {
   });
 
   return () => unsub();
+
+  
 }, []);
 };
 
