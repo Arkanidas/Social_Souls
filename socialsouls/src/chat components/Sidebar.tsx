@@ -1,7 +1,5 @@
 import { useState, useEffect} from 'react';
 import { Users2Icon, MessageSquareIcon, SettingsIcon, SearchIcon, SunIcon, LogOutIcon, UserPlusIcon } from 'lucide-react';
-import { signOut } from "firebase/auth";
-import { useNavigate } from 'react-router-dom';
 import { auth, db} from '../firebase/firebaseConfig'; 
 import { SettingsPopup } from '../chat components/SettingsModal';
 import { showAddFriendModal } from './ChatArea'

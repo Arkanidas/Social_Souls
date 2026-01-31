@@ -202,7 +202,7 @@ const handlePerishSoul = async (friendId: string) => {
       {friends.length === 0 ? (
         <p  className="text-gray-500 text-sm overflow-y-scroll relative left-[30%] top-4">No friends yet...</p>
       ) : (friends.map((id) => (<FriendItem key={id} userId={id} onOpenChat={handleOpenChat} openMenuUid={openMenuUid}
-    setOpenMenuUid={setOpenMenuUid} onPerishSoul={handlePerishSoul}/> ))
+           setOpenMenuUid={setOpenMenuUid} onPerishSoul={handlePerishSoul}/> ))
       )}
     </div>
   );
@@ -256,7 +256,6 @@ const AFK = now - lastSeen > 30000;
   });
 
    
-
       return () => unsub();
   }, [userId]);
 
@@ -272,7 +271,7 @@ const AFK = now - lastSeen > 30000;
 
 
   return (
-    <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="relative flex items-center gap-3 p-3 hover:bg-purple-500/10 cursor-pointer mt-0 border-b border-gray-800/50 border-1">
+    <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="relative flex items-center gap-3 p-3 hover:bg-purple-500/10 duration-200 cursor-pointer mt-0 border-b border-l-0 border-r-0 border-gray-800/50 border-1">
   
       <img
         src={friendData.profilePic || Ghost}
