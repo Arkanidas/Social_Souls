@@ -25,7 +25,7 @@ export const LogoutConfirmModal = () => {
 if (user) {
     const userRef = doc(db, "users", user.uid);
 
-    // ✅ Force Offline BEFORE logout
+    // set Offline Before logout
     await updateDoc(userRef, {
       status: {
         state: "offline",
@@ -33,9 +33,6 @@ if (user) {
       },
     });
   }
-
-
-
     await signOut(auth);
     window.location.reload();
   };
@@ -43,7 +40,7 @@ if (user) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-md animate-fadeIn ">
       <div className="bg-gray-900 border border-purple-700/40 rounded-xl shadow-2xl p-6 w-full max-w-md scale-95 UserProfileModal">
 
         {/* Header */}
@@ -60,12 +57,12 @@ if (user) {
           </button>
         </div>
 
-        {/* Body */}
+      
         <p className="text-gray-400 mb-6">
           Your spectral presence will fade until you return 👻
         </p>
 
-        {/* Buttons */}
+
         <div className="flex justify-end gap-3">
           <button
             onClick={() => setIsOpen(false)}

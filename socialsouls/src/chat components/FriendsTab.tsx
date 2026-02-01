@@ -300,12 +300,12 @@ const AFK = now - lastSeen > 30000;
 {openMenuUid === friendData.uid && (
     <div
       ref={menuRef}
-      className="absolute right-12 top-1/2 -translate-y-1/2 w-48 rounded-md bg-black/90 border border-white/10 shadow-xl z-50"
+      className="absolute right-12 top-1/2 -translate-y-1/2 w-48 rounded-md bg-[#171717] border border-white/10 shadow-xl z-50"
       onClick={(e) => e.stopPropagation()}
     >
       <MenuItem
       icon={<User size={16} />}
-      text="View Profile"
+      text="View Soul Profile"
       onClick={() => {
        showUserProfileModal(friendData.uid);
        setOpenMenuUid(null);
@@ -343,25 +343,24 @@ const MenuItem = ({
   text,
   icon,
   danger = false,
-  onClick
+  onClick,
 }: {
   text: string;
   icon: React.ReactNode;
   danger?: boolean;
   onClick?: () => void;
+
 }) => {
   return (
     <button
     onClick={onClick}
-      className={`w-full flex items-center justify-between px-3 py-2 text-sm transition
+      className={`group w-full flex items-center justify-start gap-3 p-3 text-sm transition cursor-pointer duration-200
         ${
           danger
             ? "text-red-400 hover:bg-red-500/10"
-            : "text-gray-200 hover:bg-white/10"
-        }`}
-    >
-      <span>{text}</span>
-      <span className="opacity-80">{icon}</span>
+            : "text-gray-200 hover:bg-white/10"}`}>
+      <span className="flex order-2  group-hover:translate-x-1.5 transition-all duration-200">{text}</span>
+      <span className="opacity-80 order-1 transition-all duration-200 group-hover:opacity-100 group-hover:scale-115">{icon}</span>
     </button>
   );
 };
