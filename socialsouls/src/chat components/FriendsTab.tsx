@@ -6,6 +6,7 @@ import  Ghost  from "../assets/ghosts.png";
 import { useChat } from '../context/ChatContext';
 import { useSidebar } from "../context/SidebarContext";
 import { showUserProfileModal } from "../chat components/ProfileModal";
+import { useNotificationSound } from "../Hooks/Notification";
 
 type FriendRequestItemProps = {
   userId: string;
@@ -22,6 +23,7 @@ export const FriendsTab = () => {
   const { openChat } = useChat();
   const { setActiveTab } = useSidebar();
   const [openMenuUid, setOpenMenuUid] = useState<string | null>(null);
+  const { play } = useNotificationSound();
   
 
   
@@ -90,6 +92,24 @@ const handlePerishSoul = async (friendId: string) => {
   }
 };
  
+const toggleMuteSoul = async (friendId: string) => {
+  if (!auth.currentUser) return;
+
+  const ref = doc(db, "users", auth.currentUser.uid);
+  const snap = await getDoc(ref);
+
+  const muted = snap.data()?.mutedSouls || [];
+
+  await updateDoc(ref, {
+    mutedSouls: muted.includes(friendId)
+      ? arrayRemove(friendId)
+      : arrayUnion(friendId),
+  });
+  if (muted.includes(friendId)) return;
+    play();
+
+  
+};
 
 
   if (!user) {
@@ -139,7 +159,6 @@ const handlePerishSoul = async (friendId: string) => {
     const userRef = doc(db, "users", user.uid);
     const friendRef = doc(db, "users", friendId);
 
-   
     await updateDoc(userRef, {
       friends: arrayUnion(friendId),
       friendRequests: arrayRemove(friendId)
@@ -152,6 +171,7 @@ const handlePerishSoul = async (friendId: string) => {
 
     setFriendRequests(prev => prev.filter((id) => id !== friendId));
   };
+
 
   const handleDecline = async (friendId: string) => {
     const userRef = doc(db, "users", user.uid);
@@ -218,7 +238,7 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
 
   const [friendData, setFriendData] = useState<any>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
-  
+  const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => {
   const handleClickOutside = (e: MouseEvent) => {
@@ -230,6 +250,23 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
   document.addEventListener("mousedown", handleClickOutside);
   return () => document.removeEventListener("mousedown", handleClickOutside);
 }, []);
+
+
+useEffect(() => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) return;
+
+  const ref = doc(db, "users", currentUser.uid);
+
+  const unsub = onSnapshot(ref, (snap) => {
+    const muted = snap.data()?.mutedSouls || [];
+    setIsMuted(muted.includes(userId));
+  });
+
+  
+
+  return () => unsub();
+}, [userId]);
 
 
   useEffect(() => {
@@ -314,9 +351,8 @@ const AFK = now - lastSeen > 30000;
 
     <MenuItem
       icon={<VolumeX size={16} />}
-      text="Mute Soul"
+      text={isMuted ? "Unmute Soul" : "Mute Soul"}
       onClick={() => {
-        console.log("Mute soul:", friendData.uid);
         setOpenMenuUid(null);
       }}
     />
