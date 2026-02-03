@@ -61,6 +61,7 @@ export const ChatArea = () => {
   const [isSpamBlocked, setIsSpamBlocked] = useState(false);
   const [spamCountdown, setSpamCountdown] = useState(0);
   const { openChats, activeChatId } = useChat();
+  const [mutedSouls, setMutedSouls] = useState<string[]>([]);
 
   const activeChatUser = openChats.find(
   (chat) => chat.chatId === activeChatId
@@ -195,6 +196,19 @@ lastMessageIdRef.current = lastMsg?.id || null;
 }, [activeChatUser?.chatId]);
 
 
+useEffect(() => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) return;
+
+  const ref = doc(db, "users", currentUser.uid);
+
+  const unsub = onSnapshot(ref, snap => {
+    setMutedSouls(snap.data()?.mutedSouls || []);
+  });
+
+  return () => unsub();
+}, []);
+
 
 
 useEffect(() => {
@@ -204,12 +218,18 @@ useEffect(() => {
   const lastMessage = Usermessages[Usermessages.length - 1];
   const currentUserId = auth.currentUser?.uid;
 
-  if (Usermessages.length > prevMessageCountRef.current && lastMessage.senderId !== currentUserId) {
+  const isNewMessage = Usermessages.length > prevMessageCountRef.current;
+
+  const isFromOtherUser = lastMessage.senderId !== currentUserId;
+
+  const isMuted = mutedSouls.includes(lastMessage.senderId);
+
+  if (isNewMessage && isFromOtherUser && !isMuted) {
     play();
   }
 
   prevMessageCountRef.current = Usermessages.length;
-}, [Usermessages, activeChatUser, play]);
+}, [Usermessages, activeChatUser, mutedSouls, play]);
 
 
 

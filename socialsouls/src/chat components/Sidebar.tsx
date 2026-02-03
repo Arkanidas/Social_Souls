@@ -12,7 +12,7 @@ import { Ghost as GhostIcon } from "lucide-react";
 import { showUserProfileModal } from "../chat components/ProfileModal";
 import { LogoutConfirmModal } from "./ShowLogoutModal";
 import { showLogoutModal } from "../chat components/ShowLogoutModal";
-import { useChat } from "../context/ChatContext";
+
 
 
 type ProfileType = {
@@ -37,7 +37,6 @@ export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
   const [friends, setFriends] = useState<any[]>([]);
   const [filteredFriends, setFilteredFriends] = useState<any[]>([]);
   const [showSearchModal, setShowSearchModal] = useState(false);
-  const {setActiveChatId,} = useChat();
 
 
   

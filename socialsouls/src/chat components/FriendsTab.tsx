@@ -1,7 +1,7 @@
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
 import { useEffect, useState, useRef } from "react";
-import { XIcon, MoreVertical, User, VolumeX, Skull, Check  } from "lucide-react";
+import { XIcon, MoreVertical, User, VolumeX, Skull, Check, Volume2, Ban } from "lucide-react";
 import  Ghost  from "../assets/ghosts.png";
 import { useChat } from '../context/ChatContext';
 import { useSidebar } from "../context/SidebarContext";
@@ -24,16 +24,16 @@ export const FriendsTab = () => {
   const { setActiveTab } = useSidebar();
   const [openMenuUid, setOpenMenuUid] = useState<string | null>(null);
   const { play } = useNotificationSound();
-  
-
-  
-
-
-
-  
   const user = auth.currentUser;
 
+  
 
+
+
+  
+
+
+   // Open Chat on Friend Click
   const handleOpenChat = async (friend:any) => {
    if (!user) return;
 
@@ -44,7 +44,6 @@ export const FriendsTab = () => {
 
   const chatRef = doc(db, "Chats", chatId);
   const chatSnap = await getDoc(chatRef);
-
 
   if (!chatSnap.exists()) {
     await setDoc(chatRef, {
@@ -68,6 +67,8 @@ export const FriendsTab = () => {
   setActiveTab("chats");
 };
 
+
+ // Delete Friend
 const handlePerishSoul = async (friendId: string) => {
   if (!user) return;
 
@@ -91,6 +92,8 @@ const handlePerishSoul = async (friendId: string) => {
     console.error("Failed to perish soul:", err);
   }
 };
+
+
  
 const toggleMuteSoul = async (friendId: string) => {
   if (!auth.currentUser) return;
@@ -105,11 +108,10 @@ const toggleMuteSoul = async (friendId: string) => {
       ? arrayRemove(friendId)
       : arrayUnion(friendId),
   });
-  if (muted.includes(friendId)) return;
-    play();
 
-  
 };
+
+
 
 
   if (!user) {
@@ -137,7 +139,7 @@ const toggleMuteSoul = async (friendId: string) => {
 
 
 
-
+   // Cancel Sent Friend Request
   const handleCancelSentRequest = async (friendId: string) => {
   const userRef = doc(db, "users", user.uid);
   const friendRef = doc(db, "users", friendId);
@@ -154,7 +156,7 @@ const toggleMuteSoul = async (friendId: string) => {
 };
 
   
-
+   // Accept Friend Request
   const handleAccept = async (friendId: string) => {
     const userRef = doc(db, "users", user.uid);
     const friendRef = doc(db, "users", friendId);
@@ -173,6 +175,7 @@ const toggleMuteSoul = async (friendId: string) => {
   };
 
 
+   // Decline Friend Request
   const handleDecline = async (friendId: string) => {
     const userRef = doc(db, "users", user.uid);
     await updateDoc(userRef, {
@@ -182,63 +185,52 @@ const toggleMuteSoul = async (friendId: string) => {
   };
 
 
-
-
-
   return (
-<div className="flex flex-col">
-  {sentRequests.length > 0 && (
+    <div className="flex flex-col">
+     {sentRequests.length > 0 && (
     <div>
       <div className="p-2 mt-2">
-      <h3 className="text-white relative left-15 text-md"> Sent Soulmate Requests 
-       <span className="text-sm text-purple-400"> ({sentRequests.length})</span>
-      </h3>
+        <h3 className="text-white relative left-15 text-md"> Sent Soulmate Requests 
+         <span className="text-sm text-purple-400"> ({sentRequests.length})</span>
+        </h3>
       </div>
-      {sentRequests.map((id) => (
-        <SentRequestItem key={id} userId={id} onCancel={handleCancelSentRequest}/>
-      ))}
-    </div>
-  )}
+     {sentRequests.map((id) => (
+      <SentRequestItem key={id} userId={id} onCancel={handleCancelSentRequest}/>))}
+    </div>)}
     
-      {friendRequests.length > 0 && (
-        <div>
+     {friendRequests.length > 0 && (
+      <div>
         <div className=" mt-2 mb-2">
           <h3 className="text-white relative left-15 text-md"> New Soulmate Requests!
              <span className="text-sm text-purple-400"> ({friendRequests.length})</span>
           </h3>
-           </div>
+        </div>
           {friendRequests.map((id) => (
             <FriendRequestItem
               key={id}
               userId={id}
               onAccept={handleAccept}
-              onDecline={handleDecline}
-            />
-          ))}
-         
-        </div>
-      )}
+              onDecline={handleDecline}/>))}   
+      </div>)}
   
       {friends.length === 0 ? (
-        <p  className="text-gray-500 text-sm overflow-y-scroll relative left-[30%] top-4">No friends yet...</p>
+        <p className="text-gray-500 text-sm overflow-y-scroll relative left-[30%] top-4">No friends yet...</p>
       ) : (friends.map((id) => (<FriendItem key={id} userId={id} onOpenChat={handleOpenChat} openMenuUid={openMenuUid}
-           setOpenMenuUid={setOpenMenuUid} onPerishSoul={handlePerishSoul}/> ))
-      )}
+           setOpenMenuUid={setOpenMenuUid} onPerishSoul={handlePerishSoul} toggleMuteSoul={toggleMuteSoul} /> )))}
     </div>
   );
 };
 
 
 
-
-
-const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishSoul, }: { userId: string; onOpenChat:(friend:any) => void; openMenuUid: string | null;
+const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishSoul, toggleMuteSoul }: { userId: string; onOpenChat:(friend:any) => void; openMenuUid: string | null;
   setOpenMenuUid: React.Dispatch<React.SetStateAction<string | null>>;
-  onPerishSoul: (friendId: string) => void;}) => {
+  onPerishSoul: (friendId: string) => void;
+  toggleMuteSoul: (friendId: string) => void;}) => {
 
   const [friendData, setFriendData] = useState<any>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
 
   useEffect(() => {
   const handleClickOutside = (e: MouseEvent) => {
@@ -251,7 +243,7 @@ const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishS
   return () => document.removeEventListener("mousedown", handleClickOutside);
 }, []);
 
-
+// creates a real-time listener array to check if the friend is muted
 useEffect(() => {
   const currentUser = auth.currentUser;
   if (!currentUser) return;
@@ -264,7 +256,6 @@ useEffect(() => {
   });
 
   
-
   return () => unsub();
 }, [userId]);
 
@@ -299,8 +290,6 @@ const AFK = now - lastSeen > 30000;
   if (!friendData) return null;
 
   
-
-
   const handleFriendMenuClick = (uid: string) => {
     setOpenMenuUid(prev => (prev === uid ? null : uid));
   };
@@ -328,7 +317,7 @@ const AFK = now - lastSeen > 30000;
       </div>
 
   <button onClick={(e) => {e.stopPropagation(); handleFriendMenuClick(friendData.uid);}}
-    className="ml-auto p-2 cursor-pointer rounded-full text-gray-400 hover:text-white transition duration-100"
+    className="ml-auto p-2 cursor-pointer rounded-full text-gray-400 hover:text-white transition duration-200"
     title="More options">
     <MoreVertical size={21}
 />
@@ -350,8 +339,18 @@ const AFK = now - lastSeen > 30000;
     />
 
     <MenuItem
-      icon={<VolumeX size={16} />}
+      icon={ isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
       text={isMuted ? "Unmute Soul" : "Mute Soul"}
+      onClick={() => {
+        setOpenMenuUid(null);
+        toggleMuteSoul(friendData.uid);
+      }}
+    />
+
+    <MenuItem
+      icon={ <Ban size={16}/>}
+      text={"Block Soul"}
+      danger
       onClick={() => {
         setOpenMenuUid(null);
       }}
@@ -390,7 +389,7 @@ const MenuItem = ({
   return (
     <button
     onClick={onClick}
-      className={`group w-full flex items-center justify-start gap-3 p-3 text-sm transition cursor-pointer duration-200
+      className={`group w-full flex items-center justify-start gap-3 p-3 text-sm transition cursor-pointer duration-200 border-b border-gray-800/40
         ${
           danger
             ? "text-red-400 hover:bg-red-500/10"
