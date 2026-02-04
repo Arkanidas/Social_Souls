@@ -94,7 +94,7 @@ const handlePerishSoul = async (friendId: string) => {
 };
 
 
- 
+ //function to mute/unmute a friend
 const toggleMuteSoul = async (friendId: string) => {
   if (!auth.currentUser) return;
 
@@ -108,9 +108,24 @@ const toggleMuteSoul = async (friendId: string) => {
       ? arrayRemove(friendId)
       : arrayUnion(friendId),
   });
-
 };
 
+
+ //function to block/unblock a friend
+const toggleBlockSoul = async (friendId: string) => {
+  if (!auth.currentUser) return;
+
+  const ref = doc(db, "users", auth.currentUser.uid);
+  const snap = await getDoc(ref);
+
+  const blocked = snap.data()?.blockedSouls || [];
+
+  await updateDoc(ref, {
+    blockedSouls: blocked.includes(friendId)
+      ? arrayRemove(friendId)
+      : arrayUnion(friendId),
+  });
+};
 
 
 
@@ -216,21 +231,24 @@ const toggleMuteSoul = async (friendId: string) => {
       {friends.length === 0 ? (
         <p className="text-gray-500 text-sm overflow-y-scroll relative left-[30%] top-4">No friends yet...</p>
       ) : (friends.map((id) => (<FriendItem key={id} userId={id} onOpenChat={handleOpenChat} openMenuUid={openMenuUid}
-           setOpenMenuUid={setOpenMenuUid} onPerishSoul={handlePerishSoul} toggleMuteSoul={toggleMuteSoul} /> )))}
+           setOpenMenuUid={setOpenMenuUid} onPerishSoul={handlePerishSoul} toggleMuteSoul={toggleMuteSoul} toggleBlockSoul={toggleBlockSoul}/> )))}
     </div>
   );
 };
 
 
 
-const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishSoul, toggleMuteSoul }: { userId: string; onOpenChat:(friend:any) => void; openMenuUid: string | null;
+const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishSoul, toggleMuteSoul, toggleBlockSoul }: { userId: string; onOpenChat:(friend:any) => void; openMenuUid: string | null;
+  
   setOpenMenuUid: React.Dispatch<React.SetStateAction<string | null>>;
   onPerishSoul: (friendId: string) => void;
-  toggleMuteSoul: (friendId: string) => void;}) => {
+  toggleMuteSoul: (friendId: string) => void;
+  toggleBlockSoul: (friendId: string) => void;}) => {
 
   const [friendData, setFriendData] = useState<any>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [isBlocked, setIsBlocked] = useState<boolean>(false);
 
   useEffect(() => {
   const handleClickOutside = (e: MouseEvent) => {
@@ -258,6 +276,22 @@ useEffect(() => {
   
   return () => unsub();
 }, [userId]);
+
+useEffect(() => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) return;
+
+  const ref = doc(db, "users", currentUser.uid);
+
+  const unsub = onSnapshot(ref, (snap) => {
+    const blocked = snap.data()?.blockedSouls || [];
+    setIsBlocked(blocked.includes(userId));
+  });
+
+  return () => unsub();
+}, [userId]);
+
+
 
 
   useEffect(() => {
@@ -349,10 +383,11 @@ const AFK = now - lastSeen > 30000;
 
     <MenuItem
       icon={ <Ban size={16}/>}
-      text={"Block Soul"}
+      text={isBlocked ? "Unblock Soul" : "Block Soul"}
       danger
       onClick={() => {
         setOpenMenuUid(null);
+        toggleBlockSoul(friendData.uid);
       }}
     />
 

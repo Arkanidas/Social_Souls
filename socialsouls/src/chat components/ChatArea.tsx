@@ -34,8 +34,6 @@ interface ChatMessage {
 
 export const ChatArea = () => {
 
-
-
   const [Usermessages, setUserMessages] = useState<ChatMessage[]>([]);
   const [otherUserStatus, setOtherUserStatus] = useState<"online" | "idle"| "offline">("offline");
   const [showAddFriend, setShowAddFriend] = useState<boolean>(false);
@@ -58,17 +56,16 @@ export const ChatArea = () => {
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const lastMessageIdRef = useRef<string | null>(null);
   const [messageTimestamps, setMessageTimestamps] = useState<number[]>([]);
-  const [isSpamBlocked, setIsSpamBlocked] = useState(false);
-  const [spamCountdown, setSpamCountdown] = useState(0);
+  const [isSpamBlocked, setIsSpamBlocked] = useState<boolean>(false);
+  const [spamCountdown, setSpamCountdown] = useState<number>(0);
   const { openChats, activeChatId } = useChat();
   const [mutedSouls, setMutedSouls] = useState<string[]>([]);
-
-  const activeChatUser = openChats.find(
-  (chat) => chat.chatId === activeChatId
-);
-
-
+  const [iBlockedThem, setIBlockedThem] = useState<boolean>(false);
+  const [theyBlockedMe, setTheyBlockedMe] = useState<boolean>(false);
+  const activeChatUser = openChats.find((chat) => chat.chatId === activeChatId);
   const BASE_TITLE = "Social Souls";
+
+  const isChatBlocked = iBlockedThem || theyBlockedMe;
 
 useEffect(() => {
  if (!showScrollToBottom) {
@@ -77,12 +74,12 @@ useEffect(() => {
 }, [Usermessages]);
 
 
-
+   //function for sending a message
   const handleSendMessage = async (text: string) => {
   if (!user) return;
   if (!activeChatUser?.chatId) return;
   if (!text.trim() && attachments.length === 0) return;
-
+  if (isChatBlocked) return;
   if (isSpamBlocked) return;
 
   const isSpamming = checkSpam();
@@ -133,6 +130,7 @@ useEffect(() => {
 
 };
 
+   // Update document title based on unread messages
 useEffect(() => {
   if (unreadCount > 0) {
     document.title = `(${unreadCount}) New message${unreadCount > 1 ? "s" : ""} ${BASE_TITLE}`;
@@ -141,6 +139,34 @@ useEffect(() => {
   }
 }, [unreadCount]);
 
+useEffect(() => {
+  if (!user || !activeChatUser?.otherUser?.uid) return;
+
+  const ref = doc(db, "users", user.uid);
+
+  const unsub = onSnapshot(ref, snap => {
+    const blocked = snap.data()?.blockedSouls || [];
+    setIBlockedThem(blocked.includes(activeChatUser.otherUser.uid));
+  });
+
+  return () => unsub();
+}, [activeChatUser?.otherUser?.uid]);
+
+useEffect(() => {
+  if (!user || !activeChatUser?.otherUser?.uid) return;
+
+  const ref = doc(db, "users", activeChatUser.otherUser.uid);
+
+  const unsub = onSnapshot(ref, snap => {
+    const blocked = snap.data()?.blockedSouls || [];
+    setTheyBlockedMe(blocked.includes(user.uid));
+  });
+
+  return () => unsub();
+}, [activeChatUser?.otherUser?.uid]);
+
+
+  // update unread count based on tab visibility
 useEffect(() => {
   const handleVisibilityChange = () => {
     if (document.visibilityState === "visible") {
@@ -153,6 +179,7 @@ useEffect(() => {
     document.removeEventListener("visibilitychange", handleVisibilityChange);
 }, []);
 
+  // reset unread count when active chat changes
 useEffect(() => {
   if (activeChatUser?.chatId) {
     setUnreadCount(0);
@@ -175,11 +202,7 @@ useEffect(() => {
 
     const lastMsg = msgs[msgs.length - 1];
 
-if (
-  lastMsg &&
-  lastMsg.id !== lastMessageIdRef.current &&
-  lastMsg.senderId !== user?.uid
-) {
+if (lastMsg && lastMsg.id !== lastMessageIdRef.current && lastMsg.senderId !== user?.uid) {
   const isTabHidden = document.visibilityState !== "visible";
 
   if (isTabHidden) {
@@ -214,6 +237,8 @@ useEffect(() => {
 useEffect(() => {
   if (!activeChatUser) return;
   if (!Usermessages.length) return;
+  if (isChatBlocked) return;
+
 
   const lastMessage = Usermessages[Usermessages.length - 1];
   const currentUserId = auth.currentUser?.uid;
@@ -223,6 +248,7 @@ useEffect(() => {
   const isFromOtherUser = lastMessage.senderId !== currentUserId;
 
   const isMuted = mutedSouls.includes(lastMessage.senderId);
+
 
   if (isNewMessage && isFromOtherUser && !isMuted) {
     play();
@@ -259,7 +285,6 @@ useEffect(() => {
 
   });
 
-
   return () => unsub();
 }, [activeChatUser?.otherUser?.uid]);
 
@@ -279,27 +304,22 @@ useEffect(() => {
   return () => window.removeEventListener("keydown", onEsc);
 }, []);
 
-
+// Check for spam messages
 const checkSpam = () => {
   const now = Date.now();
-
- 
-  const recent = messageTimestamps.filter(
-    (t) => now - t < 5000
-  );
+  const recent = messageTimestamps.filter((t) => now - t < 5000);
 
   recent.push(now);
   setMessageTimestamps(recent);
-
 
   if (recent.length >= 4) {
     triggerSpamCooldown();
     return true;
   }
-
   return false;
 };
 
+// Function to trigger spam cooldown timer 
 const triggerSpamCooldown = () => {
   setIsSpamBlocked(true);
   setSpamCountdown(10);
@@ -318,6 +338,8 @@ const triggerSpamCooldown = () => {
   }, 1000);
 };
 
+
+   //Function for adding a friend
   const handleAddFriendSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const input = addFriendInputRef.current
@@ -336,8 +358,7 @@ const triggerSpamCooldown = () => {
     if (input && friendUsername) {
       console.log(`Searching for user: ${input.value}`)
       
-try {
-   
+    try {
       const q = query(collection(db, "users"), where("username", "==", friendUsername))
       const querySnapshot = await getDocs(q)
 
@@ -364,8 +385,7 @@ try {
 
       await updateDoc(doc(db, "users", friendId), {
        friendRequests: arrayUnion(user.uid),
-       sentRequests: arrayRemove(user.uid)
-});
+       sentRequests: arrayRemove(user.uid)});
 
       toast.success(`${friendUsername} has been summoned successfully!`)
       input.value = ''
@@ -412,6 +432,7 @@ const handleMouseMove = (e: React.MouseEvent<HTMLImageElement>) => {
   setOrigin({ x, y });
 };
 
+  //Copy image URL to clipboard
 const handleCopyImageUrl = async () => {
   if (!previewImage) return;
 
@@ -422,7 +443,7 @@ const handleCopyImageUrl = async () => {
     toast.error("Failed to copy image link");
   }
 };
-
+  //Download image in browser 
 const handleDownloadImage = async () => {
   if (!previewImage || !PreviewImageName) return;
 
@@ -443,6 +464,19 @@ const handleDownloadImage = async () => {
   } catch {
     toast.error("Download failed, Please try again!");
   }
+};
+
+  //Component to show block notice text
+const BlockNotice = ({ theyBlockedMe, iBlockedThem, activeChatUser }: { theyBlockedMe: boolean; iBlockedThem: boolean; activeChatUser: any }) => {
+  if (theyBlockedMe) {
+  return <div className="text-red-500">You are blocked!</div>;
+}
+
+if (iBlockedThem) {
+  return <div className="text-red-500  w-[100px] flex justify-center border-1 ">You have blocked {activeChatUser.username}</div>;
+}
+
+return null
 };
 
  
@@ -496,6 +530,11 @@ const handleDownloadImage = async () => {
           </div>
         </div>
       </div>
+
+
+      {isChatBlocked && (
+  <BlockNotice theyBlockedMe={theyBlockedMe} iBlockedThem={iBlockedThem} activeChatUser={activeChatUser}/>)}
+
       
 {isUploading && (
   <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-md flex items-center justify-center">
@@ -504,12 +543,10 @@ const handleDownloadImage = async () => {
       className="w-12 h-12 animate-spin text-purple-400 fill-purple-600"
       viewBox="0 0 100 101"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+      xmlns="http://www.w3.org/2000/svg">
       <path
         d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908Z"
-        fill="currentColor"
-      />
+        fill="currentColor"/>
       <path
         d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124"
         fill="currentFill"
@@ -519,32 +556,24 @@ const handleDownloadImage = async () => {
 )}
 
 
-     
     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95 shadow-[inset_0px_0px_100px_50px_rgba(0,_0,_0,_0.8)]" ref={messagesContainerRef}
      onScroll={() => {
     const scroller = messagesContainerRef.current;
     if (!scroller) return;
 
-    const isNearBottom =
-      scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 550;
+    const isNearBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 550;
 
     setShowScrollToBottom(!isNearBottom);
   }}
 
-
-  
-     onDragEnter={(e) => {
-      e.preventDefault();
-      setIsDragging(true);}}
+     onDragEnter={(e) => {e.preventDefault(); setIsDragging(true);}}
 
      onDragOver={handleDragOver}
       onDragLeave={(e) => {
        if (e.currentTarget === e.target) {
          setIsDragging(false);}}}
 
-     onDrop={(e) => {
-      e.preventDefault();
-      setIsDragging(false);
+     onDrop={(e) => {e.preventDefault(); setIsDragging(false);
 
     const droppedFiles = Array.from(e.dataTransfer.files);
     const validFiles = validateFiles(droppedFiles);
@@ -647,36 +676,30 @@ const handleDownloadImage = async () => {
 {previewImage && (
   <div
     className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md"
-    onClick={() => setPreviewImage(null)}
-  >
+    onClick={() => setPreviewImage(null)}>
  
     <div
       className="absolute top-6 right-6 flex items-center gap-2 bg-gray-900/80 backdrop-blur-lg rounded-xl p-2 shadow-lg"
-      onClick={(e) => e.stopPropagation()}
-    >
+      onClick={(e) => e.stopPropagation()}>
  
       <button
         className="p-2 rounded-lg hover:bg-white/10 transition cursor-pointer"
         onClick={handleCopyImageUrl}
-        title="Copy image"
-      >
+        title="Copy image">
         <Copy className="w-5 h-5 text-white" />
       </button>
 
-   
       <button
         onClick={handleDownloadImage}
         className="p-2 rounded-lg hover:bg-white/10 transition cursor-pointer"
-        title="Download"
-      >
+        title="Download">
         <Download className="w-5 h-5 text-white" />
       </button>
 
       <button
         onClick={() => setPreviewImage(null)}
         className="p-2 rounded-lg hover:bg-red-500/20 transition cursor-pointer"
-        title="Close"
-      >
+        title="Close">
         <X className="w-5 h-5 text-white" />
       </button>
     </div>
@@ -684,31 +707,19 @@ const handleDownloadImage = async () => {
   
     <div
       className="flex items-center justify-center w-full h-full"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <img
-        id="preview-image"
-        src={previewImage}
-        onClick={(e) => {
+      onClick={(e) => e.stopPropagation()}>
+      <img id="preview-image" src={previewImage} onClick={(e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
-
     setOrigin({ x, y });
     setIsZoomed((prev) => !prev);
   }}
-        onMouseMove={handleMouseMove}
-        className={`
-    max-w-[90vw]
-    max-h-[90vh]
-    rounded-xl
-    transition-transform duration-300 ease-out
-    ${isZoomed ? "cursor-zoom-out scale-200" : "cursor-zoom-in"}
-  `}
+    onMouseMove={handleMouseMove}
+    className={`max-w-[90vw] max-h-[90vh] rounded-xl transition-transform duration-300 ease-out
+    ${isZoomed ? "cursor-zoom-out scale-200" : "cursor-zoom-in"}`}
   style={{
-    transformOrigin: `${origin.x}% ${origin.y}%`,
-  }}
-      />
+    transformOrigin: `${origin.x}% ${origin.y}%`,}}/>
     </div>
   </div>
 )}
@@ -753,6 +764,7 @@ const handleDownloadImage = async () => {
             </form>
           </div>
         </div>
+        
       )}
    <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.zip" className="hidden" ref={fileInputRef}
       onChange={(e) => {
@@ -760,6 +772,6 @@ const handleDownloadImage = async () => {
       const validFiles = validateFiles(Array.from(e.target.files));
       setAttachments((prev) => [...prev, ...validFiles]);}}/>
 
-      <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments} setAttachments={setAttachments} isSpamBlocked={isSpamBlocked} spamCountdown={spamCountdown} />
+      <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments} setAttachments={setAttachments} isSpamBlocked={isSpamBlocked} spamCountdown={spamCountdown} isChatBlocked={isChatBlocked}/>
     </div>;
 };

@@ -10,12 +10,13 @@ type MessageInputProps = {
   setAttachments: React.Dispatch<React.SetStateAction<File[]>>;
   isSpamBlocked: boolean;
   spamCountdown: number;
+  isChatBlocked: boolean;
 
 };
 
 
 
-export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments, isSpamBlocked, spamCountdown,}:MessageInputProps) => {
+export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments, isSpamBlocked, spamCountdown, isChatBlocked}:MessageInputProps) => {
 
  const [MessageText, setMessageText] = useState<string>("");
  const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
@@ -58,6 +59,7 @@ export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments,
 
  const handleSend = () => {
     if (isSpamBlocked) return;
+    if (isChatBlocked) return;
     if (!MessageText.trim() && attachments.length === 0) return;
     onSend(MessageText);
     setMessageText("");
@@ -91,13 +93,8 @@ export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments,
         )}
 
         <button
-          onClick={() =>
-            setAttachments((prev) =>
-              prev.filter((_, i) => i !== index)
-            )
-          }
-          className="absolute top-1 right-1 bg-black/70 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer"
-        >
+          onClick={() => setAttachments((prev) => prev.filter((_, i) => i !== index))}
+          className="absolute top-1 right-1 bg-black/70 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer">
           ✕
         </button>
       </div>
@@ -117,17 +114,17 @@ export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments,
         <div ref={emojiPickerRef} className="absolute bottom-16 left-4 z-50">
            <EmojiPicker height={400} emojiStyle={EmojiStyle.GOOGLE} theme={Theme.DARK} onEmojiClick={(emojiData) => {setMessageText(prev => prev + emojiData.emoji);}}/>
        </div>)}
-          <div className={`flex flex-col ${attachments.length > 0 ? "pt-2": ""}`}> 
-            <input value={MessageText} onChange={(e) => setMessageText(e.target.value)}  disabled={isSpamBlocked} onKeyDown={(e) => e.key === "Enter" && handleSend()}
+          <div className={`flex flex-col ${attachments.length > 0 ? "pt-2": ""} ${isChatBlocked ? "cursor-not-allowed": ""}`}> 
+            <input value={MessageText} onChange={(e) => setMessageText(e.target.value)}  disabled={isSpamBlocked || isChatBlocked} onKeyDown={(e) => e.key === "Enter" && handleSend()}
             type="text" placeholder={isSpamBlocked
         ? `You are sent to the human world due to spamming. Wait ${spamCountdown}s`
         : "Send a message into the void..."
-    }
-            className= {`flex flex-col w-full bg-gray-800 text-gray-300 border-gray-700 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600/80 border animation-ease-in duration-200 ${
+
+    } 
+            className= {` ${isChatBlocked ? "cursor-not-allowed": ""} flex flex-col w-full bg-gray-800 text-gray-300 border-gray-700 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600/80 border animation-ease-in duration-200 ${
             isSpamBlocked
         ? "border-red-500 cursor-not-allowed placeholder-red-400"
-        : "border-gray-700 focus:ring-2 focus:ring-purple-600/80"
-    }${attachments.length > 0 ? "pt-2": ""}`}/>
+        : "border-gray-700 focus:ring-2 focus:ring-purple-600/80"}${attachments.length > 0 ? "pt-2": ""}`}/>
          </div>
         </div>
         <button onClick={handleSend} disabled={isSpamBlocked} className={`transition text-purple-500 hover:text-purple-600 ${
@@ -139,9 +136,6 @@ export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments,
             : "text-purple-500 hover:text-purple-600"}`}/>
         </button>
       </div>
-
-
- 
     </div>;
 
     
