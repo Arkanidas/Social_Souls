@@ -218,7 +218,7 @@ lastMessageIdRef.current = lastMsg?.id || null;
   return () => unsubscribe();
 }, [activeChatUser?.chatId]);
 
-
+// Silence Souls OnSnapShot
 useEffect(() => {
   const currentUser = auth.currentUser;
   if (!currentUser) return;
@@ -473,7 +473,8 @@ const BlockNotice = ({ theyBlockedMe, iBlockedThem, activeChatUser }: { theyBloc
 }
 
 if (iBlockedThem) {
-  return <div className="text-red-500  w-[100px] flex justify-center border-1 ">You have blocked {activeChatUser.username}</div>;
+  return <div className=" self-center inline-flex px-4 py-2 rounded-md border border-red-500 text-red-500 bg-red-500/10 relative top-4 UserProfileModal">You have blocked {activeChatUser.otherUser.username}</div>;
+    
 }
 
 return null
@@ -481,7 +482,7 @@ return null
 
  
   
-  return <div className="flex-1 flex flex-col relative z-10 bg-gray-900/95 ">
+  return <div className="flex-1 flex flex-col relative bg-gray-[#0B111C] ">
       <div className="p-4 border-b backdrop-blur-sm border-purple-900/30 bg-gray-900/95 flex items-center shadow-[inset_0px_0px_100px_-12px_rgba(0,_0,_0,_0.8)]">
         <div className="flex items-center ">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400 cursor-pointer" onClick={() => {
@@ -532,10 +533,9 @@ return null
       </div>
 
 
-      {isChatBlocked && (
-  <BlockNotice theyBlockedMe={theyBlockedMe} iBlockedThem={iBlockedThem} activeChatUser={activeChatUser}/>)}
+{isChatBlocked && (<BlockNotice theyBlockedMe={theyBlockedMe} iBlockedThem={iBlockedThem} activeChatUser={activeChatUser}/>)}
 
-      
+
 {isUploading && (
   <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-md flex items-center justify-center">
     <svg
