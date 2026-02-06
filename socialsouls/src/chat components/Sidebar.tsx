@@ -10,7 +10,6 @@ import { useSidebar } from "../context/SidebarContext";
 import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import { Ghost as GhostIcon } from "lucide-react";
 import { showUserProfileModal } from "../chat components/ProfileModal";
-import { LogoutConfirmModal } from "./ShowLogoutModal";
 import { showLogoutModal } from "../chat components/ShowLogoutModal";
 
 
@@ -238,7 +237,7 @@ const openChatWithFriend = (friend: any) => {
           <SunIcon className="h-6 w-6" /> 
         </button>
 
-        <button  onClick={showLogoutModal} className="text-gray-400 hover:text-purple-500 p-2">
+        <button onClick={showLogoutModal} className="text-gray-400 hover:text-purple-500 p-2">
           <LogOutIcon className="h-6 w-6 cursor-pointer"/>
         </button>
       </div>
@@ -251,6 +250,6 @@ const openChatWithFriend = (friend: any) => {
         profilepic={profile?.profilepic ?? ""}
         onProfileUpdated={onProfileUpdated}/>
 
-        <LogoutConfirmModal />
+       
     </div>;
 };

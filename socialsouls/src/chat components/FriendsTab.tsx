@@ -1,12 +1,11 @@
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
 import { useEffect, useState, useRef } from "react";
-import { XIcon, MoreVertical, User, VolumeX, Skull, Check, Volume2, Ban } from "lucide-react";
+import { XIcon, MoreVertical, User, VolumeX, Skull, Check, Volume2, Ban,  } from "lucide-react";
 import  Ghost  from "../assets/ghosts.png";
 import { useChat } from '../context/ChatContext';
 import { useSidebar } from "../context/SidebarContext";
 import { showUserProfileModal } from "../chat components/ProfileModal";
-import { useNotificationSound } from "../Hooks/Notification";
 
 type FriendRequestItemProps = {
   userId: string;
@@ -23,7 +22,6 @@ export const FriendsTab = () => {
   const { openChat } = useChat();
   const { setActiveTab } = useSidebar();
   const [openMenuUid, setOpenMenuUid] = useState<string | null>(null);
-  const { play } = useNotificationSound();
   const user = auth.currentUser;
 
   
@@ -239,7 +237,7 @@ const toggleBlockSoul = async (friendId: string) => {
 
 
 const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishSoul, toggleMuteSoul, toggleBlockSoul }: { userId: string; onOpenChat:(friend:any) => void; openMenuUid: string | null;
-  
+
   setOpenMenuUid: React.Dispatch<React.SetStateAction<string | null>>;
   onPerishSoul: (friendId: string) => void;
   toggleMuteSoul: (friendId: string) => void;
@@ -402,6 +400,15 @@ const AFK = now - lastSeen > 30000;
     />
     </div>
   )}
+
+{isMuted && (
+  <div className="absolute top-7 left-1/2 translate-x-2  text-red-500 px-1 rounded ProfileModal duration-300 ghost-fade-in">
+  <VolumeX size={20}/>
+  </div>
+)}
+
+
+
 
     </div>
   );

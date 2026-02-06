@@ -11,7 +11,7 @@ import { Ghost as GhostIcon } from "lucide-react";
 import {formatChatTimestamp, formatLastSeen} from './DateUtils';
 import { useNotificationSound } from "../Hooks/Notification";
 import { showUserProfileModal } from "../chat components/ProfileModal";
-
+import { LogoutConfirmModal } from "./ShowLogoutModal";
 
 export const showAddFriendModal = () => {
   const event = new CustomEvent('showAddFriendModal')
@@ -469,11 +469,11 @@ const handleDownloadImage = async () => {
   //Component to show block notice text
 const BlockNotice = ({ theyBlockedMe, iBlockedThem, activeChatUser }: { theyBlockedMe: boolean; iBlockedThem: boolean; activeChatUser: any }) => {
   if (theyBlockedMe) {
-  return <div className="text-red-500">You are blocked!</div>;
+  return <div className="self-center inline-flex px-4 py-2 rounded-md border border-red-500 text-red-500 bg-red-500/10 relative top-4">You are blocked!</div>;
 }
 
 if (iBlockedThem) {
-  return <div className=" self-center inline-flex px-4 py-2 rounded-md border border-red-500 text-red-500 bg-red-500/10 relative top-4 UserProfileModal">You have blocked {activeChatUser.otherUser.username}</div>;
+  return <div className="self-center inline-flex px-4 py-2 rounded-md border border-red-500 text-red-500 bg-red-500/10 relative top-4">You have blocked {activeChatUser.otherUser.username}</div>;
     
 }
 
@@ -727,10 +727,10 @@ return null
 
       {showAddFriend && (
         <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/40 ">
-          <div className="add-friend-modal bg-purple-200 text-gray-200 border-purple-900/50 text-gray-800 border-purple-300/50 border-2 rounded-lg shadow-2xl p-6 w-full max-w-md ">
+          <div className="add-friend-modal bg-gray-800/80 text-gray-200 border-purple-900/50 text-gray-800 border-purple-300/50 border-2 rounded-lg shadow-2xl p-6 w-full max-w-md ">
             <div className="flex justify-between items-center mb-4 ">
               <h2 className="text-2xl font-bold font-serif ">
-                <span className="text-purple-500 ">Summon</span> a Spirit
+                <span className="text-purple-500 ">Summon a Spirit</span>
               </h2>
                 <button
                   onClick={() => setShowAddFriend(false)}
@@ -773,5 +773,6 @@ return null
       setAttachments((prev) => [...prev, ...validFiles]);}}/>
 
       <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments} setAttachments={setAttachments} isSpamBlocked={isSpamBlocked} spamCountdown={spamCountdown} isChatBlocked={isChatBlocked}/>
+      <LogoutConfirmModal/>
     </div>;
 };

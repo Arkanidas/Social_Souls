@@ -111,8 +111,8 @@ export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments,
         </button>
         <div className="flex-1">
       {showEmojiPicker && (
-        <div ref={emojiPickerRef} className="absolute bottom-16 left-4 z-50">
-           <EmojiPicker height={400} emojiStyle={EmojiStyle.GOOGLE} theme={Theme.DARK} onEmojiClick={(emojiData) => {setMessageText(prev => prev + emojiData.emoji);}}/>
+        <div ref={emojiPickerRef} className={` ${isChatBlocked ? "invisble" : "text-purple-500 hover:text-purple-600"}: absolute bottom-16 left-4 z-50`}>
+           <EmojiPicker height={400} emojiStyle={EmojiStyle.GOOGLE} theme={Theme.DARK} onEmojiClick={ (emojiData) => {setMessageText(prev => prev + emojiData.emoji);}}/>
        </div>)}
           <div className={`flex flex-col ${attachments.length > 0 ? "pt-2": ""} ${isChatBlocked ? "cursor-not-allowed": ""}`}> 
             <input value={MessageText} onChange={(e) => setMessageText(e.target.value)}  disabled={isSpamBlocked || isChatBlocked} onKeyDown={(e) => e.key === "Enter" && handleSend()}

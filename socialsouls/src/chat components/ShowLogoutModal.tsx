@@ -41,11 +41,11 @@ if (user) {
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-md animate-fadeIn ">
-      <div className="bg-gray-900 border border-purple-700/40 rounded-xl shadow-2xl p-6 w-full max-w-md scale-95 UserProfileModal">
+      <div className="bg-gray-900 border border-purple-700/40 rounded-xl shadow-2xl p-6 w-full max-w-md scale-95 UserProfileModal ">
 
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-purple-300">
+          <h2 className="text-xl font-semibold text-purple-300 text-center flex-1">
             Do you want to log out?
           </h2>
 
@@ -53,27 +53,27 @@ if (user) {
             onClick={() => setIsOpen(false)}
             className="text-gray-400 hover:text-red-500 transition"
           >
-            <XIcon size={20} />
+            <XIcon size={24} className="cursor-pointer hover:text-purple-600 duration-200"/>
           </button>
         </div>
 
       
         <p className="text-gray-400 mb-6">
-          Your spectral presence will fade until you return 👻
+          Are you sure you want to return to the Human World?
         </p>
 
 
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-center gap-3 ">
           <button
             onClick={() => setIsOpen(false)}
-            className="px-4 py-2 rounded-md bg-gray-700 hover:bg-gray-600 text-white transition"
+            className="px-4 py-2 rounded-md bg-gray-700 hover:bg-gray-600 text-white transition duration-200 shadow-md shadow-gray-500/30 cursor-pointer"
           >
             No
           </button>
 
           <button
             onClick={handleLogout}
-            className="px-4 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white transition shadow-lg shadow-purple-500/30"
+            className="px-4 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white transition shadow-lg shadow-purple-500/30 cursor-pointer"
           >
             Yes
           </button>
