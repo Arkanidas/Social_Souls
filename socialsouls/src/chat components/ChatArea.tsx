@@ -13,6 +13,7 @@ import { useNotificationSound } from "../Hooks/Notification";
 import { showUserProfileModal } from "../chat components/ProfileModal";
 import { LogoutConfirmModal } from "./ShowLogoutModal";
 
+
 export const showAddFriendModal = () => {
   const event = new CustomEvent('showAddFriendModal')
   window.dispatchEvent(event)
@@ -766,11 +767,13 @@ return null
         </div>
         
       )}
+      {!isChatBlocked && (<div>
    <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.zip" className="hidden" ref={fileInputRef}
       onChange={(e) => {
         if (!e.target.files) return;
       const validFiles = validateFiles(Array.from(e.target.files));
       setAttachments((prev) => [...prev, ...validFiles]);}}/>
+      </div>)}
 
       <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments} setAttachments={setAttachments} isSpamBlocked={isSpamBlocked} spamCountdown={spamCountdown} isChatBlocked={isChatBlocked}/>
       <LogoutConfirmModal/>

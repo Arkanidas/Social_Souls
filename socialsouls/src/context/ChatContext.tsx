@@ -86,8 +86,7 @@ const closeChat = async (chatId: string): Promise<void> => {
   if (!user) return;
 
   const updated = openChats.filter(c => c.chatId !== chatId);
-  const nextActive =
-    activeChatId === chatId ? updated[0]?.chatId || null : activeChatId;
+  const nextActive = activeChatId === chatId ? updated[0]?.chatId || null : activeChatId;
 
   await updateDoc(doc(db, "users", user.uid), {
     openChats: updated,

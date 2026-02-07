@@ -57,6 +57,14 @@ export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments,
   };
 }, []);
 
+// Close emoji picker if chat gets blocked while it's open
+useEffect(() => {
+  if (isChatBlocked) {
+    setShowEmojiPicker(false);
+  }
+}, [isChatBlocked]);
+
+// Sends message on Enter/Clicks send button
  const handleSend = () => {
     if (isSpamBlocked) return;
     if (isChatBlocked) return;
@@ -72,25 +80,18 @@ export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments,
     {attachments.length > 0 && (
   <div className="flex gap-2 mb-2 flex-wrap">
     {attachments.map((file, index) => (
-      <div
-        key={index}
-        className="relative w-20 h-20 border rounded overflow-hidden bg-gray-800"
-      >
+      <div key={index} className="relative w-20 h-20 border rounded overflow-hidden bg-gray-800">
         {file.type.startsWith("image") ? (
-          <img
-            src={URL.createObjectURL(file)}
-            className="w-full h-full object-cover"
-          />
+          <img src={URL.createObjectURL(file)} className="w-full h-full object-cover"/>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-xs text-white text-center px-1 gap-1">
             <div className="text-2xl">
              {getFileIcon(file)}
            </div>
-    <span className="text-[8px] opacity-80 uppercase">
-     {file.name}
-    </span>
-          </div>
-        )}
+             <span className="text-[8px] opacity-80 uppercase">
+              {file.name}
+             </span>
+          </div>)}
 
         <button
           onClick={() => setAttachments((prev) => prev.filter((_, i) => i !== index))}
@@ -107,31 +108,32 @@ export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments,
         </button>
         <button type="button" onClick={() => fileInputRef.current?.click()} className="text-gray-400 hover:text-purple-500">
           <PaperclipIcon className="h-6 w-6 cursor-pointer" />
-   
         </button>
+
         <div className="flex-1">
-      {showEmojiPicker && (
-        <div ref={emojiPickerRef} className={` ${isChatBlocked ? "invisble" : "text-purple-500 hover:text-purple-600"}: absolute bottom-16 left-4 z-50`}>
+      {showEmojiPicker && !isChatBlocked &&(
+        <div ref={emojiPickerRef} className={"absolute bottom-16 left-4 z-50"}>
            <EmojiPicker height={400} emojiStyle={EmojiStyle.GOOGLE} theme={Theme.DARK} onEmojiClick={ (emojiData) => {setMessageText(prev => prev + emojiData.emoji);}}/>
        </div>)}
           <div className={`flex flex-col ${attachments.length > 0 ? "pt-2": ""} ${isChatBlocked ? "cursor-not-allowed": ""}`}> 
             <input value={MessageText} onChange={(e) => setMessageText(e.target.value)}  disabled={isSpamBlocked || isChatBlocked} onKeyDown={(e) => e.key === "Enter" && handleSend()}
             type="text" placeholder={isSpamBlocked
         ? `You are sent to the human world due to spamming. Wait ${spamCountdown}s`
+        : isChatBlocked ? "You are blocked from chatting in this conversation"
         : "Send a message into the void..."
-
     } 
             className= {` ${isChatBlocked ? "cursor-not-allowed": ""} flex flex-col w-full bg-gray-800 text-gray-300 border-gray-700 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600/80 border animation-ease-in duration-200 ${
-            isSpamBlocked
-        ? "border-red-500 cursor-not-allowed placeholder-red-400"
+            isSpamBlocked || isChatBlocked
+        ? "border-red-500 cursor-not-allowed placeholder-red-500"
         : "border-gray-700 focus:ring-2 focus:ring-purple-600/80"}${attachments.length > 0 ? "pt-2": ""}`}/>
          </div>
         </div>
+
         <button onClick={handleSend} disabled={isSpamBlocked} className={`transition text-purple-500 hover:text-purple-600 ${
          isSpamBlocked
             ? "text-gray-600 cursor-not-allowed"
             : "text-purple-500 hover:text-purple-600"}`}>
-         <SendIcon className={`h-6 w-6 cursor-pointer ${isSpamBlocked
+         <SendIcon className={`h-6 w-6 cursor-pointer ${isSpamBlocked || isChatBlocked
             ? "text-gray-600 cursor-wait"
             : "text-purple-500 hover:text-purple-600"}`}/>
         </button>

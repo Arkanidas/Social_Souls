@@ -7,6 +7,8 @@ import { useChat } from '../context/ChatContext';
 import { useSidebar } from "../context/SidebarContext";
 import { showUserProfileModal } from "../chat components/ProfileModal";
 
+
+
 type FriendRequestItemProps = {
   userId: string;
   onAccept: (friendId: string) => void;
@@ -19,11 +21,10 @@ export const FriendsTab = () => {
   const [friends, setFriends] = useState<any[]>([]);
   const [friendRequests, setFriendRequests] = useState<any[]>([]);
   const [sentRequests, setSentRequests] = useState<any[]>([]);
-  const { openChat } = useChat();
+  const { openChat, closeChat } = useChat();
   const { setActiveTab } = useSidebar();
   const [openMenuUid, setOpenMenuUid] = useState<string | null>(null);
   const user = auth.currentUser;
-
   
 
 
@@ -69,10 +70,11 @@ export const FriendsTab = () => {
  // Delete Friend
 const handlePerishSoul = async (friendId: string) => {
   if (!user) return;
-
+  
   const userRef = doc(db, "users", user.uid);
   const friendRef = doc(db, "users", friendId);
 
+  const chatId = [user.uid, friendId].sort().join("_");
   try {
    
     await Promise.all([
@@ -84,8 +86,9 @@ const handlePerishSoul = async (friendId: string) => {
       }),
     ]);
 
-    console.log("Soul perished:", friendId);
+    await closeChat(chatId);
     setOpenMenuUid(null);
+    
   } catch (err) {
     console.error("Failed to perish soul:", err);
   }
