@@ -59,7 +59,7 @@ if (user) {
 
       
         <p className="text-gray-400 mb-6">
-          Are you sure you want to return to the Human World?
+          Are you sure you want to return to the Living World?
         </p>
 
 

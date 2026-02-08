@@ -68,6 +68,12 @@ export const ChatArea = () => {
 
   const isChatBlocked = iBlockedThem || theyBlockedMe;
 
+  const capitalizeFirstLetter = (value: string) => {
+  if (!value) return value;
+  return value.charAt(0).toUpperCase() + value.slice(1);
+};
+
+
 useEffect(() => {
  if (!showScrollToBottom) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -340,24 +346,27 @@ const triggerSpamCooldown = () => {
 };
 
 
-   //Function for adding a friend
+   // Function for adding a friend
   const handleAddFriendSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const input = addFriendInputRef.current
-    const friendUsername = input?.value.trim()
+    const rawUsername = input?.value.trim()
+      if (!rawUsername) return;
+
+    const friendUsername = capitalizeFirstLetter(rawUsername);
 
       if(!friendUsername) return
       const user = auth.currentUser
 
-        if(!user) {
+      if(!user) {
         toast.error("You must be logged in to summon a spirit!", {
           duration: 4000,
         });
         return
        }
 
-    if (input && friendUsername) {
-      console.log(`Searching for user: ${input.value}`)
+      if (input && friendUsername) {
+       console.log(`Searching for user: ${input.value}`)
       
     try {
       const q = query(collection(db, "users"), where("username", "==", friendUsername))
@@ -668,7 +677,6 @@ return null
       
     );
   })}
-
 
 </div>
 

@@ -70,7 +70,8 @@ useEffect(() => {
        <button
         onClick={(e) => {e.stopPropagation(); closeChat(chat.chatId);}}
         className="p-1 rounded-md float-right text-gray-400 cursor-pointer hover:text-white transition absolute right-3"
-        title="Close chat">
+        title="Close chat"
+      >
         <X size={20} />
       </button>
     </div>

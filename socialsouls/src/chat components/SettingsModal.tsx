@@ -42,6 +42,9 @@ if(isOpen) {
  if (!isOpen) return null
 
  const SaveData = async () => {
+
+
+  
   try {
     setIsSaving(true);
 
@@ -49,18 +52,16 @@ if(isOpen) {
     if (!user) throw new Error("No authenticated user found");
 
     const userRef = doc(db, "users", user.uid);
+    const capitalizeUsername = (name: string) => {if (!name) return ""; return name.charAt(0).toUpperCase() + name.slice(1);};
+    const trimmedUsername = capitalizeUsername(username.trim());
+ 
 
-  
-    const trimmedUsername = username.trim();
-
-  
     const usernameQuery = query(
       collection(db, "users"),
       where("username", "==", trimmedUsername)
     );
 
     const usernameSnapshot = await getDocs(usernameQuery);
-
     const usernameTaken = usernameSnapshot.docs.some(
       (doc) => doc.id !== user.uid
     );
@@ -73,7 +74,6 @@ if(isOpen) {
 
     let photoURL = profilePicture;
 
-
     if (profilePicture.startsWith("data:image")) {
       const storage = getStorage();
       const fileRef = ref(storage, `profilePics/${user.uid}.jpg`);
@@ -82,7 +82,6 @@ if(isOpen) {
       photoURL = await getDownloadURL(fileRef);
     }
 
-  
     await updateDoc(userRef, {
       username: trimmedUsername,
       bio: bio,
@@ -141,6 +140,7 @@ if(isOpen) {
             Modify your ghostly presence...
           </p>
         </div>
+
         {/* Settings form */}
         <div className="p-6 space-y-20">
 
@@ -158,9 +158,9 @@ if(isOpen) {
               </div>
               <label
                 htmlFor="profile-upload"
-                className="absolute top-25 left-25 p-2 rounded-full cursor-pointer bg-gray-800 text-purple-400 hover:bg-gray-700 border border-purple-900/30"
-              >
+                className="absolute top-25 left-25 p-2 rounded-full cursor-pointer bg-gray-800 text-purple-400 hover:bg-gray-700 border border-purple-900/30">
                 <Upload className="h-6 w-6" />
+
                 <input
                   id="profile-upload"
                   type="file"
@@ -171,16 +171,13 @@ if(isOpen) {
                       const file = e.target.files[0]
                       const reader = new FileReader()
                       reader.onload = () => {
-                        setProfilePicture(reader.result as string)
-                      }
-                      reader.readAsDataURL(file)
-                    }
-                  }}
-                />
+                        setProfilePicture(reader.result as string)}
+                        reader.readAsDataURL(file)
+                    }}}/>
               </label>
             </div>
-            <p className="text-s text-purple-500 mt-7">Change your Soul projection</p>
-          </div>
+             <p className="text-s text-purple-500 mt-7">Change your Soul projection</p>
+            </div>
 
           {/* Username */}
           <div>
@@ -202,12 +199,9 @@ if(isOpen) {
           </div>
           {/* Bio */}
           <div className="flex flex-col gap-2 relative bottom-15">
-            <label
-              htmlFor="bio"
-              className="flex items-center gap-2 text-sm font-medium text-gray-300"
-            >
+            <label htmlFor="bio" className="flex items-center gap-2 text-sm font-medium text-gray-300">
               <FileTextIcon className="h-4 w-4 text-purple-500" />
-             Soul Description
+                Soul Description
             </label>
             <textarea
               id="bio"
@@ -216,11 +210,10 @@ if(isOpen) {
               onChange={(e) => setBio(e.target.value)}
               rows={3}
               className="w-full px-4 py-2 h-30 resize-none rounded-md focus:outline-none duration-200 focus:ring-2 focus:ring-purple-500 border bg-gray-800 text-gray-300 border-gray-700"
-              placeholder="Describe your spectral essence..."
-            />
-             <span className="absolute bottom-1 right-2 text-xs text-gray-400">
-              {InputFieldChar - bio.length}
-             </span>
+              placeholder="Describe your spectral essence..."/>
+              <span className="absolute bottom-1 right-2 text-xs text-gray-400">
+               {InputFieldChar - bio.length}
+              </span>
           </div>
         </div>
 

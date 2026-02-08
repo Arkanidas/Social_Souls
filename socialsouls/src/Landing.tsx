@@ -1,14 +1,13 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { faLock, faUser, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { doc,setDoc, getDoc } from "firebase/firestore";
+import { doc,setDoc, getDoc,where, getDocs, collection, query } from "firebase/firestore";
 import { auth, db} from './firebase/firebaseConfig'; // auth: connects app to firebase auth service, db: handles storing and app data in cloud lets your app read, write, update, and delete data in your Firestore database.
-import './index.css'
 import { useNavigate } from 'react-router-dom';
 import {Toaster, toast} from 'react-hot-toast';
 import { Eye, EyeClosed} from 'lucide-react';
-
+import './index.css'
 
 function Landing() {
 
@@ -39,16 +38,36 @@ const [password, setPassword] = useState<string>('');
 const [ErrorMessage, setErrorMessage] = useState('');
 const [showPassword, setShowPassword] = useState<boolean>(false);
 
+
+const capitalizeUsername = (name: string) => {
+  if (!name) return "";
+  return name.charAt(0).toUpperCase() + name.slice(1);
+};
+
+
 const HandleSignup = async (e: React.FormEvent) => {
   e.preventDefault();
   setAllowRedirect(false);
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+    const formattedUsername = capitalizeUsername(username.trim());
+
+    const q = query(
+    collection(db, "users"),
+    where("username", "==", formattedUsername)
+);
+
+    const snapshot = await getDocs(q);
+
+if (!snapshot.empty) {
+  toast.error("That username already exists sadly, Choose another one!");
+  return;
+}
 
  await setDoc(doc(db, "users", user.uid), {
       email: user.email,
-      username: username,
+      username: formattedUsername,
       createdAt: new Date()
 
     });
@@ -108,11 +127,9 @@ const togglePassword = () => {
 
   return (
     <>
-   <div><Toaster   
-  position="top-center"
-  reverseOrder={false}
-  />
-  </div>
+
+  <Toaster position="top-center" reverseOrder={false}/>
+
 
       <div className="flex justify-center items-center flex-wrap mb-8">
         <div className="max-w-[60%] p-5">
@@ -193,8 +210,7 @@ const togglePassword = () => {
  peer-valid:text-[22px]
  peer-valid:text-gray-400
  cursor-text"     
- htmlFor="password"
-   >
+ htmlFor="password">
     Password
               </label>
               {password.length === 0 ? (

@@ -88,7 +88,7 @@ const handlePerishSoul = async (friendId: string) => {
 
     await closeChat(chatId);
     setOpenMenuUid(null);
-    
+
   } catch (err) {
     console.error("Failed to perish soul:", err);
   }
@@ -127,7 +127,6 @@ const toggleBlockSoul = async (friendId: string) => {
       : arrayUnion(friendId),
   });
 };
-
 
 
   if (!user) {
@@ -172,8 +171,8 @@ const toggleBlockSoul = async (friendId: string) => {
 };
 
   
-   // Accept Friend Request
-  const handleAccept = async (friendId: string) => {
+     // Accept Friend Request
+    const handleAccept = async (friendId: string) => {
     const userRef = doc(db, "users", user.uid);
     const friendRef = doc(db, "users", friendId);
 
@@ -205,9 +204,9 @@ const toggleBlockSoul = async (friendId: string) => {
     <div className="flex flex-col">
      {sentRequests.length > 0 && (
     <div>
-      <div className="p-2 mt-2">
-        <h3 className="text-white relative left-15 text-md"> Sent Soulmate Requests 
-         <span className="text-sm text-purple-400"> ({sentRequests.length})</span>
+      <div className="p-2 mt-2 mb-2">
+        <h3 className="text-white relative left-12 text-lg"> Sent Soulmate Requests 
+         <span className="text-md text-purple-400"> ( {sentRequests.length} )</span>
         </h3>
       </div>
      {sentRequests.map((id) => (
@@ -216,9 +215,9 @@ const toggleBlockSoul = async (friendId: string) => {
     
      {friendRequests.length > 0 && (
       <div>
-        <div className=" mt-2 mb-2">
-          <h3 className="text-white relative left-15 text-md"> New Soulmate Requests!
-             <span className="text-sm text-purple-400"> ({friendRequests.length})</span>
+        <div className=" p-2 mt-2 mb-2">
+          <h3 className="text-white relative left-12 text-lg"> New Soulmate Requests
+             <span className="text-md text-purple-400"> ( {friendRequests.length} )</span>
           </h3>
         </div>
           {friendRequests.map((id) => (
@@ -293,14 +292,11 @@ useEffect(() => {
 }, [userId]);
 
 
-
-
   useEffect(() => {
 
     const ref = doc(db, "users", userId);
-
     const unsub = onSnapshot(ref, (snap) => {
-    if (!snap.exists()) return;
+      if (!snap.exists()) return;
 
 
     const data = snap.data();
@@ -318,7 +314,6 @@ const AFK = now - lastSeen > 30000;
     }));
   });
 
-   
       return () => unsub();
   }, [userId]);
 
@@ -342,11 +337,11 @@ const AFK = now - lastSeen > 30000;
       <div>
         <p className="text-gray-200 font-[ChatFont] text-xl">{friendData.username}</p>
 
-        <div className="flex items-center gap-2">
-  <span className={`w-2 h-2 rounded-full ${friendData.status === "online" ? "bg-green-500" : friendData.status === "idle" ? "bg-yellow-500" : "bg-gray-500"}`}/>
-  <p className="text-xs text-gray-400 ">
-    {friendData.status === "online" ? "Active now" : friendData.status === "idle" ? "Idle" : "Offline"}
-  </p>
+      <div className="flex items-center gap-2">
+       <span className={`w-2 h-2 rounded-full ${friendData.status === "online" ? "bg-green-500" : friendData.status === "idle" ? "bg-yellow-500" : "bg-gray-500"}`}/>
+       <p className="text-xs text-gray-400 ">
+        {friendData.status === "online" ? "Active now" : friendData.status === "idle" ? "Idle" : "Offline"}
+       </p>
 
        </div>
       </div>
@@ -354,8 +349,7 @@ const AFK = now - lastSeen > 30000;
   <button onClick={(e) => {e.stopPropagation(); handleFriendMenuClick(friendData.uid);}}
     className="ml-auto p-2 cursor-pointer rounded-full text-gray-400 hover:text-white transition duration-200"
     title="More options">
-    <MoreVertical size={21}
-/>
+    <MoreVertical size={21}/>
   </button>
 
 {openMenuUid === friendData.uid && (
@@ -399,8 +393,7 @@ const AFK = now - lastSeen > 30000;
       onClick={() => {
         onPerishSoul(friendData.uid);
         setOpenMenuUid(null);
-      }}
-    />
+      }}/>
     </div>
   )}
 
@@ -410,10 +403,7 @@ const AFK = now - lastSeen > 30000;
   </div>
 )}
 
-
-
-
-    </div>
+  </div>
   );
 };
 
@@ -470,11 +460,11 @@ const FriendRequestItem = ({ userId, onAccept, onDecline }: FriendRequestItemPro
         />
         <div>
           <p className="text-gray-200 font-[Chatfont] text-xl">{friendData.username}</p>
-          <p className="text-sm text-purple-300 italic">wants to be your soulmate</p>
+          <p className="text-xs text-purple-300 italic">wants to be your soulmate</p>
         </div>
       </div>
 
-      <div className="opacity-0 group-hover:opacity-100 flex gap-2 transition-opacity duration-500">
+      <div className="opacity-0 group-hover:opacity-100 duration-500 flex gap-2 transition-opacity">
         <button onClick={() => onAccept(userId)}>
           <Check className="w-5 h-5 text-gray-500 hover:text-white cursor-pointer" />
         </button>
@@ -501,18 +491,18 @@ const SentRequestItem = ({ userId, onCancel }: { userId: string; onCancel:(id: s
   if (!friendData) return null;
 
   return (
-    <div className=" relative group flex items-center justify-between gap-3 p-3 hover:bg-purple-500/10 transition border-gray-800 border-dashed border-b-3">
+    <div className=" relative group flex items-center justify-between gap-3 p-3 hover:bg-purple-500/10 transition border-gray-800 border-dashed border-b-2">
       <img
         src={friendData.profilePic || Ghost}
         className="w-10 h-10 rounded-full border border-purple-500 object-cover"
       />
-      <div className="flex items-start flex-col relative right-6 p-1">
-        <p className="text-gray-200">{friendData.username}</p>
-        <p className="text-xs mt-1 text-purple-300 italic">awaiting their response</p>
+      <div className="flex items-start flex-col relative right-6">
+        <p className="text-gray-200 font-[ChatFont] text-xl">{friendData.username}</p>
+        <p className="text-xs mt-1 text-purple-300 italic ">awaiting their response</p>
       </div>
 
      
-    <button onClick={() => onCancel(userId)} className="opacity-0 group-hover:opacity-100 hover:text-purple-400 text-gray-400 px-3 py-1 text-sm cursor-pointer">
+    <button onClick={() => onCancel(userId)} className="opacity-0 group-hover:opacity-100 hover:text-white text-gray-400 px-3 py-1 text-sm cursor-pointer duration-200">
       <XIcon className="h-5 w-5" />
     </button>
     </div>

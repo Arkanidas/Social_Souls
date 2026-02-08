@@ -102,8 +102,7 @@ const useUserPresence = () => {
 
 
 useEffect(() => {
-  fetchProfile();
-        
+  fetchProfile();    
   }, []);
 
 
