@@ -6,8 +6,8 @@ import  Ghost  from "../assets/ghosts.png";
 import { useChat } from '../context/ChatContext';
 import { useSidebar } from "../context/SidebarContext";
 import { showUserProfileModal } from "../chat components/ProfileModal";
-
-
+import AcceptSound from "../assets/FriendAccept.mp3";
+import DeclineSound from "../assets/DeclineFriend.mp3"
 
 type FriendRequestItemProps = {
   userId: string;
@@ -25,11 +25,25 @@ export const FriendsTab = () => {
   const { setActiveTab } = useSidebar();
   const [openMenuUid, setOpenMenuUid] = useState<string | null>(null);
   const user = auth.currentUser;
-  
+  const acceptAudioRef = useRef<HTMLAudioElement | null>(null);
+  const DeclineAudioRef = useRef<HTMLAudioElement | null>(null);
 
+ 
 
+   // Preload accept and decline sounds
+  useEffect(() => {
+  const Acceptaudio = new Audio(AcceptSound);
+  const Declineaudio = new Audio(DeclineSound);
 
-  
+  Acceptaudio.volume = 0.2;
+  Declineaudio.volume = 0.2;
+
+  Acceptaudio.load();   
+  Declineaudio.load(); 
+
+  acceptAudioRef.current = Acceptaudio;
+  DeclineAudioRef.current = Declineaudio;
+}, []);
 
 
    // Open Chat on Friend Click
@@ -171,8 +185,18 @@ const toggleBlockSoul = async (friendId: string) => {
 };
 
   
-     // Accept Friend Request
+    // Accept Friend Request
     const handleAccept = async (friendId: string) => {
+
+    try {
+
+    const audio = acceptAudioRef.current;
+
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
+
     const userRef = doc(db, "users", user.uid);
     const friendRef = doc(db, "users", friendId);
 
@@ -187,26 +211,40 @@ const toggleBlockSoul = async (friendId: string) => {
     });
 
     setFriendRequests(prev => prev.filter((id) => id !== friendId));
-  };
+  } catch (error) {
+    console.error("Accept failed:", error);
+  }
+};
 
 
    // Decline Friend Request
   const handleDecline = async (friendId: string) => {
+
+   try {
+
+     const audio = DeclineAudioRef.current;
+
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
+
     const userRef = doc(db, "users", user.uid);
     await updateDoc(userRef, {
       friendRequests: arrayRemove(friendId)
     });
     setFriendRequests(prev => prev.filter((id) => id !== friendId));
-  };
-
+  } catch (error) {
+    console.error("Decline failed:", error);
+  };}
 
   return (
     <div className="flex flex-col">
      {sentRequests.length > 0 && (
     <div>
-      <div className="p-2 mt-2 mb-2">
-        <h3 className="text-white relative left-12 text-lg"> Sent Soulmate Requests 
-         <span className="text-md text-purple-400"> ( {sentRequests.length} )</span>
+      <div className="p-2 mt-1">
+        <h3 className="text-white relative left-12 text-md"> Sent Soulmate Requests 
+         <span className="text-sm text-purple-400"> ( {sentRequests.length} )</span>
         </h3>
       </div>
      {sentRequests.map((id) => (
@@ -215,9 +253,9 @@ const toggleBlockSoul = async (friendId: string) => {
     
      {friendRequests.length > 0 && (
       <div>
-        <div className=" p-2 mt-2 mb-2">
-          <h3 className="text-white relative left-12 text-lg"> New Soulmate Requests
-             <span className="text-md text-purple-400"> ( {friendRequests.length} )</span>
+        <div className=" p-2 mt-1">
+          <h3 className="text-white relative left-12 text-md"> New Soulmate Requests
+             <span className="text-sm text-purple-400"> ( {friendRequests.length} )</span>
           </h3>
         </div>
           {friendRequests.map((id) => (
@@ -229,7 +267,7 @@ const toggleBlockSoul = async (friendId: string) => {
       </div>)}
   
       {friends.length === 0 ? (
-        <p className="text-gray-500 text-sm overflow-y-scroll relative left-[30%] top-4">No friends yet...</p>
+        <p className="text-gray-500 text-sm overflow-y-scroll relative left-[33%] top-4">No friends yet...</p>
       ) : (friends.map((id) => (<FriendItem key={id} userId={id} onOpenChat={handleOpenChat} openMenuUid={openMenuUid}
            setOpenMenuUid={setOpenMenuUid} onPerishSoul={handlePerishSoul} toggleMuteSoul={toggleMuteSoul} toggleBlockSoul={toggleBlockSoul}/> )))}
     </div>
@@ -466,10 +504,10 @@ const FriendRequestItem = ({ userId, onAccept, onDecline }: FriendRequestItemPro
 
       <div className="opacity-0 group-hover:opacity-100 duration-500 flex gap-2 transition-opacity">
         <button onClick={() => onAccept(userId)}>
-          <Check className="w-5 h-5 text-gray-500 hover:text-white cursor-pointer" />
+          <Check className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer duration-500" />
         </button>
         <button onClick={() => onDecline(userId)}>
-           <XIcon className="w-5 h-5 text-gray-500 hover:text-white cursor-pointer duration-500" />
+           <XIcon className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer duration-500" />
         </button>
       </div>
     </div>
