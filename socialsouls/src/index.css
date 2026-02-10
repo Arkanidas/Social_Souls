@@ -56,7 +56,7 @@ html, body {
 }
 
 
-@keyframes ghost-fade-in {
+      @keyframes ghost-fade-in {
           0% {
             opacity: 0;
           }
@@ -65,7 +65,7 @@ html, body {
           }
         }
         
-        @keyframes ghost-appear {
+      @keyframes ghost-appear {
           0% {
             opacity: 0;
             transform: translateY(10px) scale(0.98);
@@ -127,15 +127,14 @@ html, body {
         }
       
 
-     @keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(60px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+      @keyframes fade-in-up {
+        from {
+         opacity: 0;
+         transform: translateY(60px);}
+
+         to {
+          opacity: 1;
+           transform: translateY(0);}
 }
 
 .animate-fade-in-up {
@@ -144,7 +143,7 @@ html, body {
 
 .UserProfileModal {
   
-          animation: modalanimation 0.5s ease-out forwards;
+  animation: modalanimation 0.5s ease-out forwards;
    
       
         }
@@ -162,3 +161,16 @@ html, body {
             transform: scale(1);
           }
         }
+
+
+    
+         @keyframes pulseSoft {
+           0%, 100% { opacity: 0.6; transform: scale(1); }
+           50% { opacity: 1; transform: scale(1.15); }
+}
+
+.ghost-ball {
+  animation:
+   
+    pulseSoft 2.5s ease-in-out infinite;
+}

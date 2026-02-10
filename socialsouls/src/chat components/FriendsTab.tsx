@@ -19,7 +19,6 @@ type FriendRequestItemProps = {
 
 export const FriendsTab = () => {
   const [friends, setFriends] = useState<any[]>([]);
-  const [friendRequests, setFriendRequests] = useState<any[]>([]);
   const [sentRequests, setSentRequests] = useState<any[]>([]);
   const { openChat, closeChat } = useChat();
   const { setActiveTab } = useSidebar();
@@ -27,7 +26,7 @@ export const FriendsTab = () => {
   const user = auth.currentUser;
   const acceptAudioRef = useRef<HTMLAudioElement | null>(null);
   const DeclineAudioRef = useRef<HTMLAudioElement | null>(null);
-
+  const {friendRequests, setFriendsRequests } = useSidebar();
  
 
    // Preload accept and decline sounds
@@ -156,7 +155,7 @@ const toggleBlockSoul = async (friendId: string) => {
   const unsubscribe = onSnapshot(userRef, (snap:any) => {
     if (snap.exists()) {
       const data = snap.data();
-      setFriendRequests(data.friendRequests || []);
+      setFriendsRequests(data.friendRequests || []);
       setFriends(data.friends || []);
       setSentRequests(data.sentRequests || []);
     }
@@ -210,7 +209,7 @@ const toggleBlockSoul = async (friendId: string) => {
       sentRequests: arrayRemove(user.uid)
     });
 
-    setFriendRequests(prev => prev.filter((id) => id !== friendId));
+    setFriendsRequests(prev => prev.filter((id) => id !== friendId));
   } catch (error) {
     console.error("Accept failed:", error);
   }
@@ -219,24 +218,34 @@ const toggleBlockSoul = async (friendId: string) => {
 
    // Decline Friend Request
   const handleDecline = async (friendId: string) => {
-
-   try {
-
-     const audio = DeclineAudioRef.current;
-
+  try {
+    const audio = DeclineAudioRef.current;
+    
     if (audio) {
       audio.currentTime = 0;
       audio.play().catch(() => {});
     }
 
-    const userRef = doc(db, "users", user.uid);
-    await updateDoc(userRef, {
-      friendRequests: arrayRemove(friendId)
-    });
-    setFriendRequests(prev => prev.filter((id) => id !== friendId));
+    const userRef = doc(db, "users", user.uid);       
+    const friendRef = doc(db, "users", friendId);     
+
+    await Promise.all([
+      updateDoc(userRef, {
+        friendRequests: arrayRemove(friendId),
+      }),
+      updateDoc(friendRef, {
+        sentRequests: arrayRemove(user.uid),
+      }),
+    ]);
+
+    setFriendsRequests(prev =>
+      prev.filter(id => id !== friendId)
+    );
+
   } catch (error) {
     console.error("Decline failed:", error);
-  };}
+  }
+};
 
   return (
     <div className="flex flex-col">
