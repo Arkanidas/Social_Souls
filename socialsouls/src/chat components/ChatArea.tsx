@@ -206,7 +206,6 @@ useEffect(() => {
 
   const unsubscribe = onSnapshot(q, (snapshot) => {
     const msgs = snapshot.docs.map((doc) => ({id: doc.id, ...doc.data() as Omit<ChatMessage, "id">}));
-
     const lastMsg = msgs[msgs.length - 1];
 
 if (lastMsg && lastMsg.id !== lastMessageIdRef.current && lastMsg.senderId !== user?.uid) {
@@ -249,13 +248,9 @@ useEffect(() => {
 
   const lastMessage = Usermessages[Usermessages.length - 1];
   const currentUserId = auth.currentUser?.uid;
-
   const isNewMessage = Usermessages.length > prevMessageCountRef.current;
-
   const isFromOtherUser = lastMessage.senderId !== currentUserId;
-
   const isMuted = mutedSouls.includes(lastMessage.senderId);
-
 
   if (isNewMessage && isFromOtherUser && !isMuted) {
     play();
@@ -511,40 +506,33 @@ return null
   {activeChatUser && (
         <div className="relative group flex items-center gap-2">
 
-        <p className="text-sm text-purple-400">
+      <p className="text-sm text-purple-400">
         {otherUserStatus === "online"
         ? "Haunting Online"
         : otherUserStatus === "idle"
         ? "Haunting Idle"
         : "Haunting Offline"}
-    </p>
+      </p>
 
-    <GhostIcon
-      size={16}
+    <GhostIcon size={16}
       className={
         otherUserStatus === "online"
           ? "text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]"
           : otherUserStatus === "idle"
           ? "text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]"
-          : "text-gray-400 shadow-[-1px_0px_23px_15px_rgba(0,_0,_0,_0.3)]"
-      }
-    />
+          : "text-gray-400 shadow-[-1px_0px_23px_15px_rgba(0,_0,_0,_0.3)]"}/>
 
-    {otherUserStatus === "offline" && lastSeen && (
-      <div className="absolute top-full left-0 mt-1 px-2 py-1 rounded-md text-xs bg-gray-50 text-black opacity-0 group-hover:opacity-100 transition pointer-events-none">
-        Last seen {formatLastSeen(lastSeen)}
-      </div>
-    )}
-  </div>
-)}
-
+        {otherUserStatus === "offline" && lastSeen && (
+            <div className="absolute top-full left-0 mt-1 px-2 py-1 rounded-md text-xs bg-gray-50 text-black opacity-0 group-hover:opacity-100 transition pointer-events-none">
+               Last seen {formatLastSeen(lastSeen)}
+            </div>)}
+           </div>)}
           </div>
         </div>
       </div>
 
 
 {isChatBlocked && (<BlockNotice theyBlockedMe={theyBlockedMe} iBlockedThem={iBlockedThem} activeChatUser={activeChatUser}/>)}
-
 
 {isUploading && (
   <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-md flex items-center justify-center">
@@ -735,11 +723,11 @@ return null
       
 
       {showAddFriend && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/40 ">
+        <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/50 ">
           <div className="add-friend-modal bg-gray-800/80 text-gray-200 border-purple-900/50 text-gray-800 border-purple-300/50 border-2 rounded-lg shadow-2xl p-6 w-full max-w-md ">
             <div className="flex justify-between items-center mb-4 ">
               <h2 className="text-2xl font-bold font-serif ">
-                <span className="text-purple-500 ">Summon a Spirit</span>
+                <span className="text-purple-500">Summon <span className='text-white'>Soulmate</span></span>
               </h2>
                 <button
                   onClick={() => setShowAddFriend(false)}
@@ -748,7 +736,7 @@ return null
               </button>
             </div>
 
-            <p className="mb-6 text-gray-600">Search the void for lost souls...</p>
+            <p className="mb-4 mt-1 text-gray-400 text-sm">Search the void for lost souls...</p>
             
             <form onSubmit={handleAddFriendSubmit} className="relative ">
               <div className="relative flex items-center ">
@@ -756,8 +744,8 @@ return null
                   ref={addFriendInputRef}
                   type="text"
                   placeholder="Enter a username to summon..."
-                  className="w-full pl-10 pr-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border bg-gray-100 text-gray-900 border-purple-200 placeholder-purple-500/50"/>
-                <SkullIcon className="absolute left-3 text-purple-500 h-5 w-5 animate-pulse pointer-events-none "/>
+                  className="w-full pl-10 pr-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600/80 duration-200 border bg-gray-100 text-gray-900 border-purple-200 placeholder-purple-600/80"/>
+                <SkullIcon className="absolute left-3 text-purple-600/80 h-5 w-5 animate-pulse pointer-events-none "/>
               </div>
               <div className="mt-6 flex justify-end ">
                 <button

@@ -7,16 +7,16 @@ import { FriendsTab } from './FriendsTab';
 import { ChatTab } from '../chat components/ChatsTab'
 import Ghost from "../assets/ghosts.png"
 import { useSidebar } from "../context/SidebarContext";
-import { doc, onSnapshot, getDoc } from "firebase/firestore";
+import { doc, onSnapshot, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { Ghost as GhostIcon } from "lucide-react";
 import { showUserProfileModal } from "../chat components/ProfileModal";
 import { showLogoutModal } from "../chat components/ShowLogoutModal";
-
+import {useChat} from '../context/ChatContext';
 
 
 type ProfileType = {
   username: string;
-  profilepic: string;
+  profilePic: string;
   bio: string;
 };
 
@@ -37,6 +37,7 @@ export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
   const [filteredFriends, setFilteredFriends] = useState<any[]>([]);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const {friendRequests} = useSidebar();
+  const { openChat} = useChat();
 
   
  
@@ -72,7 +73,7 @@ useEffect(() => {
           return {
            uid: friendSnap.id,
            username: data.username || data.displayName || data.name || "",
-           profilepic: data.profilepic || Ghost,
+           profilePic: data.profilePic || Ghost,
           };
         })
       );
@@ -86,7 +87,7 @@ useEffect(() => {
   });
 
   return () => unsub();
-}, []);
+}, [filteredFriends.length]);
 
 const TempModal = () => {
   if (searchValue.trim() === "") return null;
@@ -114,22 +115,39 @@ useEffect(() => {
 }, [searchValue, friends]);
 
   
-const openChatWithFriend = (friend: any) => {
+// Opens chat with friend on click from search results
+const openChatWithFriend = async (friend: any) => {
+  if (!auth.currentUser) return;
 
-  localStorage.setItem(
-    "activeChat",
-    JSON.stringify({
+  const currentUserId = auth.currentUser.uid;
+  const friendId = friend.uid;
+
+  const chatId = [currentUserId, friendId].sort().join("_");
+
+  const chatRef = doc(db, "Chats", chatId);
+  const chatSnap = await getDoc(chatRef);
+
+  if (!chatSnap.exists()) {
+    await setDoc(chatRef, {
+      participants: [currentUserId, friendId],
+      createdAt: serverTimestamp(),
+      lastMessage: "",
+      lastMessageAt: serverTimestamp(),
+    });
+  }
+
+  await openChat({
+    chatId,
+    otherUser: {
       uid: friend.uid,
       username: friend.username,
-      profilepic: friend.profilepic || Ghost,
-    })
-  );
+      profilePic: friend.profilePic || Ghost,
+    },
+  });
 
-  
   setActiveTab("chats");
   setShowSearchModal(false);
   setSearchValue("");
-
 };
 
 
@@ -140,7 +158,7 @@ const openChatWithFriend = (friend: any) => {
       <div className="p-4 border-b border-purple-900/30">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-500 cursor-pointer" onClick={() => showUserProfileModal()}>
-            <img src={profile? profile.profilepic : Ghost} alt="Profile" className="w-full h-full object-cover" />
+            <img src={profile? profile.profilePic : Ghost} alt="Profile" className="w-full h-full object-cover" />
           </div>
 
           <div>
@@ -196,7 +214,7 @@ const openChatWithFriend = (friend: any) => {
             onClick={() => openChatWithFriend(friend)}
           >
             <img
-              src={friend.profilepic || Ghost}
+              src={friend.profilePic || Ghost}
               className="w-9 h-9 rounded-full object-cover border-gray border"
             />
             <span className="text-white">{friend.username}</span>
@@ -249,7 +267,7 @@ const openChatWithFriend = (friend: any) => {
         onClose={() => setIsSettingsOpen(false)}
         UserName={profile?.username ?? ""}
         Bio={profile?.bio ?? ""}
-        profilepic={profile?.profilepic ?? ""}
+        profilepic={profile?.profilePic ?? ""}
         onProfileUpdated={onProfileUpdated}/>
 
        

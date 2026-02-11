@@ -45,7 +45,7 @@ if (user) {
 
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-purple-300 text-center flex-1">
+          <h2 className="text-xl font-semibold text-purple-300 text-center flex-1 text-xl">
             Do you want to log out?
           </h2>
 
@@ -57,25 +57,23 @@ if (user) {
           </button>
         </div>
 
-      
-        <p className="text-gray-400 mb-6">
+        <p className="text-gray-400 mb-6 text-md">
           Are you sure you want to return to the Living World?
         </p>
-
 
         <div className="flex justify-center gap-3 ">
           <button
             onClick={() => setIsOpen(false)}
             className="px-4 py-2 rounded-md bg-gray-700 hover:bg-gray-600 text-white transition duration-200 shadow-md shadow-gray-500/30 cursor-pointer"
           >
-            No
+            Nope
           </button>
 
           <button
             onClick={handleLogout}
             className="px-4 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white transition shadow-lg shadow-purple-500/30 cursor-pointer"
           >
-            Yes
+            Sure
           </button>
         </div>
       </div>

@@ -220,7 +220,7 @@ const toggleBlockSoul = async (friendId: string) => {
   const handleDecline = async (friendId: string) => {
   try {
     const audio = DeclineAudioRef.current;
-    
+
     if (audio) {
       audio.currentTime = 0;
       audio.play().catch(() => {});
@@ -324,6 +324,7 @@ useEffect(() => {
   return () => unsub();
 }, [userId]);
 
+// creates a real-time listener array to check if the friend is blocked
 useEffect(() => {
   const currentUser = auth.currentUser;
   if (!currentUser) return;
@@ -342,15 +343,12 @@ useEffect(() => {
   useEffect(() => {
 
     const ref = doc(db, "users", userId);
-    const unsub = onSnapshot(ref, (snap) => {
-      if (!snap.exists()) return;
-
-
+    const unsub = onSnapshot(ref, (snap) => {if (!snap.exists()) return;
     const data = snap.data();
 
-const lastSeen = data.status?.lastSeen?.toDate?.()?.getTime() || 0;
-const now = Date.now();
-const AFK = now - lastSeen > 30000;
+    const lastSeen = data.status?.lastSeen?.toDate?.()?.getTime() || 0;
+    const now = Date.now();
+    const AFK = now - lastSeen > 1000000;
 
   setFriendData((prev:any) => ({
       ...prev,
@@ -378,8 +376,7 @@ const AFK = now - lastSeen > 30000;
   
       <img
         src={friendData.profilePic || Ghost}
-        className="w-10 h-10 rounded-full border border-purple-500 object-cover"
-      />
+        className="w-10 h-10 rounded-full border border-purple-500 object-cover"/>
 
       <div>
         <p className="text-gray-200 font-[ChatFont] text-xl">{friendData.username}</p>
@@ -403,25 +400,21 @@ const AFK = now - lastSeen > 30000;
     <div
       ref={menuRef}
       className="absolute right-12 top-1/2 -translate-y-1/2 w-48 rounded-md bg-[#171717] border border-white/10 shadow-xl z-50"
-      onClick={(e) => e.stopPropagation()}
-    >
+      onClick={(e) => e.stopPropagation()}>
+
       <MenuItem
       icon={<User size={16} />}
       text="View Soul Profile"
       onClick={() => {
        showUserProfileModal(friendData.uid);
-       setOpenMenuUid(null);
-  }}
-    />
+       setOpenMenuUid(null);}}/>
 
     <MenuItem
       icon={ isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
       text={isMuted ? "Unmute Soul" : "Mute Soul"}
       onClick={() => {
         setOpenMenuUid(null);
-        toggleMuteSoul(friendData.uid);
-      }}
-    />
+        toggleMuteSoul(friendData.uid);}}/>
 
     <MenuItem
       icon={ <Ban size={16}/>}
@@ -429,9 +422,7 @@ const AFK = now - lastSeen > 30000;
       danger
       onClick={() => {
         setOpenMenuUid(null);
-        toggleBlockSoul(friendData.uid);
-      }}
-    />
+        toggleBlockSoul(friendData.uid);}}/>
 
     <MenuItem
       icon={<Skull size={16} />}
@@ -439,8 +430,7 @@ const AFK = now - lastSeen > 30000;
       danger
       onClick={() => {
         onPerishSoul(friendData.uid);
-        setOpenMenuUid(null);
-      }}/>
+        setOpenMenuUid(null);}}/>
     </div>
   )}
 
@@ -453,8 +443,6 @@ const AFK = now - lastSeen > 30000;
   </div>
   );
 };
-
-
 
 const MenuItem = ({
   text,

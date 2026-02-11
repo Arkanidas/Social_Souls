@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebase/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import { X } from "lucide-react";
+import { X, Users } from "lucide-react";
 import Ghost from "../assets/ghosts.png";
 
 type UserProfile = {
   username: string;
   bio?: string;
   profilePic?: string;
+  friends?: string[];
   status?: {
     state: "online" | "offline" | "idle";
     lastChanged: any;
@@ -28,7 +29,7 @@ export const UserProfileModal = () => {
   const [open, setOpen] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
-   const closeModal = () => {
+  const closeModal = () => {
   setOpen(false);
   setProfile(null);
 };
@@ -36,11 +37,8 @@ export const UserProfileModal = () => {
   useEffect(() => {
     const handler = async (e: any) => {
 
- 
-  setOpen(true);
-  setProfile(null); 
-
-  
+    setOpen(true);
+    setProfile(null); 
 
   const passedUserId = e.detail?.userId;
   const userIdToLoad = passedUserId || auth.currentUser?.uid;
@@ -51,11 +49,7 @@ export const UserProfileModal = () => {
   if (snap.exists()) {
     setProfile(snap.data() as UserProfile);
   }
-  
 };
-
-
-
     window.addEventListener("showUserProfileModal", handler);
     return () => window.removeEventListener("showUserProfileModal", handler);
   }, []);
@@ -79,6 +73,7 @@ const statusColor =
     ? "yellow"
     : "gray";
 
+const friendsCount = profile.friends?.length ?? 0;
  
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm ">
@@ -113,6 +108,13 @@ const statusColor =
         <p className="mt-4 text-white/90 text-md leading-relaxed px-2">
           {profile.bio || "No bio set yet...."}
         </p>
+
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 text-white/90">
+         <Users  size={20} />
+         <span className="text-md font-medium">
+          {friendsCount}
+         </span>
+       </div>
       </div>
     </div>
   );

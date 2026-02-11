@@ -67,7 +67,6 @@ const useUserPresence = () => {
 
    
 
-
     // Set Offline on logout or disconnect 
     return () => {
       handleUnload();
@@ -111,7 +110,7 @@ useEffect(() => {
 
         <Sidebar profile={profile ? {
           username: profile.username,
-          profilepic: profile.profilePic,
+          profilePic: profile.profilePic,
           bio: profile.bio} : undefined}
           onProfileUpdated={fetchProfile}/>
          <UserProfileModal />
