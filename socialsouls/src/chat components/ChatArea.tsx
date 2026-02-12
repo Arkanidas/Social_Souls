@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { MessageInput } from './MessageInput';
-import { XIcon, SkullIcon, FileInput, PaperclipIcon, X, Download, Copy } from 'lucide-react'
+import { XIcon, SkullIcon, FileInput, PaperclipIcon, X, Download, Copy, ArrowDown  } from 'lucide-react'
 import { auth, db, storage } from '../firebase/firebaseConfig'
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, addDoc, orderBy, onSnapshot } from "firebase/firestore"
@@ -591,14 +591,17 @@ return null
     onClick={() =>
       bottomRef.current?.scrollIntoView({ behavior: "smooth" })
     }
-    className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 bg-purple-600 hover:bg-purple-700 text-white p-3
+    className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 bg-gray-400/20 hover:bg-purple-700 text-white px-3 w-14 h-14
       rounded-full
+      duration-300
+      cursor-pointer
+      border-2 border-purple-500/50
       shadow-lg
       animate-bounce
       transition"
     title="Scroll to latest"
   >
-    ↓
+    <ArrowDown size={29}/>
   </button>
 )}
 

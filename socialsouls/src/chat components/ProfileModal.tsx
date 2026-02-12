@@ -109,12 +109,20 @@ const friendsCount = profile.friends?.length ?? 0;
           {profile.bio || "No bio set yet...."}
         </p>
 
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 text-white/90">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 text-white/90 group cursor-default">
          <Users  size={20} />
          <span className="text-md font-medium">
           {friendsCount}
          </span>
-       </div>
+
+
+        <div className="absolute -top-9 left-1/2 -translate-x-1/2 
+                  bg-black/50 text-xs text-white px-2 py-2 rounded-md
+                  opacity-0 group-hover:opacity-100
+                  transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                   Souls Befriended
+        </div>
+       </div> 
       </div>
     </div>
   );
