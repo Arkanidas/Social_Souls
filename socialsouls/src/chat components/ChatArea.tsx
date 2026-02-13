@@ -12,6 +12,7 @@ import {formatChatTimestamp, formatLastSeen} from './DateUtils';
 import { useNotificationSound } from "../Hooks/Notification";
 import { showUserProfileModal } from "../chat components/ProfileModal";
 import { LogoutConfirmModal } from "./ShowLogoutModal";
+import { PerishModal } from './PerishModal';
 
 
 export const showAddFriendModal = () => {
@@ -776,5 +777,6 @@ return null
 
       <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments} setAttachments={setAttachments} isSpamBlocked={isSpamBlocked} spamCountdown={spamCountdown} isChatBlocked={isChatBlocked}/>
       <LogoutConfirmModal/>
+      <PerishModal/>
     </div>;
 };

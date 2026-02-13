@@ -8,6 +8,8 @@ import { useSidebar } from "../context/SidebarContext";
 import { showUserProfileModal } from "../chat components/ProfileModal";
 import AcceptSound from "../assets/FriendAccept.mp3";
 import DeclineSound from "../assets/DeclineFriend.mp3"
+import {showPerishModal} from "../chat components/PerishModal";
+import {PerishModal} from "../chat components/PerishModal";
 
 type FriendRequestItemProps = {
   userId: string;
@@ -285,7 +287,7 @@ const toggleBlockSoul = async (friendId: string) => {
 
 
 
-const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, onPerishSoul, toggleMuteSoul, toggleBlockSoul }: { userId: string; onOpenChat:(friend:any) => void; openMenuUid: string | null;
+const FriendItem = ({ userId, onOpenChat, openMenuUid, setOpenMenuUid, toggleMuteSoul, toggleBlockSoul }: { userId: string; onOpenChat:(friend:any) => void; openMenuUid: string | null;
 
   setOpenMenuUid: React.Dispatch<React.SetStateAction<string | null>>;
   onPerishSoul: (friendId: string) => void;
@@ -429,7 +431,7 @@ useEffect(() => {
       text="Perish Soul"
       danger
       onClick={() => {
-        onPerishSoul(friendData.uid);
+        showPerishModal()
         setOpenMenuUid(null);}}/>
     </div>
   )}
@@ -540,6 +542,8 @@ const SentRequestItem = ({ userId, onCancel }: { userId: string; onCancel:(id: s
     <button onClick={() => onCancel(userId)} className="opacity-0 group-hover:opacity-100 hover:text-white text-gray-400 px-3 py-1 text-sm cursor-pointer duration-200">
       <XIcon className="h-5 w-5" />
     </button>
+ 
     </div>
+  
   );
 };

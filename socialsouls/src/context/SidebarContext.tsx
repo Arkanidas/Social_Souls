@@ -13,14 +13,11 @@ const SidebarContext = createContext<SidebarContextType | null>(null);
 
 export function SidebarProvider({ children }: any) {
 
-  
-  
   const [activeTab, setActiveTab] = useState("friends"); 
   const [friendRequests, setFriendsRequests] = useState<string[]>([]);
 
 
  
-
   return (
     <SidebarContext.Provider value={{ activeTab, setActiveTab, friendRequests, setFriendsRequests }}>
       {children}

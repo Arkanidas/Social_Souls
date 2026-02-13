@@ -269,7 +269,7 @@ const openChatWithFriend = async (friend: any) => {
         Bio={profile?.bio ?? ""}
         profilepic={profile?.profilePic ?? ""}
         onProfileUpdated={onProfileUpdated}/>
-
+      
        
     </div>;
 };
