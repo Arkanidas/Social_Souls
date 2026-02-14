@@ -474,13 +474,15 @@ const handleDownloadImage = async () => {
 
   //Component to show block notice text
 const BlockNotice = ({ theyBlockedMe, iBlockedThem, activeChatUser }: { theyBlockedMe: boolean; iBlockedThem: boolean; activeChatUser: any }) => {
+
+   if (!activeChatUser) return null; 
+
   if (theyBlockedMe) {
   return <div className="self-center inline-flex px-4 py-2 rounded-md border border-red-500 text-red-500 bg-red-500/10 relative top-4">You are blocked!</div>;
 }
 
 if (iBlockedThem) {
   return <div className="self-center inline-flex px-4 py-2 rounded-md border border-red-500 text-red-500 bg-red-500/10 relative top-4">You have blocked {activeChatUser.otherUser.username}</div>;
-    
 }
 
 return null
@@ -735,7 +737,7 @@ return null
               </h2>
                 <button
                   onClick={() => setShowAddFriend(false)}
-                  className="text-gray-600 hover:text-red-500 transition-colors cursor-pointer">
+                  className="text-gray-600 hover:text-purple-600  transition-colors cursor-pointer">
                   <XIcon className="h-6 w-6" />
               </button>
             </div>
@@ -775,7 +777,7 @@ return null
       setAttachments((prev) => [...prev, ...validFiles]);}}/>
       </div>)}
 
-      <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments} setAttachments={setAttachments} isSpamBlocked={isSpamBlocked} spamCountdown={spamCountdown} isChatBlocked={isChatBlocked}/>
+      <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments} setAttachments={setAttachments} isSpamBlocked={isSpamBlocked} spamCountdown={spamCountdown} isChatBlocked={isChatBlocked} hasActiveChat={!!activeChatUser}/>
       <LogoutConfirmModal/>
       <PerishModal/>
     </div>;

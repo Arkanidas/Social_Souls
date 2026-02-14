@@ -7,9 +7,9 @@ import { useChat } from '../context/ChatContext';
 import { useSidebar } from "../context/SidebarContext";
 import { showUserProfileModal } from "../chat components/ProfileModal";
 import AcceptSound from "../assets/FriendAccept.mp3";
-import DeclineSound from "../assets/DeclineFriend.mp3"
+import DeclineSound from "../assets/DeclineFriend.mp3";
 import {showPerishModal} from "../chat components/PerishModal";
-import {PerishModal} from "../chat components/PerishModal";
+
 
 type FriendRequestItemProps = {
   userId: string;
@@ -431,7 +431,7 @@ useEffect(() => {
       text="Perish Soul"
       danger
       onClick={() => {
-        showPerishModal()
+        showPerishModal(friendData.uid, friendData.username);
         setOpenMenuUid(null);}}/>
     </div>
   )}

@@ -34,8 +34,6 @@ export function ChatProvider({ children }: any) {
 
 const [openChats, setOpenChats] = useState<OpenChat[]>([]);
 const [activeChatId, setActiveChatId] = useState<string | null>(null);
-
-
 const [user, setUser] = useState(() => auth.currentUser);
 
 useEffect(() => {

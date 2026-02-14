@@ -1,31 +1,49 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { XIcon } from "lucide-react";
 import { doc, updateDoc, arrayRemove} from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
 import { useChat } from "../context/ChatContext";
+import DeclineSound from "../assets/DeclineFriend.mp3";
 
 
-
-export const showPerishModal = () => {
-  window.dispatchEvent(new CustomEvent("showPerishModal"));
+export const showPerishModal = (friendId: string, username: string) => {
+  window.dispatchEvent(
+    new CustomEvent("showPerishModal", {
+      detail: { friendId, username }
+    })
+  );
 };
 
 export const PerishModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const user = auth.currentUser;
   const { closeChat } = useChat();
-
+  const [FriendId, setFriendId] = useState<string | null>(null);
+  const [friendName, setFriendName] = useState<string | null>(null);
+  const DeclineAudioRef = useRef<HTMLAudioElement | null>(null);
 
 
   useEffect(() => {
-  const open = () => setIsOpen(true);
+  const open = (e: any) => {
+    const CustomEvent = e as CustomEvent;
+    setFriendId(CustomEvent.detail.friendId);
+    setFriendName(CustomEvent.detail.username);
+    setIsOpen(true);
+  };
+
   window.addEventListener("showPerishModal", open);
   return () => window.removeEventListener("showPerishModal", open);
 }, []);
 
+useEffect(() => {
+  const Declineaudio = new Audio(DeclineSound);
 
+  Declineaudio.volume = 0.2;
+  
+  Declineaudio.load(); 
 
-
+  DeclineAudioRef.current = Declineaudio;
+}, []);
 
 
   const handlePerishSoul = async (friendId: string) => {
@@ -34,8 +52,16 @@ export const PerishModal = () => {
     const userRef = doc(db, "users", user.uid);
     const friendRef = doc(db, "users", friendId);
   
+    
     const chatId = [user.uid, friendId].sort().join("_");
     try {
+        
+    const audio = DeclineAudioRef.current;
+
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
      
       await Promise.all([
         updateDoc(userRef, {
@@ -62,20 +88,20 @@ export const PerishModal = () => {
 
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-purple-300 text-center flex-1 text-xl">
-            Are you sure you want to extinguish 
+          <h2 className=" font-semibold text-purple-300 text-center flex-1 text-lg">
+            Are you sure you want to extinguish {friendName}?
           </h2>
 
           <button
             onClick={() => setIsOpen(false)}
-            className="text-gray-400 hover:text-red-500 transition"
+            className="text-gray-400 transition mb-7"
           >
             <XIcon size={24} className="cursor-pointer hover:text-purple-600 duration-200"/>
           </button>
         </div>
 
-        <p className="text-gray-400 mb-6 text-md">
-           Chats between and your soulmate will be saved until reunited again
+        <p className="text-gray-400 mb-6 text-sm">
+           Chats between you and your soulmate will be saved until reunited again
         </p>
 
         <div className="flex justify-center gap-3 ">
@@ -87,7 +113,11 @@ export const PerishModal = () => {
           </button>
 
           <button
-            onClick={() => {handlePerishSoul(user!.uid); setIsOpen(false);}}
+            onClick={() => {
+           if (FriendId) {
+             handlePerishSoul(FriendId);
+          }
+             setIsOpen(false);}}
             className="px-4 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white transition shadow-lg shadow-purple-500/30 cursor-pointer"
           >
             Perish

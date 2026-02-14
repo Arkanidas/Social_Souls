@@ -11,12 +11,12 @@ type MessageInputProps = {
   isSpamBlocked: boolean;
   spamCountdown: number;
   isChatBlocked: boolean;
-
+  hasActiveChat: boolean;
 };
 
 
 
-export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments, isSpamBlocked, spamCountdown, isChatBlocked}:MessageInputProps) => {
+export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments, isSpamBlocked, spamCountdown, isChatBlocked, hasActiveChat}:MessageInputProps) => {
 
  const [MessageText, setMessageText] = useState<string>("");
  const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
@@ -106,24 +106,27 @@ useEffect(() => {
         <button onClick={() => setShowEmojiPicker(prev => !prev)} ref={emojiButtonRef} className="text-gray-400 hover:text-purple-500">
           <SmileIcon className="h-6 w-6 cursor-pointer"/>
         </button>
-        <button type="button" onClick={() => fileInputRef.current?.click()} className="text-gray-400 hover:text-purple-500">
+        <button type="button" onClick={() => hasActiveChat ? fileInputRef.current?.click(): null} className="text-gray-400 hover:text-purple-500">
           <PaperclipIcon className="h-6 w-6 cursor-pointer" />
         </button>
 
         <div className="flex-1">
-      {showEmojiPicker && !isChatBlocked &&(
-        <div ref={emojiPickerRef} className={"absolute bottom-16 left-4 z-50"}>
-           <EmojiPicker height={400} emojiStyle={EmojiStyle.GOOGLE} theme={Theme.DARK} onEmojiClick={ (emojiData) => {setMessageText(prev => prev + emojiData.emoji);}}/>
-       </div>)}
+      {showEmojiPicker && !isChatBlocked && hasActiveChat &&( <div ref={emojiPickerRef} className={"absolute bottom-16 left-4 z-50"}>
+           <EmojiPicker height={400} emojiStyle={EmojiStyle.GOOGLE} theme={Theme.DARK} onEmojiClick={ (emojiData) => {setMessageText(prev => prev + emojiData.emoji);}}/></div>)}
+
           <div className={`flex flex-col ${attachments.length > 0 ? "pt-2": ""} ${isChatBlocked ? "cursor-not-allowed": ""}`}> 
-            <input value={MessageText} onChange={(e) => setMessageText(e.target.value)}  disabled={isSpamBlocked || isChatBlocked} onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            type="text" placeholder={isSpamBlocked
+           <input value={MessageText} onChange={(e) => setMessageText(e.target.value)} disabled={isSpamBlocked || (isChatBlocked && hasActiveChat) || !hasActiveChat} onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            type="text" placeholder={
+            !hasActiveChat
+        ? "Send a message into the void..."
+        : isSpamBlocked
         ? `You are sent to the human world due to spamming. Wait ${spamCountdown}s`
-        : isChatBlocked ? "You are blocked from chatting in this conversation"
+        : isChatBlocked
+        ? "You are blocked from chatting in this conversation"
         : "Send a message into the void..."
-    } 
+}
             className= {` ${isChatBlocked ? "cursor-not-allowed": ""} flex flex-col w-full bg-gray-800 text-gray-300 border-gray-700 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600/80 border animation-ease-in duration-200 ${
-            isSpamBlocked || isChatBlocked
+            isSpamBlocked || (isChatBlocked && hasActiveChat)
         ? "border-red-500 cursor-not-allowed placeholder-red-500"
         : "border-gray-700 focus:ring-2 focus:ring-purple-600/80"}${attachments.length > 0 ? "pt-2": ""}`}/>
          </div>
