@@ -7,6 +7,7 @@ import { auth, db} from './firebase/firebaseConfig'; // auth: connects app to fi
 import { useNavigate } from 'react-router-dom';
 import {Toaster, toast} from 'react-hot-toast';
 import { Eye, EyeClosed} from 'lucide-react';
+import { sendPasswordResetEmail } from "firebase/auth";
 import './index.css'
 
 function Landing() {
@@ -89,6 +90,29 @@ if (!snapshot.empty) {
   }
 };
 
+const handlePasswordReset = async (email: string) => {
+  if (!email) {
+    alert("Please enter your email first. So we know it's you");
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("A password reset link has been sent to your email. Psst check your spam folder if you don't see it!");
+  } catch (error: any) {
+    console.error(error);
+
+    if (error.code === "auth/user-not-found") {
+      alert("No account found with this email.");
+    } else if (error.code === "auth/invalid-email") {
+      alert("Invalid email address.");
+    } else {
+      alert("Something went wrong. Try again.");
+    }
+  }
+};
+
+
 const HandleLogin = async (e:React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(''); 
@@ -130,14 +154,13 @@ const togglePassword = () => {
 
   <Toaster position="top-center" reverseOrder={false}/>
 
-
       <div className="flex justify-center items-center flex-wrap mb-8">
-        <div className="max-w-[60%] p-5">
-          <h1 className="text-[65px] text-center text-white font-[Spooky] mt-7 text-clamp-header">
+        <div className="max-w-[70%] p-5">
+          <h1 className="text-[clamp(2.3rem,4vw,5rem)] text-center text-white font-[Spooky] mt-7 ">
             Welcome to
-            <span className="text-[#f06868] text-[65px] px-2 text-clamp-header">Social Souls</span>
+            <span className="text-[#f06868] text-[clamp(2.3rem,4vw,5rem)]px-2"> Social Souls</span>
           </h1>
-          <p className="text-center font-[desc] text-[#d7dee5] text-[25px] ">
+          <p className="text-center font-[desc] text-[#d7dee5] text-[clamp(0.8rem,5vw,1.7rem)] ">
             A dreadfully engaging social platform
           </p>
         </div>
@@ -235,8 +258,8 @@ const togglePassword = () => {
             </span>
 
              <span className="text-xs text-gray-400 font-[sawarabi] relative top-5 italic">
-              Forgot your soul Password?{" "}
-              <label htmlFor="register_toggle" className="underline font-bold cursor-pointer">
+              Forgot your Soul Password? {" "}
+              <label onClick={() => handlePasswordReset(email)} className="underline font-bold cursor-pointer">
                 Reset password
               </label>
             </span>
@@ -244,8 +267,7 @@ const togglePassword = () => {
 
 
 
-
-
+  
           {/* Sign Up */}
           <form className="w-1/2 flex flex-col justify-center items-center gap-10 p-6">
             <h2 className="text-4xl font-bold text-[#ffeedd] font-[spook1]">Sign Up</h2>
