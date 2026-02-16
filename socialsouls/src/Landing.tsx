@@ -6,7 +6,7 @@ import { doc,setDoc, getDoc,where, getDocs, collection, query } from "firebase/f
 import { auth, db} from './firebase/firebaseConfig'; // auth: connects app to firebase auth service, db: handles storing and app data in cloud lets your app read, write, update, and delete data in your Firestore database.
 import { useNavigate } from 'react-router-dom';
 import {Toaster, toast} from 'react-hot-toast';
-import { Eye, EyeClosed} from 'lucide-react';
+import { Eye, EyeClosed, Copyright } from 'lucide-react';
 import { sendPasswordResetEmail } from "firebase/auth";
 import './index.css'
 
@@ -155,12 +155,12 @@ const togglePassword = () => {
   <Toaster position="top-center" reverseOrder={false}/>
 
       <div className="flex justify-center items-center flex-wrap mb-8">
-        <div className="max-w-[70%] p-5">
-          <h1 className="text-[clamp(2.3rem,4vw,5rem)] text-center text-white font-[Spooky] mt-7 ">
+        <div className="max-w-[90%] p-5">
+          <h1 className="text-[clamp(2.1rem,calc(1.5rem+3vw),5rem)] text-center text-white font-[Spooky] mt-7 ">
             Welcome to
-            <span className="text-[#f06868] text-[clamp(2.3rem,4vw,5rem)]px-2"> Social Souls</span>
+            <span className="text-[#f06868] text-[clamp(2.1rem,calc(1.5rem+3vw),5rem)] px-2">Social Souls</span>
           </h1>
-          <p className="text-center font-[desc] text-[#d7dee5] text-[clamp(0.8rem,5vw,1.7rem)] ">
+          <p className="text-center font-[desc] text-[#d7dee5] text-[clamp(1.1rem,calc(0.8rem+1.5vw),1.7rem)] ">
             A dreadfully engaging social platform
           </p>
         </div>
@@ -374,13 +374,16 @@ const togglePassword = () => {
                 Sign In
               </label>
             </span>
-
-           
-
-            
           </form>
         </div>
       </div>
+      <footer className="w-full bg-gray-700/20 py-2 absolute bottom-0">
+       <div className="flex justify-center items-center gap-1 text-gray-400 text-xs font-[desc]">
+        <span><Copyright size={15}/></span>
+        <span>{new Date().getFullYear()}</span>
+        <span className="text-[#f06868] font-semibold tracking-wide">CodeXynapse</span>
+       </div>
+     </footer>
     </>
   );
 }
