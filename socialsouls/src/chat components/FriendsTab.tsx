@@ -374,7 +374,7 @@ useEffect(() => {
 
 
   return (
-    <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="relative flex items-center gap-3 p-3 hover:bg-purple-500/10 duration-200 cursor-pointer mt-0 border-b border-l-0 border-r-0 border-gray-800/50 border-1">
+    <div onClick={() => onOpenChat(friendData)} key={friendData.uid ?? friendData.id} className="relative flex items-center gap-3 p-3 hover:bg-purple-500/10 duration-200 cursor-pointer mt-0 border-b border-l-0 border-t-0 border-r-0 border-gray-800/50 border-1">
   
       <img
         src={friendData.profilePic || Ghost}
@@ -401,7 +401,7 @@ useEffect(() => {
 {openMenuUid === friendData.uid && (
     <div
       ref={menuRef}
-      className="absolute right-12 top-1/2 -translate-y-1/2 w-48 rounded-md bg-[#171717] border border-white/10 shadow-xl z-50"
+      className="absolute right-12 top-1/2 -translate-y-1/2 w-48 rounded-md bg-[#171717] border border-white/10 shadow-xl z-10"
       onClick={(e) => e.stopPropagation()}>
 
       <MenuItem

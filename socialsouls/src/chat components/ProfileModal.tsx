@@ -77,7 +77,7 @@ const friendsCount = profile.friends?.length ?? 0;
  
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm ">
-      <div className="relative w-[340px] h-[460px] rounded-3xl bg-purple-800 p-6 shadow-2xl text-center UserProfileModal shadow-[4px_4px_0px_0px_rgba(255,_105,_180,_0.8)]">
+      <div className="relative w-[340px] h-[460px] rounded-3xl bg-gray-700/50 p-6 shadow-2xl text-center UserProfileModal shadow-[0px_0px_61px_16px_rgba(255,_255,_255,_0.05)]">
 
         <button onClick={closeModal} className="absolute top-4 right-4 text-white/80 hover:text-white cursor-pointer">
           <X/>

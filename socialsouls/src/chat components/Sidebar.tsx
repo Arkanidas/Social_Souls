@@ -152,7 +152,7 @@ const openChatWithFriend = async (friend: any) => {
 
 
   
-  return <div className="w-80 border-r backdrop-blur-sm border-purple-900/30 bg-gray-900/95 flex flex-col relative z-10">
+  return <div className="w-80 border-r backdrop-blur-sm border-purple-900/30 bg-gray-900/40 flex flex-col relative z-1">
     
       {/* User Profile Header */}
       <div className="p-4 border-b border-purple-900/30">
@@ -241,13 +241,13 @@ const openChatWithFriend = async (friend: any) => {
     
         
       
-     <div className="flex flex-col">
+     <div className="flex flex-col border-b flex-1 border-2">
       {activeTab === "friends" && <FriendsTab/>}
       {activeTab === "chats" && <ChatTab/>}
      </div>
    
    
-      <div className="p-4 border-t border-purple-900/30 flex justify-around fixed top-189 w-full">
+      <div className="p-4 border-t border-purple-900/30 flex justify-around absolute bottom-0 w-full">
 
         <button onClick={() => setIsSettingsOpen(true)} className="text-gray-400 hover:text-purple-500 p-2">
           <SettingsIcon className="h-6 w-6 cursor-pointer" />
@@ -269,7 +269,5 @@ const openChatWithFriend = async (friend: any) => {
         Bio={profile?.bio ?? ""}
         profilepic={profile?.profilePic ?? ""}
         onProfileUpdated={onProfileUpdated}/>
-      
-       
     </div>;
 };

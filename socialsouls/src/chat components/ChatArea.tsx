@@ -3,7 +3,7 @@ import { MessageInput } from './MessageInput';
 import { XIcon, SkullIcon, FileInput, PaperclipIcon, X, Download, Copy, ArrowDown  } from 'lucide-react'
 import { auth, db, storage } from '../firebase/firebaseConfig'
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, addDoc, orderBy, onSnapshot } from "firebase/firestore"
+import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, addDoc, orderBy, onSnapshot, getDoc } from "firebase/firestore"
 import { toast } from 'react-hot-toast'
 import { useChat } from "../context/ChatContext";
 import Ghostly from "../assets/ghosts.png";
@@ -343,65 +343,82 @@ const triggerSpamCooldown = () => {
 
 
    // Function for adding a friend
-  const handleAddFriendSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const input = addFriendInputRef.current
-    const rawUsername = input?.value.trim()
-      if (!rawUsername) return;
+ const handleAddFriendSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const friendUsername = capitalizeFirstLetter(rawUsername);
+  const input = addFriendInputRef.current;
+  const rawUsername = input?.value.trim();
+  if (!rawUsername) return;
 
-      if(!friendUsername) return
-      const user = auth.currentUser
+  const friendUsername = capitalizeFirstLetter(rawUsername);
+  if (!friendUsername) return;
 
-      if(!user) {
-        toast.error("You must be logged in to summon a spirit!", {
-          duration: 4000,
-        });
-        return
-       }
+  const user = auth.currentUser;
+  if (!user) {
+    toast.error("You must be logged in to summon a spirit!");
+    return;
+  }
 
-      if (input && friendUsername) {
-       console.log(`Searching for user: ${input.value}`)
-      
-    try {
-      const q = query(collection(db, "users"), where("username", "==", friendUsername))
-      const querySnapshot = await getDocs(q)
+  try {
+    const q = query(
+      collection(db, "users"),
+      where("username", "==", friendUsername)
+    );
+    const querySnapshot = await getDocs(q);
 
-      if (querySnapshot.empty) {
-        toast.error("Spirit not found...")
-        return
-      }
-
-      const friendDoc = querySnapshot.docs[0]
-      const friendId = friendDoc.id
-
-
-      if (friendId === user.uid) {
-        toast.error("You cannot summon yourself")
-        return
-      }
-
-      const userRef = doc(db, "users", user.uid)
-
-      await updateDoc(userRef, {
-        sentRequests: arrayUnion(friendId),
-        friendRequests: arrayRemove(friendId)
-      })
-
-      await updateDoc(doc(db, "users", friendId), {
-       friendRequests: arrayUnion(user.uid),
-       sentRequests: arrayRemove(user.uid)});
-
-      toast.success(`${friendUsername} has been summoned successfully!`)
-      input.value = ''
-      setShowAddFriend(false)
-
-    } catch (error) {
-      toast.error("Something went wrong!")
+    if (querySnapshot.empty) {
+      toast.error("Spirit not found...");
+      return;
     }
-  }}
 
+    const friendDoc = querySnapshot.docs[0];
+    const friendId = friendDoc.id;
+
+    if (friendId === user.uid) {
+      toast.error("You cannot summon yourself");
+      return;
+    }
+
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    const userData = userSnap.data();
+
+    const friends = userData?.friends || [];
+    const sentRequests = userData?.sentRequests || [];
+    const friendRequests = userData?.friendRequests || [];
+
+    if (friends.includes(friendId)) {
+      toast.error("You are already bounded with this soul.");
+      return;
+    }
+
+    if (sentRequests.includes(friendId)) {
+      toast.error("You have already summoned this Soul.");
+      return;
+    }
+
+    if (friendRequests.includes(friendId)) {
+      toast.error("This Soul has already summoned you. Accept their request instead!.");
+      return;
+    }
+
+    await updateDoc(doc(db, "users", user.uid), {
+      sentRequests: arrayUnion(friendId),
+    });
+
+    await updateDoc(doc(db, "users", friendId), {
+      friendRequests: arrayUnion(user.uid),
+    });
+
+    toast.success(`${friendUsername} has been summoned successfully!`);
+    if(input)
+    input.value = "";
+    setShowAddFriend(false);
+
+  } catch (error) {
+    console.error(error);
+    toast.error("Something went wrong!, Try again later.");
+  }
+};
 
 
   const MAX_FILES = 10;
@@ -438,7 +455,7 @@ const handleMouseMove = (e: React.MouseEvent<HTMLImageElement>) => {
   setOrigin({ x, y });
 };
 
-  //Copy image URL to clipboard
+  // Copy image URL to clipboard
 const handleCopyImageUrl = async () => {
   if (!previewImage) return;
 
@@ -507,8 +524,7 @@ return null
 
 
   {activeChatUser && (
-        <div className="relative group flex items-center gap-2">
-
+    <div className="relative group flex items-center gap-2">
       <p className="text-sm text-purple-400">
         {otherUserStatus === "online"
         ? "Haunting Online"
