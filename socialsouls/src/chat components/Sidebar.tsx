@@ -152,7 +152,7 @@ const openChatWithFriend = async (friend: any) => {
 
 
   
-  return <div className="w-80 border-r backdrop-blur-sm border-purple-900/30 bg-gray-900/40 flex flex-col relative z-1">
+  return <div className="w-80 border-r backdrop-blur-sm border-purple-900/30 bg-gradient-to-tl from-slate-800 to-gray-900flex flex-col relative z-1">
     
       {/* User Profile Header */}
       <div className="p-4 border-b border-purple-900/30">
@@ -241,7 +241,7 @@ const openChatWithFriend = async (friend: any) => {
     
         
       
-     <div className="flex flex-col border-b flex-1 border-2">
+     <div className="flex flex-col border-b flex-1 border-2 ">
       {activeTab === "friends" && <FriendsTab/>}
       {activeTab === "chats" && <ChatTab/>}
      </div>
