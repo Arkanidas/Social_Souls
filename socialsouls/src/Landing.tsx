@@ -377,11 +377,11 @@ const togglePassword = () => {
           </form>
         </div>
       </div>
-      <footer className="w-full bg-gray-700/20 py-2 absolute bottom-0">
+      <footer className="w-full bg-gray-black py-3 absolute bottom-0 ">
        <div className="flex justify-center items-center gap-1 text-gray-400 text-xs font-[desc]">
         <span><Copyright size={15}/></span>
+        <span className="text-[#f06868] font-semibold tracking-wide text-xs">CodeXynapse</span>
         <span>{new Date().getFullYear()}</span>
-        <span className="text-[#f06868] font-semibold tracking-wide">CodeXynapse</span>
        </div>
      </footer>
     </>

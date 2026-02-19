@@ -4,11 +4,13 @@ import { doc, getDoc } from "firebase/firestore";
 import { X, Users } from "lucide-react";
 import Ghost from "../assets/ghosts.png";
 
+
 type UserProfile = {
   username: string;
   bio?: string;
   profilePic?: string;
   friends?: string[];
+  role?: "user" | "superuser";
   status?: {
     state: "online" | "offline" | "idle";
     lastChanged: any;
@@ -28,6 +30,8 @@ export const showUserProfileModal = (userId?: string) => {
 export const UserProfileModal = () => {
   const [open, setOpen] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const isSuperUser = profile?.role === "superuser";
+
 
   const closeModal = () => {
   setOpen(false);
@@ -76,8 +80,13 @@ const statusColor =
 const friendsCount = profile.friends?.length ?? 0;
  
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm ">
-      <div className="relative w-[340px] h-[460px] rounded-3xl bg-gray-700/50 p-6 shadow-2xl text-center UserProfileModal shadow-[0px_0px_52px_14px_rgba(255,_255,_255,_0.05)]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm ">
+      <div className={`relative w-[340px] h-[460px] rounded-3xl p-6 shadow-2xl text-center UserProfileModal
+  ${isSuperUser
+    ? "bg-gradient-to-br from-fuchsia-500 via-purple-500 via-indigo-500 via-blue-500 to-cyan-500 modal-card super-gradient super-glow"
+    : "bg-gray-700/50 text-white"
+  }`}>
+
 
         <button onClick={closeModal} className="absolute top-4 right-4 text-white/80 hover:text-white cursor-pointer">
           <X/>

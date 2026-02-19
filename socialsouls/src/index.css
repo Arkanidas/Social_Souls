@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 @import url('https://fonts.googleapis.com/css2?family=Agbalumo&display=swap');
 
 @font-face {
@@ -52,7 +53,9 @@
 }
 
 html, body {
-  @apply bg-zinc-800 m-0 p-0;
+  background-color: #27272a; /* Tailwind's bg-zinc-800 */
+  margin: 0;
+  padding: 0;
 }
 
 
@@ -142,11 +145,10 @@ html, body {
 }
 
 .UserProfileModal {
-  
   animation: modalanimation 0.5s ease-out forwards;
-   
-      
         }
+
+        
         @keyframes modalanimation {
           0% {
             opacity: 0;
@@ -169,6 +171,49 @@ html, body {
 
 .ghost-ball {
   animation:
-   
     pulseSoft 2.5s ease-in-out infinite;
 }
+
+.modal-card {
+  background-size: 300% 300%;
+  background-position: 0% 50%;
+  animation:
+    modalanimation 0.5s ease-out forwards,
+    gradientFlow 8s ease infinite;
+}
+
+
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.super-gradient {
+  background-size: 300% 300%;
+  background-position: 0% 50%;
+  animation: auroraFlow 8s ease infinite;
+}
+
+@keyframes auroraFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.super-glow {
+  box-shadow:
+    0 0 25px rgba(255, 0, 255, 0.6),
+    0 0 50px rgba(0, 255, 255, 0.4),
+    0 0 80px rgba(138, 43, 226, 0.4);
+}
+
+
+
