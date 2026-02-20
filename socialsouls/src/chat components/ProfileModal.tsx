@@ -3,7 +3,7 @@ import { auth, db } from "../firebase/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { X, Users } from "lucide-react";
 import Ghost from "../assets/ghosts.png";
-
+import ShinyText from '../components/ShinyText';
 
 type UserProfile = {
   username: string;
@@ -104,13 +104,30 @@ const friendsCount = profile.friends?.length ?? 0;
         : "border-gray-500 shadow-[-1px_0px_23px_15px_rgba(0,_0,_0,_0.3)]"}`}/>
         </div>
        <span className={`mt-2 px-2 py-1 rounded-full text-xs font-medium ${statusState === "online" ? "text-green-300" : statusState === "idle" ? "text-yellow-500" : "text-gray-300"}`}>
+        
         {statusText}
        </span>
 
-        {/* Username */}
-        <h2 className="mt-4 text-4xl font-[Scary] text-white ">
-          {profile.username || "Unknown Soul"}
-        </h2>
+       {/* Username */}
+<h2 className="mt-4 text-4xl font-[Scary] text-white">
+  {isSuperUser ? (
+    <ShinyText
+      text={profile.username || "Unknown Soul"}
+      speed={2}
+      delay={0}
+      color="#d60000a2"
+      shineColor="#ffffff"
+      spread={120}
+      direction="left"
+      yoyo={false}
+      pauseOnHover={false}
+      disabled={false}
+    />
+  ) : (
+    profile.username || "Unknown Soul"
+  )}
+</h2>
+
 
    
         {/* Bio */}

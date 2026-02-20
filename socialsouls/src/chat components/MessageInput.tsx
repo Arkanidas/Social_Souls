@@ -1,4 +1,4 @@
-import { SmileIcon, PaperclipIcon, SendIcon, FileText, FileArchive, File } from 'lucide-react';
+import { PaperclipIcon, SendIcon, FileText, FileArchive, File, Ghost  } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import EmojiPicker, {Theme, EmojiStyle, } from 'emoji-picker-react';
 
@@ -76,7 +76,7 @@ useEffect(() => {
   
   
   
-  return <div className="p-4 relative border-t border-purple-900/30 bg-gray-900 ">
+  return <div className="p-4 relative border-t border-white/10 bg-zinc-950">
     {attachments.length > 0 && (
   <div className="flex gap-2 mb-2 flex-wrap">
     {attachments.map((file, index) => (
@@ -104,7 +104,7 @@ useEffect(() => {
 )}
       <div className="flex items-center space-x-4">
         <button onClick={() => setShowEmojiPicker(prev => !prev)} ref={emojiButtonRef} className="text-gray-400 hover:text-purple-500">
-          <SmileIcon className="h-6 w-6 cursor-pointer"/>
+          <Ghost className="h-6 w-6 cursor-pointer"/>
         </button>
         <button type="button" onClick={() => hasActiveChat ? fileInputRef.current?.click(): null} className="text-gray-400 hover:text-purple-500">
           <PaperclipIcon className="h-6 w-6 cursor-pointer" />

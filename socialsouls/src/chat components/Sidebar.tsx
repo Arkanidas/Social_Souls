@@ -152,12 +152,12 @@ const openChatWithFriend = async (friend: any) => {
 
 
   
-  return <div className="w-80 border-r backdrop-blur-sm border-purple-900/30 bg-gradient-to-tl from-slate-800 to-gray-900flex flex-col relative z-1">
+  return <div className="w-80 backdrop-blur-sm bg-zinc-950  flex flex-col relative z-1">
     
       {/* User Profile Header */}
-      <div className="p-4 border-b border-purple-900/30">
+      <div className="p-4 border-b border-r border-white/8">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-500 cursor-pointer" onClick={() => showUserProfileModal()}>
+          <div className="w-10 h-10 rounded-full overflow-hidden border-1 border-purple-500 cursor-pointer" onClick={() => showUserProfileModal()}>
             <img src={profile? profile.profilePic : Ghost} alt="Profile" className="w-full h-full object-cover" />
           </div>
 
@@ -184,8 +184,8 @@ const openChatWithFriend = async (friend: any) => {
         </div>
       </div>
     
-      <div className="p-4">
-        <div className="relative">
+      <div className="p-4 border-r border-white/8">
+        <div className="relative ">
           <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
           <input type="text" placeholder="Search the void..." onChange={(e) => setSearchValue(e.target.value)} value={searchValue} onClick={TempModal}
           className="w-full bg-gray-800 text-gray-300 border-gray-700 pl-10 pr-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 border animation-ease-in duration-200"/>
@@ -232,22 +232,22 @@ const openChatWithFriend = async (friend: any) => {
           Chats
         </button>
 
-        <button onClick={() => setActiveTab('friends')} className={`flex-1 p-4 text-sm font-medium cursor-pointer ${activeTab === 'friends' ? 'text-purple-500 border-b-2 border-purple-500' : 'text-gray-400 hover:text-purple-500 '}`}>
+        <button onClick={() => setActiveTab('friends')} className={`flex-1 p-4 text-sm font-medium cursor-pointer border-r border-white/8 ${activeTab === 'friends' ? 'text-purple-500 border-b-2 border-purple-500' : 'text-gray-400 hover:text-purple-500 '}`}>
          <div className={friendRequests.length > 0 ? "relative w-1.5 h-1.5 bg-white rounded-full top-2 right-2 left-19 ghost-ball shadow-[0_0_2px_rgba(255,255,255,0.8)]" : ""}></div>
-          <Users2Icon className="h-5 w-5 mx-auto mb-1" />
+          <Users2Icon className="h-5 w-5 mx-auto mb-1 " />
           Friends
         </button>
       </div>
     
         
       
-     <div className="flex flex-col border-b flex-1 border-2 ">
+     <div className="flex flex-col flex-1 border-r border-white/8">
       {activeTab === "friends" && <FriendsTab/>}
       {activeTab === "chats" && <ChatTab/>}
      </div>
    
    
-      <div className="p-4 border-t border-purple-900/30 flex justify-around absolute bottom-0 w-full">
+      <div className="p-4 border-t border-white/8 flex justify-around absolute bottom-0.5 w-full">
 
         <button onClick={() => setIsSettingsOpen(true)} className="text-gray-400 hover:text-purple-500 p-2">
           <SettingsIcon className="h-6 w-6 cursor-pointer" />

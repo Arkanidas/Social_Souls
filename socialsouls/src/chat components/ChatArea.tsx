@@ -3,7 +3,7 @@ import { MessageInput } from './MessageInput';
 import { XIcon, SkullIcon, FileInput, PaperclipIcon, X, Download, Copy, ArrowDown  } from 'lucide-react'
 import { auth, db, storage } from '../firebase/firebaseConfig'
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, addDoc, orderBy, onSnapshot, getDoc } from "firebase/firestore"
+import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, serverTimestamp, addDoc, orderBy, onSnapshot, getDoc } from "firebase/firestore"
 import { toast } from 'react-hot-toast'
 import { useChat } from "../context/ChatContext";
 import Ghostly from "../assets/ghosts.png";
@@ -507,10 +507,10 @@ return null
 
  
   
-  return <div className="flex-1 flex flex-col relative bg-gray-[#0B111C] ">
-      <div className="p-4 border-b backdrop-blur-sm border-purple-900/30 bg-gray-900/95 flex items-center shadow-[inset_0px_0px_100px_-12px_rgba(0,_0,_0,_0.8)]">
+  return <div className="flex-1 flex flex-col relative  ">
+      <div className="p-4 border-b backdrop-blur-sm border-white/8 bg-zinc-950 flex items-center ">
         <div className="flex items-center ">
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-400 cursor-pointer" onClick={() => {
+          <div className="w-10 h-10 rounded-full overflow-hidden border-1 border-purple-400 cursor-pointer" onClick={() => {
              if (!activeChatUser) return;
                 showUserProfileModal(activeChatUser.otherUser.uid);}}>
             <img src={activeChatUser ? activeChatUser.otherUser.profilePic : Ghostly} alt="Unknown Ghost" className="w-full h-full object-cover" />
@@ -525,7 +525,7 @@ return null
 
   {activeChatUser && (
     <div className="relative group flex items-center gap-2">
-      <p className="text-sm text-purple-400">
+      <p className="text-sm text-purple-500">
         {otherUserStatus === "online"
         ? "Haunting Online"
         : otherUserStatus === "idle"
