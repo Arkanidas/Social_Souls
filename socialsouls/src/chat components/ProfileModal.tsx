@@ -83,7 +83,7 @@ const friendsCount = profile.friends?.length ?? 0;
     <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm ">
       <div className={`relative w-[340px] h-[460px] rounded-3xl p-6 shadow-2xl text-center UserProfileModal
   ${isSuperUser
-    ? "bg-gradient-to-br from-fuchsia-500 via-purple-500 via-indigo-500 via-blue-500 to-cyan-500 modal-card super-gradient super-glow"
+    ? "bg-gradient-to-br from-fuchsia-500 via-purple-500 via-indigo-500 via-blue-500 to-cyan-500 modal-card super-glow"
     : "bg-gray-700/50 text-white"
   }`}>
 
@@ -115,7 +115,7 @@ const friendsCount = profile.friends?.length ?? 0;
       text={profile.username || "Unknown Soul"}
       speed={2}
       delay={0}
-      color="#d60000a2"
+      color="#343434de"
       shineColor="#ffffff"
       spread={120}
       direction="left"
