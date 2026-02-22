@@ -13,6 +13,7 @@ import { useNotificationSound } from "../Hooks/Notification";
 import { showUserProfileModal } from "../chat components/ProfileModal";
 import { LogoutConfirmModal } from "./ShowLogoutModal";
 import { PerishModal } from './PerishModal';
+import {DeleteAccountConfirmModal} from '../chat components/DeleteAccModal';
 
 
 export const showAddFriendModal = () => {
@@ -239,8 +240,7 @@ useEffect(() => {
   return () => unsub();
 }, []);
 
-
-
+// Play sound on new message if not muted
 useEffect(() => {
   if (!activeChatUser) return;
   if (!Usermessages.length) return;
@@ -261,7 +261,7 @@ useEffect(() => {
 }, [Usermessages, activeChatUser, mutedSouls, play]);
 
 
-
+   // Listen for showAddFriendModal event to open the Add Friend modal
   useEffect(() => {
     const handleShowModal = () => setShowAddFriend(true)
     window.addEventListener('showAddFriendModal', handleShowModal)
@@ -290,6 +290,7 @@ useEffect(() => {
 
   return () => unsub();
 }, [activeChatUser?.otherUser?.uid]);
+
 
   useEffect(() => {
     if (showAddFriend && addFriendInputRef.current) {
@@ -796,5 +797,7 @@ return null
       <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments} setAttachments={setAttachments} isSpamBlocked={isSpamBlocked} spamCountdown={spamCountdown} isChatBlocked={isChatBlocked} hasActiveChat={!!activeChatUser}/>
       <LogoutConfirmModal/>
       <PerishModal/>
+      <DeleteAccountConfirmModal/>
+
     </div>;
 };

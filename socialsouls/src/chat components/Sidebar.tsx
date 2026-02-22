@@ -1,5 +1,5 @@
 import { useState, useEffect} from 'react';
-import { Users2Icon, MessageSquareIcon, SettingsIcon, SearchIcon, SunIcon, LogOutIcon, UserPlusIcon } from 'lucide-react';
+import { Users2Icon, MessageSquareIcon, SettingsIcon, SearchIcon, UserX, LogOutIcon, UserPlusIcon } from 'lucide-react';
 import { auth, db} from '../firebase/firebaseConfig'; 
 import { SettingsPopup } from '../chat components/SettingsModal';
 import { showAddFriendModal } from './ChatArea'
@@ -12,6 +12,7 @@ import { Ghost as GhostIcon } from "lucide-react";
 import { showUserProfileModal } from "../chat components/ProfileModal";
 import { showLogoutModal } from "../chat components/ShowLogoutModal";
 import {useChat} from '../context/ChatContext';
+import { showDeleteAccountModal } from './DeleteAccModal';
 
 
 type ProfileType = {
@@ -249,16 +250,16 @@ const openChatWithFriend = async (friend: any) => {
    
       <div className="p-4 border-t border-white/8 flex justify-around absolute bottom-0.5 w-full">
 
-        <button onClick={() => setIsSettingsOpen(true)} className="text-gray-400 hover:text-purple-500 p-2">
-          <SettingsIcon className="h-6 w-6 cursor-pointer" />
+        <button onClick={() => setIsSettingsOpen(true)} className="text-gray-400 hover:text-purple-500 p-2 cursor-pointer">
+          <SettingsIcon className="h-6 w-6" />
         </button>
 
-        <button className="text-gray-400 hover:text-purple-500 p-2">
-          <SunIcon className="h-6 w-6" /> 
+        <button className="text-gray-400 hover:text-purple-500 p-2 cursor-pointer" onClick={showDeleteAccountModal}>
+          <UserX className="h-6 w-6" /> 
         </button>
 
-        <button onClick={showLogoutModal} className="text-gray-400 hover:text-purple-500 p-2">
-          <LogOutIcon className="h-6 w-6 cursor-pointer"/>
+        <button onClick={showLogoutModal} className="text-gray-400 hover:text-purple-500 p-2 cursor-pointer">
+          <LogOutIcon className="h-6 w-6"/>
         </button>
       </div>
 

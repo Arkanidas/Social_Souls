@@ -22,7 +22,6 @@ const [allowRedirect, setAllowRedirect] = useState(true);
 
       if (user && allowRedirect) {
         navigate('/chat'); 
-        console.log("👤 User is logged in:", user.email);
       }
     });
 

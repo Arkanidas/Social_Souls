@@ -36,15 +36,12 @@ if(isOpen) {
   setBio(Bio)
   setProfilePicture(profilepic) 
 }
-
 },[UserName, isOpen, Bio])
 
  if (!isOpen) return null
 
  const SaveData = async () => {
 
-
-  
   try {
     setIsSaving(true);
 
@@ -111,8 +108,6 @@ if(isOpen) {
     
     <div className='fixed inset-0 flex items-center justify-center z-50 overflow-y-hidden'>
 
- 
-     
       {/* Settings popup */}
       <div
         className="relative w-full h-full max-w-md bg-gray-900 border-none text-gray-200 border-2 rounded-lg shadow-2xl overflow-hidden z-10 animate-ghost-appear"
@@ -220,7 +215,7 @@ if(isOpen) {
   
         
         {/* Footer */}
-        <div className="p-6 border-purple-900/30 flex justify-center gap-5 mt-8">
+        <div className="p-6 border-purple-900/30 flex justify-center gap-5 mt-10">
           <button onClick={onClose} className="px-4 py-2 rounded-md font-medium transition-colors bg-gray-800 text-gray-300 hover:bg-gray-700 mr-2 cursor-pointer">
             Cancel
           </button>
