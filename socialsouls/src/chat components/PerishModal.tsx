@@ -84,11 +84,11 @@ useEffect(() => {
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-md animate-fadeIn ">
-      <div className="bg-gray-900 border border-purple-700/40 rounded-xl shadow-2xl p-6 w-full max-w-md scale-95 UserProfileModal ">
+      <div className="bg-gray-900 border border-red-600 border-2 rounded-xl shadow-2xl p-6 w-full max-w-md scale-95 UserProfileModal ">
 
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className=" font-semibold text-purple-300 text-center flex-1 text-lg">
+          <h2 className=" font-semibold text-red-500 text-center flex-1 text-lg">
             Are you sure you want to extinguish {friendName}?
           </h2>
 
@@ -118,7 +118,7 @@ useEffect(() => {
              handlePerishSoul(FriendId);
           }
              setIsOpen(false);}}
-            className="px-4 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white transition shadow-lg shadow-purple-500/30 cursor-pointer"
+            className="px-4 py-2 rounded-md bg-red-600 hover:bg-red-800 text-white transition shadow-lg shadow-purple-500/30 cursor-pointer"
           >
             Perish
           </button>

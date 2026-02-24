@@ -250,15 +250,15 @@ const openChatWithFriend = async (friend: any) => {
    
       <div className="p-4 border-t border-white/8 flex justify-around absolute bottom-0.5 w-full">
 
-        <button onClick={() => setIsSettingsOpen(true)} className="text-gray-400 hover:text-purple-500 p-2 cursor-pointer">
+        <button title="Settings" onClick={() => setIsSettingsOpen(true)} className="text-gray-400 hover:text-purple-500 p-2 cursor-pointer">
           <SettingsIcon className="h-6 w-6" />
         </button>
 
-        <button className="text-gray-400 hover:text-purple-500 p-2 cursor-pointer" onClick={showDeleteAccountModal}>
+        <button title="Delete Account" className="text-gray-400 hover:text-red-500 p-2 cursor-pointer" onClick={showDeleteAccountModal}>
           <UserX className="h-6 w-6" /> 
         </button>
 
-        <button onClick={showLogoutModal} className="text-gray-400 hover:text-purple-500 p-2 cursor-pointer">
+        <button title="Logout" onClick={showLogoutModal} className="text-gray-400 hover:text-purple-500 p-2 cursor-pointer">
           <LogOutIcon className="h-6 w-6"/>
         </button>
       </div>

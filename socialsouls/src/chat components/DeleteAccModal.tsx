@@ -62,10 +62,11 @@ export const DeleteAccountConfirmModal = () => {
     setIsOpen(false);
 
   } catch (error: any) {
-    console.error(error);
+    console.error("Delete error:", error);
+    console.error("Error code:", error.code);
 
     if (error.code === "auth/requires-recent-login") {
-      alert("Please log in again before deleting your account.");
+       alert("Please log in again before deleting your account.");
     } else {
       alert("Something went wrong while deleting the account.");
     }
@@ -77,11 +78,11 @@ export const DeleteAccountConfirmModal = () => {
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-md animate-fadeIn ">
-      <div className="bg-gray-900 border border-purple-700/40 rounded-xl shadow-2xl p-6 w-full max-w-md scale-95 UserProfileModal ">
+      <div className="bg-gray-900 border border-red-800 border-2 rounded-xl shadow-2xl p-6 w-full max-w-md scale-95 UserProfileModal ">
 
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-purple-300 text-center flex-1 text-xl">
+          <h2 className="text-xl font-semibold text-red-600 text-center flex-1">
             Delete your spectral soul?
           </h2>
 
@@ -93,7 +94,7 @@ export const DeleteAccountConfirmModal = () => {
           </button>
         </div>
 
-        <p className="text-gray-400 mb-6 text-xs">
+        <p className="text-gray-400 mb-6 text-sm">
           Are you really sure you want to return to the Living World forever? This action cannot be undone and all your chats and friendships will be lost.
         </p>
 
@@ -107,9 +108,10 @@ export const DeleteAccountConfirmModal = () => {
 
           <button
             onClick={handleDeleteAccount}
-            className="px-4 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white transition shadow-lg shadow-purple-500/30 cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-red-600 hover:bg-red-800 text-white transition shadow-lg shadow-purple-500/30 cursor-pointer"
           >
-            End me <Skull size={13}/>
+          <span>End me</span>
+          <Skull size={15} />
           </button>
         </div>
       </div>
