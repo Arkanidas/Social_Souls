@@ -285,7 +285,6 @@ useEffect(() => {
     if (data?.status?.lastChanged?.seconds) {
       setLastSeen(data.status.lastChanged.seconds);
     }
-
   });
 
   return () => unsub();
@@ -307,6 +306,7 @@ useEffect(() => {
   window.addEventListener("keydown", onEsc);
   return () => window.removeEventListener("keydown", onEsc);
 }, []);
+
 
 // Check for spam messages
 const checkSpam = () => {

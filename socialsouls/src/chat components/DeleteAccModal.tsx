@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { XIcon, Skull  } from "lucide-react";
-import { deleteUser } from "firebase/auth";
-import { useNavigate } from 'react-router-dom';
+import { deleteUser} from "firebase/auth";
 import { doc, collection, query, where, getDocs, writeBatch, arrayRemove} from "firebase/firestore";
 import { auth, db} from "../firebase/firebaseConfig";
 
@@ -12,7 +11,9 @@ export const showDeleteAccountModal = () => {
 
 export const DeleteAccountConfirmModal = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+
 
   useEffect(() => {
     const open = () => setIsOpen(true);
@@ -20,13 +21,16 @@ export const DeleteAccountConfirmModal = () => {
     return () => window.removeEventListener("showDeleteAccountModal", open);
   }, []);
 
+
+  // Handle account deletion function
   const handleDeleteAccount = async () => {
 
   const user = auth.currentUser;
-
   if (!user) return;
 
   try {
+
+    setIsDeleting(true);
 
     const batch = writeBatch(db);
 
@@ -34,8 +38,8 @@ export const DeleteAccountConfirmModal = () => {
     batch.delete(userRef);
 
     const messagesQuery = query(
-      collection(db, "messages"),
-      where("senderId", "==", user.uid)
+    collection(db, "messages"),
+    where("senderId", "==", user.uid)
     );
 
     const messagesSnapshot = await getDocs(messagesQuery);
@@ -44,23 +48,26 @@ export const DeleteAccountConfirmModal = () => {
     });
 
 
-    const usersQuery = query(collection(db, "users"));
-    const usersSnapshot = await getDocs(usersQuery);
-
-    usersSnapshot.forEach((docSnap) => {
-      batch.update(docSnap.ref, {
-        friends: arrayRemove(user.uid),
-        friendRequests: arrayRemove(user.uid),
-        sentRequests: arrayRemove(user.uid),
-      });
+    const friendsQuery = query(
+    collection(db, "users"),
+    where("friends", "array-contains", user.uid)
+);
+ const friendsSnapshot = await getDocs(friendsQuery);
+ friendsSnapshot.forEach((docSnap) => {
+  if (docSnap.id !== user.uid) {
+    batch.update(docSnap.ref, {
+      friends: arrayRemove(user.uid),
+      friendRequests: arrayRemove(user.uid),
+      sentRequests: arrayRemove(user.uid),
     });
+  }
+});
 
     await batch.commit();
     await deleteUser(user);
 
-    navigate("/");
     setIsOpen(false);
-
+   
   } catch (error: any) {
     console.error("Delete error:", error);
     console.error("Error code:", error.code);
@@ -71,7 +78,6 @@ export const DeleteAccountConfirmModal = () => {
       alert("Something went wrong while deleting the account.");
     }
   }
-
   };
 
   if (!isOpen) return null;
@@ -82,7 +88,7 @@ export const DeleteAccountConfirmModal = () => {
 
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-red-600 text-center flex-1">
+          <h2 className="text-2xl font-semibold text-red-600 text-center flex-1">
             Delete your spectral soul?
           </h2>
 
@@ -107,6 +113,7 @@ export const DeleteAccountConfirmModal = () => {
           </button>
 
           <button
+            disabled={isDeleting}
             onClick={handleDeleteAccount}
             className="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-red-600 hover:bg-red-800 text-white transition shadow-lg shadow-purple-500/30 cursor-pointer"
           >

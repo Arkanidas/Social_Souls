@@ -6,6 +6,7 @@ import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { Toaster } from "react-hot-toast";
 import { UserProfileModal } from "../src/chat components/ProfileModal";
 import { onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 interface UserProfile {
   profilePic: string;
@@ -18,13 +19,22 @@ interface UserProfile {
 
 
 
- const Chat = () => {
+const Chat = () => {
 
+ const [profile, setProfile] = useState<UserProfile | null>(null);
+ const navigate = useNavigate();
 
-const [profile, setProfile] = useState<UserProfile | null>(null);
+ const useUserPresence = () => {
 
+  useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      navigate("/");
+    }
+  });
 
-const useUserPresence = () => {
+  return () => unsubscribe();
+}, []);
 
  useEffect(() => {
 
@@ -34,15 +44,19 @@ const useUserPresence = () => {
     const userRef = doc(db, "users", user.uid);
 
     // Set user online on appload
+    const userSnap = await getDoc(userRef);
+if (userSnap.exists()) {
     await updateDoc(userRef, {
       status: {
         state: "online",
         lastSeen: serverTimestamp(),
       },
     });
-
+  }
     // Set Idle when tab is hidden
     const handleVisibility = async () => {
+      const userSnap = await getDoc(userRef);
+if (userSnap.exists()) {
       await updateDoc(userRef, {
         status: {
           state: document.hidden ? "idle" : "online",
@@ -50,11 +64,13 @@ const useUserPresence = () => {
         },
       });
     };
-
+  }
     document.addEventListener("visibilitychange", handleVisibility);
 
     // Set Offline on close / refresh
     const handleUnload = async () => {
+      const userSnap = await getDoc(userRef);
+if (userSnap.exists()) {
       await updateDoc(userRef, {
         status: {
           state: "offline",
@@ -62,7 +78,8 @@ const useUserPresence = () => {
         },
       });
     };
-
+  }
+  
     window.addEventListener("beforeunload", handleUnload);
 
    
