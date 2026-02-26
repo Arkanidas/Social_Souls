@@ -5,7 +5,7 @@ import { SettingsPopup } from '../chat components/SettingsModal';
 import { showAddFriendModal } from './ChatArea'
 import { FriendsTab } from './FriendsTab';
 import { ChatTab } from '../chat components/ChatsTab'
-import Ghost from "../assets/ghosts.png"
+import ghostly from "../assets/ghosts.png"
 import { useSidebar } from "../context/SidebarContext";
 import { doc, onSnapshot, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { Ghost as GhostIcon } from "lucide-react";
@@ -74,7 +74,7 @@ useEffect(() => {
           return {
            uid: friendSnap.id,
            username: data.username || data.displayName || data.name || "",
-           profilePic: data.profilePic || Ghost,
+           profilePic: data.profilePic || ghostly,
           };
         })
       );
@@ -142,7 +142,7 @@ const openChatWithFriend = async (friend: any) => {
     otherUser: {
       uid: friend.uid,
       username: friend.username,
-      profilePic: friend.profilePic || Ghost,
+      profilePic: friend.profilePic || ghostly,
     },
   });
 
@@ -159,12 +159,12 @@ const openChatWithFriend = async (friend: any) => {
       <div className="p-4 border-b border-r border-white/8">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full overflow-hidden border-1 border-purple-500 cursor-pointer" onClick={() => showUserProfileModal()}>
-            <img src={profile? profile.profilePic : Ghost} alt="Profile" className="w-full h-full object-cover" />
+            <img src={profile ? profile.profilePic : ghostly} alt="Profile" className="w-full h-full object-cover" />
           </div>
 
           <div>
-            <h3 className="text-white">
-              {profile? profile.username : 'unknown ghost'}
+            <h3 className="text-white font-[Arial] font-semibold">
+              {profile? profile.username : 'Hidden Soul'}
             </h3>
 
             <p className="text-sm text-purple-500"> {myStatus === "online" ? "Haunting Online" : "Haunting Offline"}
@@ -215,7 +215,7 @@ const openChatWithFriend = async (friend: any) => {
             onClick={() => openChatWithFriend(friend)}
           >
             <img
-              src={friend.profilePic || Ghost}
+              src={friend.profilePic || ghostly}
               className="w-9 h-9 rounded-full object-cover border-gray border"
             />
             <span className="text-white">{friend.username}</span>

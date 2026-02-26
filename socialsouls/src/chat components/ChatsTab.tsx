@@ -7,7 +7,7 @@ export const ChatTab = () => {
 
   if (openChats.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full text-gray-500 text-sm mt-4">
+      <div className="text-gray-500 text-md overflow-y-scroll relative left-[33%] top-4">
         No open chats...
       </div>
     );

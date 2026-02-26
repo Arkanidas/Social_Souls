@@ -278,7 +278,7 @@ const toggleBlockSoul = async (friendId: string) => {
       </div>)}
   
       {friends.length === 0 ? (
-        <p className="text-gray-500 text-sm overflow-y-scroll relative left-[33%] top-4">No friends yet...</p>
+        <p className="text-gray-500 text-md overflow-y-scroll relative left-[33%] top-4">No friends yet...</p>
       ) : (friends.map((id) => (<FriendItem key={id} userId={id} onOpenChat={handleOpenChat} openMenuUid={openMenuUid}
            setOpenMenuUid={setOpenMenuUid} onPerishSoul={handlePerishSoul} toggleMuteSoul={toggleMuteSoul} toggleBlockSoul={toggleBlockSoul}/> )))}
     </div>

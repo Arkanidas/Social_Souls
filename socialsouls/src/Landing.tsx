@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import {Toaster, toast} from 'react-hot-toast';
 import { Eye, EyeClosed, Copyright } from 'lucide-react';
 import { sendPasswordResetEmail } from "firebase/auth";
+
 import './index.css'
 
 function Landing() {
@@ -18,11 +19,16 @@ const [allowRedirect, setAllowRedirect] = useState(true);
 
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) =>  {
 
-      if (user && allowRedirect) {
-        navigate('/chat'); 
-      }
+    if (user && allowRedirect) {
+ 
+
+       navigate('/chat');
+  } else {
+       toast.error("Please check your inbox to verify your email before entering the spirit realm");
+  }
+
     });
 
     return () => unsubscribe(); 
@@ -51,6 +57,7 @@ const HandleSignup = async (e: React.FormEvent) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+
     const formattedUsername = capitalizeUsername(username.trim());
 
     const q = query(
@@ -127,15 +134,14 @@ const HandleLogin = async (e:React.FormEvent) => {
 
     if (docSnap.exists()) {
       const userData = docSnap.data();
-      console.log("👤 Username:", userData.username);
+      console.log("Username:", userData.username);
 
-      
     } else {
       console.log("No user document found!");
     }
 
   } catch (error:any) {
-    console.error("❌ Login failed:", error);
+    console.error("Login failed:", error);
     setErrorMessage("Login failed. Please check your email and password.");
     toast.error("Password or email is incorrect, please try again", {
     duration: 4000, 
@@ -305,6 +311,7 @@ const togglePassword = () => {
               <input
                 type="text"
                 id="username"
+                maxLength={15}
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}

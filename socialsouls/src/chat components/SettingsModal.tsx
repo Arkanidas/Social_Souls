@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X, Upload, UserIcon, FileTextIcon, GhostIcon } from 'lucide-react'
 import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
-import { useTheme } from '../chat components/ThemeContext'
 import { auth, db } from '../firebase/firebaseConfig'
 import { doc, updateDoc, collection, query, where, getDocs } from "firebase/firestore"
 import {toast} from 'react-hot-toast';
@@ -22,7 +21,6 @@ export const SettingsPopup = ({ isOpen, onClose, UserName, Bio, onProfileUpdated
 
   const InputFieldChar = 130;
 
-  const { isDark } = useTheme()
   const [username, setUsername] = useState(UserName)
   const [bio, setBio] = useState(Bio)
   const [profilePicture, setProfilePicture] = useState(ghost)
@@ -64,7 +62,7 @@ if(isOpen) {
     );
 
     if (usernameTaken) {
-      toast.error("Username already exists 👀");
+      toast.error("Username already exists");
       setIsSaving(false);
       return;
     }
@@ -102,15 +100,12 @@ if(isOpen) {
   }
 };
 
-
   return (
-
-    
     <div className='fixed inset-0 flex items-center justify-center z-50 overflow-y-hidden'>
 
       {/* Settings popup */}
       <div
-        className="relative w-full h-full max-w-md bg-gray-900 border-none text-gray-200 border-2 rounded-lg shadow-2xl overflow-hidden z-10 animate-ghost-appear"
+        className="relative w-full h-full max-w-md bg-gray-900 border-none text-gray-200 border-2 shadow-2xl overflow-hidden z-10 animate-ghost-appear"
         onClick={(e) => e.stopPropagation()}
       >
       
@@ -118,9 +113,7 @@ if(isOpen) {
           <GhostIcon className="w-full h-full text-purple-500" />
         </div>
        
-        <div
-          className="p-6 border-b border-purple-900/30"
-        >
+        <div className="p-6 border-b border-purple-900/30">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold font-serif">
               <span className="text-purple-500">Spectral</span> Settings
@@ -131,36 +124,24 @@ if(isOpen) {
               <X className="h-6 w-6 hover:text-purple-500 hover:drop-shadow-[0_0_1px_rgba(168,85,247,0.8)] transition duration-300 focus:text-gray-500 " />
             </button>
           </div>
-          <p className={`mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className="mt-1 text-gray-400">
             Modify your ghostly presence...
           </p>
         </div>
 
         {/* Settings form */}
         <div className="p-6 space-y-20">
-
-          {/* Profile picture */}
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
-              <div
-                className="w-34 h-34 rounded-full relative top-5 overflow-hidden border-2 border-purple-500"
-              >
-                <img
-                  src={profilePicture}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
+              <div className="w-34 h-34 rounded-full relative top-5 overflow-hidden border-2 border-purple-500">
+                <img src={profilePicture ? profilePicture : ghost} alt="Profile" className="w-full h-full object-cover"/>
               </div>
               <label
                 htmlFor="profile-upload"
                 className="absolute top-25 left-25 p-2 rounded-full cursor-pointer bg-gray-800 text-purple-400 hover:bg-gray-700 border border-purple-900/30">
                 <Upload className="h-6 w-6" />
 
-                <input
-                  id="profile-upload"
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
+                <input id="profile-upload" type="file" className="hidden" accept="image/*"
                   onChange={(e) => {
                     if (e.target.files?.[0]) {
                       const file = e.target.files[0]
@@ -215,7 +196,7 @@ if(isOpen) {
   
         
         {/* Footer */}
-        <div className="p-6 border-purple-900/30 flex justify-center gap-5 mt-10">
+        <div className="p-6 border-purple-900/30 flex justify-center gap-5 absolute bottom-0 left-0 right-0">
           <button onClick={onClose} className="px-4 py-2 rounded-md font-medium transition-colors bg-gray-800 text-gray-300 hover:bg-gray-700 mr-2 cursor-pointer">
             Cancel
           </button>

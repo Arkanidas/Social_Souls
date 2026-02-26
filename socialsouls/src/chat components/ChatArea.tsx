@@ -508,10 +508,10 @@ return null
 
  
   
-  return <div className="flex-1 flex flex-col relative  ">
+return <div className="flex-1 flex flex-col relative">
       <div className="p-4 border-b backdrop-blur-sm border-white/8 bg-zinc-950 flex items-center ">
         <div className="flex items-center ">
-          <div className="w-10 h-10 rounded-full overflow-hidden border-1 border-purple-400 cursor-pointer" onClick={() => {
+          <div className="w-11 h-11 rounded-full overflow-hidden border-1 border-purple-400 cursor-pointer" onClick={() => {
              if (!activeChatUser) return;
                 showUserProfileModal(activeChatUser.otherUser.uid);}}>
             <img src={activeChatUser ? activeChatUser.otherUser.profilePic : Ghostly} alt="Unknown Ghost" className="w-full h-full object-cover" />

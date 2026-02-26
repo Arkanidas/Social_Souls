@@ -3,6 +3,8 @@ import { XIcon, Skull  } from "lucide-react";
 import { deleteUser} from "firebase/auth";
 import { doc, collection, query, where, getDocs, writeBatch, arrayRemove} from "firebase/firestore";
 import { auth, db} from "../firebase/firebaseConfig";
+import { useNavigate } from 'react-router-dom';
+import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 
 
 export const showDeleteAccountModal = () => {
@@ -12,7 +14,8 @@ export const showDeleteAccountModal = () => {
 export const DeleteAccountConfirmModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -23,23 +26,33 @@ export const DeleteAccountConfirmModal = () => {
 
 
   // Handle account deletion function
-  const handleDeleteAccount = async () => {
-
+  const handleDeleteAccount = async (password: string) => {
   const user = auth.currentUser;
-  if (!user) return;
+  if (!user || !user.email) return;
 
   try {
-
     setIsDeleting(true);
 
+    // 1️⃣ Reauthenticate
+    const credential = EmailAuthProvider.credential(
+      user.email,
+      password
+    );
+
+    await reauthenticateWithCredential(user, credential);
+
+    // 2️⃣ Delete Auth FIRST
+    await deleteUser(user);
+
+    // 3️⃣ Delete Firestore data AFTER auth deletion
     const batch = writeBatch(db);
 
     const userRef = doc(db, "users", user.uid);
     batch.delete(userRef);
 
     const messagesQuery = query(
-    collection(db, "messages"),
-    where("senderId", "==", user.uid)
+      collection(db, "messages"),
+      where("senderId", "==", user.uid)
     );
 
     const messagesSnapshot = await getDocs(messagesQuery);
@@ -47,38 +60,24 @@ export const DeleteAccountConfirmModal = () => {
       batch.delete(docSnap.ref);
     });
 
-
-    const friendsQuery = query(
-    collection(db, "users"),
-    where("friends", "array-contains", user.uid)
-);
- const friendsSnapshot = await getDocs(friendsQuery);
- friendsSnapshot.forEach((docSnap) => {
-  if (docSnap.id !== user.uid) {
-    batch.update(docSnap.ref, {
-      friends: arrayRemove(user.uid),
-      friendRequests: arrayRemove(user.uid),
-      sentRequests: arrayRemove(user.uid),
-    });
-  }
-});
-
     await batch.commit();
-    await deleteUser(user);
 
-    setIsOpen(false);
-   
+    navigate("/");
+
   } catch (error: any) {
-    console.error("Delete error:", error);
-    console.error("Error code:", error.code);
+    console.error(error);
 
     if (error.code === "auth/requires-recent-login") {
-       alert("Please log in again before deleting your account.");
+      alert("Please log in again.");
+    } else if (error.code === "auth/wrong-password") {
+      alert("Incorrect password.");
     } else {
-      alert("Something went wrong while deleting the account.");
+      alert("Delete failed. Enter your password correctly and try again.");
     }
+  } finally {
+    setIsDeleting(false);
   }
-  };
+};
 
   if (!isOpen) return null;
 
@@ -104,6 +103,14 @@ export const DeleteAccountConfirmModal = () => {
           Are you really sure you want to return to the Living World forever? This action cannot be undone and all your chats and friendships will be lost.
         </p>
 
+        <input
+          type="password"
+          placeholder="Enter your password to confirm"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full px-4 py-2 mb-4 rounded-md bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-red-600 duration-200"
+        />
+
         <div className="flex justify-center gap-3 ">
           <button
             onClick={() => setIsOpen(false)}
@@ -114,7 +121,7 @@ export const DeleteAccountConfirmModal = () => {
 
           <button
             disabled={isDeleting}
-            onClick={handleDeleteAccount}
+            onClick={() => handleDeleteAccount(password)}
             className="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-red-600 hover:bg-red-800 text-white transition shadow-lg shadow-purple-500/30 cursor-pointer"
           >
           <span>End me</span>
