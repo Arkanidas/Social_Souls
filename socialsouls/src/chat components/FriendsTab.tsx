@@ -20,6 +20,7 @@ type FriendRequestItemProps = {
 
 
 export const FriendsTab = () => {
+  
   const [friends, setFriends] = useState<any[]>([]);
   const [sentRequests, setSentRequests] = useState<any[]>([]);
   const { openChat, closeChat } = useChat();
@@ -29,6 +30,28 @@ export const FriendsTab = () => {
   const acceptAudioRef = useRef<HTMLAudioElement | null>(null);
   const DeclineAudioRef = useRef<HTMLAudioElement | null>(null);
   const {friendRequests, setFriendsRequests } = useSidebar();
+  const [validFriendRequests, setValidFriendRequests] = useState<string[]>([]);
+
+
+  // Validates incoming friend requests to ensure they correspond to existing users
+  useEffect(() => {
+  const validateRequests = async () => {
+    const validIds: string[] = [];
+
+    for (const id of friendRequests) {
+      const ref = doc(db, "users", id);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        validIds.push(id);
+      }
+    }
+
+    setValidFriendRequests(validIds);
+  };
+
+  validateRequests();
+}, [friendRequests]);
  
 
    // Preload accept and decline sounds
@@ -262,14 +285,14 @@ const toggleBlockSoul = async (friendId: string) => {
       <SentRequestItem key={id} userId={id} onCancel={handleCancelSentRequest}/>))}
     </div>)}
     
-     {friendRequests.length > 0 && (
+     {validFriendRequests.length > 0 && (
       <div>
         <div className=" p-2 mt-1">
           <h3 className="text-white relative left-12 text-md"> New Soulmate Requests
-             <span className="text-sm text-purple-400"> ( {friendRequests.length} )</span>
+             <span className="text-sm text-purple-400"> ( {validFriendRequests.length} )</span>
           </h3>
         </div>
-          {friendRequests.map((id) => (
+          {validFriendRequests.map((id) => (
             <FriendRequestItem
               key={id}
               userId={id}

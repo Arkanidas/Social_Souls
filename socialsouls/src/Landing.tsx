@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import {Toaster, toast} from 'react-hot-toast';
 import { Eye, EyeClosed, Copyright } from 'lucide-react';
 import { sendPasswordResetEmail } from "firebase/auth";
-
 import './index.css'
 
 function Landing() {
@@ -22,18 +21,12 @@ const [allowRedirect, setAllowRedirect] = useState(true);
     const unsubscribe = onAuthStateChanged(auth, async (user) =>  {
 
     if (user && allowRedirect) {
- 
-
        navigate('/chat');
-  } else {
-       toast.error("Please check your inbox to verify your email before entering the spirit realm");
-  }
-
+  } 
     });
 
     return () => unsubscribe(); 
 
-    
   }, [navigate, allowRedirect]);
   
  

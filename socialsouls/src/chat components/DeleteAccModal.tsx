@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { XIcon, Skull  } from "lucide-react";
 import { deleteUser} from "firebase/auth";
-import { doc, collection, query, where, getDocs, writeBatch, arrayRemove} from "firebase/firestore";
+import { doc, collection, query, where, getDocs, writeBatch} from "firebase/firestore";
 import { auth, db} from "../firebase/firebaseConfig";
 import { useNavigate } from 'react-router-dom';
 import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
+
 
 
 export const showDeleteAccountModal = () => {
@@ -15,6 +16,7 @@ export const DeleteAccountConfirmModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [password, setPassword] = useState("");
+  
   const navigate = useNavigate();
 
 

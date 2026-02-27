@@ -38,9 +38,29 @@ export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
   const [filteredFriends, setFilteredFriends] = useState<any[]>([]);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const {friendRequests} = useSidebar();
+  const [validFriendRequests, setValidFriendRequests] = useState<string[]>([]);
+
   const { openChat} = useChat();
 
   
+  useEffect(() => {
+  const validateRequests = async () => {
+    const validIds: string[] = [];
+
+    for (const id of friendRequests) {
+      const ref = doc(db, "users", id);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        validIds.push(id);
+      }
+    }
+
+    setValidFriendRequests(validIds);
+  };
+
+  validateRequests();
+}, [friendRequests]);
  
 useEffect(() => {
   const user = auth.currentUser;
@@ -234,7 +254,7 @@ const openChatWithFriend = async (friend: any) => {
         </button>
 
         <button onClick={() => setActiveTab('friends')} className={`flex-1 p-4 text-sm font-medium cursor-pointer ${activeTab === 'friends' ? 'text-purple-500 border-b-2 border-purple-500' : 'text-gray-400 hover:text-purple-500 '}`}>
-         <div className={friendRequests.length > 0 ? "relative w-1.5 h-1.5 bg-white rounded-full top-2 right-2 left-19 ghost-ball shadow-[0_0_2px_rgba(255,255,255,0.8)]" : ""}></div>
+         <div className={validFriendRequests.length > 0 ? "relative w-1.5 h-1.5 bg-white rounded-full top-2 right-2 left-19 ghost-ball shadow-[0_0_2px_rgba(255,255,255,0.8)]" : ""}></div>
           <Users2Icon className="h-5 w-5 mx-auto mb-1 " />
           Friends
         </button>
