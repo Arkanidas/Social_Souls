@@ -15,12 +15,11 @@ type FriendRequestItemProps = {
   userId: string;
   onAccept: (friendId: string) => void;
   onDecline: (friendId: string) => void;
-  
 };
 
 
 export const FriendsTab = () => {
-  
+
   const [friends, setFriends] = useState<any[]>([]);
   const [sentRequests, setSentRequests] = useState<any[]>([]);
   const { openChat, closeChat } = useChat();
@@ -464,7 +463,6 @@ useEffect(() => {
   <VolumeX size={20}/>
   </div>
 )}
-
   </div>
   );
 };
@@ -565,7 +563,6 @@ const SentRequestItem = ({ userId, onCancel }: { userId: string; onCancel:(id: s
     <button onClick={() => onCancel(userId)} className="opacity-0 group-hover:opacity-100 hover:text-white text-gray-400 px-3 py-1 text-sm cursor-pointer duration-200">
       <XIcon className="h-5 w-5" />
     </button>
- 
     </div>
   
   );

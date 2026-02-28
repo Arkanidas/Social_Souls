@@ -16,8 +16,6 @@ type UserProps = {
     };
   };
   isActive: boolean;
-
-  
 };
 
 export const ChatItem = ({ chat, isActive }: UserProps) => {

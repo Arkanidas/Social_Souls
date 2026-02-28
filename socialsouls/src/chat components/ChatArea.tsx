@@ -75,7 +75,7 @@ export const ChatArea = () => {
   return value.charAt(0).toUpperCase() + value.slice(1);
 };
 
-
+// Scroll to bottom when messages change
 useEffect(() => {
  if (!showScrollToBottom) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

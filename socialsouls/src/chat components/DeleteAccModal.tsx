@@ -35,7 +35,6 @@ export const DeleteAccountConfirmModal = () => {
   try {
     setIsDeleting(true);
 
-    // 1️⃣ Reauthenticate
     const credential = EmailAuthProvider.credential(
       user.email,
       password
@@ -43,10 +42,10 @@ export const DeleteAccountConfirmModal = () => {
 
     await reauthenticateWithCredential(user, credential);
 
-    // 2️⃣ Delete Auth FIRST
+
     await deleteUser(user);
 
-    // 3️⃣ Delete Firestore data AFTER auth deletion
+
     const batch = writeBatch(db);
 
     const userRef = doc(db, "users", user.uid);
