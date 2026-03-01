@@ -39,7 +39,6 @@ export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const {friendRequests} = useSidebar();
   const [validFriendRequests, setValidFriendRequests] = useState<string[]>([]);
-  const [friendRequestsState, setFriendRequestsState  ] = useState<string[]>([]);
 
   const hasNewRequests = validFriendRequests.length > 0;
 

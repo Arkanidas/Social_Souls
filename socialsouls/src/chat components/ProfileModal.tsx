@@ -132,7 +132,7 @@ const friendsCount = profile.friends?.length ?? 0;
    
         {/* Bio */}
         <p className="mt-4 text-white/90 text-md leading-relaxed px-2">
-          {profile.bio || "No bio set yet...."}
+          {profile.bio || "Wandering soul here to explore the spectral realm..."}
         </p>
 
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 text-white/90 group cursor-default">

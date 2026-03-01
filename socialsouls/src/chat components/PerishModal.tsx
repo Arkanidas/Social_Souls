@@ -88,7 +88,7 @@ useEffect(() => {
 
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className=" font-semibold text-red-500 text-center flex-1 text-lg">
+          <h2 className=" font-semibold text-red-500 text-center flex-1 text-xl">
             Are you sure you want to extinguish {friendName}?
           </h2>
 
@@ -118,7 +118,7 @@ useEffect(() => {
              handlePerishSoul(FriendId);
           }
              setIsOpen(false);}}
-            className="px-4 py-2 rounded-md bg-red-600 hover:bg-red-800 text-white transition shadow-lg shadow-purple-500/30 cursor-pointer"
+            className="px-4 py-2 rounded-md bg-red-600 hover:bg-red-800 text-white transition shadow-lg shadow-red-500/30 cursor-pointer"
           >
             Perish
           </button>
