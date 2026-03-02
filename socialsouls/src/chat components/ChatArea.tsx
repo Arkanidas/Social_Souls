@@ -496,7 +496,7 @@ const BlockNotice = ({ theyBlockedMe, iBlockedThem, activeChatUser }: { theyBloc
    if (!activeChatUser) return null; 
 
   if (theyBlockedMe) {
-  return <div className="self-center inline-flex px-4 py-2 rounded-md border border-red-500 text-red-500 bg-red-500/10 relative top-4">You are blocked!</div>;
+  return <div className="self-center inline-flex px-4 py-2 rounded-md border border-red-500 text-red-500 bg-red-500/10 relative top-4">You have been blocked!</div>;
 }
 
 if (iBlockedThem) {
@@ -670,13 +670,11 @@ return <div className="flex-1 flex flex-col relative">
     </div>
   )}
 
-
   {message.text && (
     <p className="mb-2 font-[messageFont] text-lg break-words break-all whitespace-pre-wrap max-w-full">
       {message.text}
     </p>
   )}
-
 
   {message.createdAt && (
     <p className="text-xs opacity-70">

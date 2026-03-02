@@ -37,7 +37,6 @@ export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
   const [friends, setFriends] = useState<any[]>([]);
   const [filteredFriends, setFilteredFriends] = useState<any[]>([]);
   const [showSearchModal, setShowSearchModal] = useState(false);
-  const {friendRequests} = useSidebar();
   const [validFriendRequests, setValidFriendRequests] = useState<string[]>([]);
 
   const hasNewRequests = validFriendRequests.length > 0;
@@ -61,24 +60,7 @@ export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
 }, []);
 
   
-  useEffect(() => {
-  const validateRequests = async () => {
-    const validIds: string[] = [];
 
-    for (const id of friendRequests) {
-      const ref = doc(db, "users", id);
-      const snap = await getDoc(ref);
-
-      if (snap.exists()) {
-        validIds.push(id);
-      }
-    }
-
-    setValidFriendRequests(validIds);
-  };
-
-  validateRequests();
-}, [friendRequests]);
  
 useEffect(() => {
   const user = auth.currentUser;
