@@ -4,6 +4,7 @@ import { ChatItem } from "./ChatItem";
 export const ChatTab = () => {
 
   const { openChats, activeChatId } = useChat();
+
   
   if (openChats.length === 0) {
     return (
@@ -14,7 +15,7 @@ export const ChatTab = () => {
   }
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col">
       {openChats.map(chat => (
         <ChatItem
           key={chat.chatId}

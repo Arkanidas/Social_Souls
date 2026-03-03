@@ -16,6 +16,7 @@ import { PerishModal } from './PerishModal';
 import {DeleteAccountConfirmModal} from '../chat components/DeleteAccModal';
 
 
+
 export const showAddFriendModal = () => {
   const event = new CustomEvent('showAddFriendModal')
   window.dispatchEvent(event)
@@ -67,6 +68,7 @@ export const ChatArea = () => {
   const [theyBlockedMe, setTheyBlockedMe] = useState<boolean>(false);
   const activeChatUser = openChats.find((chat) => chat.chatId === activeChatId);
   const BASE_TITLE = "Social Souls";
+  
 
   const isChatBlocked = iBlockedThem || theyBlockedMe;
 
@@ -74,6 +76,8 @@ export const ChatArea = () => {
   if (!value) return value;
   return value.charAt(0).toUpperCase() + value.slice(1);
 };
+
+
 
 // Scroll to bottom when messages change
 useEffect(() => {

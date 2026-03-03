@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { auth, db } from "../firebase/firebaseConfig";
-import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { collection, doc, onSnapshot, orderBy, query, updateDoc, where } from "firebase/firestore";
 
 
 
@@ -35,6 +35,29 @@ export function ChatProvider({ children }: any) {
 const [openChats, setOpenChats] = useState<OpenChat[]>([]);
 const [activeChatId, setActiveChatId] = useState<string | null>(null);
 const [user, setUser] = useState(() => auth.currentUser);
+const [userChats, setUserChats] = useState<any[]>([]);
+
+useEffect(() => {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const q = query(
+    collection(db, "Chats"),
+    where("participants", "array-contains", user.uid),
+    orderBy("lastMessageAt", "desc")
+  );
+
+  const unsub = onSnapshot(q, (snapshot) => {
+    const chats = snapshot.docs.map(doc => ({
+      chatId: doc.id,
+      ...doc.data(),
+    }));
+
+    setUserChats(chats);
+  });
+
+  return () => unsub();
+}, []);
 
 useEffect(() => {
   const unsub = auth.onAuthStateChanged(u => {
