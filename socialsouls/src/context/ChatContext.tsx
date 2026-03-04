@@ -11,12 +11,14 @@ const ChatContext = createContext<{
   openChat: (chat: OpenChat) => Promise<void>;
   closeChat: (chatId: string) => Promise<void>;
   setActiveChatId: (chatId: string) => void;
+  userChats: any[];
 }>({
   openChats: [],
   activeChatId: null,
   openChat: async () => {},
   closeChat: async () => {},
   setActiveChatId: () => {},
+  userChats: [],
 });
 
 
@@ -38,26 +40,29 @@ const [user, setUser] = useState(() => auth.currentUser);
 const [userChats, setUserChats] = useState<any[]>([]);
 
 useEffect(() => {
-  const user = auth.currentUser;
-  if (!user) return;
+  const unsubAuth = auth.onAuthStateChanged((user) => {
+    if (!user) return;
 
-  const q = query(
-    collection(db, "Chats"),
-    where("participants", "array-contains", user.uid),
-    orderBy("lastMessageAt", "desc")
-  );
+    const q = query(
+      collection(db, "Chats"),
+      where("participants", "array-contains", user.uid),
+      orderBy("lastMessageAt", "desc")
+    );
 
-  const unsub = onSnapshot(q, (snapshot) => {
-    const chats = snapshot.docs.map(doc => ({
-      chatId: doc.id,
-      ...doc.data(),
-    }));
+    const unsubChats = onSnapshot(q, (snapshot) => {
+      setUserChats(snapshot.docs.map(doc => ({
+        chatId: doc.id,
+        ...doc.data(),
+      })));
+    });
 
-    setUserChats(chats);
+    return () => unsubChats();
   });
 
-  return () => unsub();
+  return () => unsubAuth();
 }, []);
+
+
 
 useEffect(() => {
   const unsub = auth.onAuthStateChanged(u => {
@@ -117,7 +122,7 @@ const closeChat = async (chatId: string): Promise<void> => {
 
 
   return (
-    <ChatContext.Provider value={{openChats, activeChatId, openChat, closeChat, setActiveChatId}}>
+    <ChatContext.Provider value={{openChats, activeChatId, openChat, closeChat, setActiveChatId, userChats}}>
       {children}
     </ChatContext.Provider>
   );
