@@ -3,7 +3,7 @@ import { MessageInput } from './MessageInput';
 import { XIcon, SkullIcon, FileInput, PaperclipIcon, X, Download, Copy, ArrowDown  } from 'lucide-react'
 import { auth, db, storage } from '../firebase/firebaseConfig'
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, serverTimestamp, addDoc, orderBy, onSnapshot, getDoc } from "firebase/firestore"
+import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, serverTimestamp, addDoc, orderBy, onSnapshot, getDoc, limit } from "firebase/firestore"
 import { toast } from 'react-hot-toast'
 import { useChat } from "../context/ChatContext";
 import Ghostly from "../assets/ghosts.png";
@@ -125,11 +125,12 @@ useEffect(() => {
     senderId: user.uid,
     createdAt: serverTimestamp(),
     attachments: uploadedAttachments,
+    limit: 50,
   });
 
   await updateDoc(doc(db, "Chats", chatId), {
     lastMessage:
-      text || (uploadedAttachments.length > 0 ? "Attachment" : ""),
+    text || (uploadedAttachments.length > 0 ? "Attachment" : ""),
     lastMessageAt: serverTimestamp(),
   });
 
@@ -140,7 +141,6 @@ useEffect(() => {
   } finally {
     setIsUploading(false);
   }
-
 };
 
    // Update document title based on unread messages
@@ -208,7 +208,7 @@ useEffect(() => {
   }
 
   const messagesRef = collection(db, "Chats", activeChatUser.chatId, "messages");
-  const q = query(messagesRef, orderBy("createdAt", "asc"));
+  const q = query(messagesRef, orderBy("createdAt", "asc"), limit(50));
 
   const unsubscribe = onSnapshot(q, (snapshot) => {
     const msgs = snapshot.docs.map((doc) => ({id: doc.id, ...doc.data() as Omit<ChatMessage, "id">}));
@@ -367,7 +367,7 @@ const triggerSpamCooldown = () => {
   try {
     const q = query(
       collection(db, "users"),
-      where("username", "==", friendUsername)
+      where("username", "==", friendUsername),
     );
     const querySnapshot = await getDocs(q);
 
