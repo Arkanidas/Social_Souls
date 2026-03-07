@@ -3,7 +3,7 @@ import { ChatItem } from "./ChatItem";
 
 export const ChatTab = () => {
 
-  const { userChats, activeChatId } = useChat();
+  const { userChats, activeChatId, openChats } = useChat();
 
   
   if (userChats.length === 0) {
@@ -16,7 +16,7 @@ export const ChatTab = () => {
 
   return (
     <div className="flex flex-col">
-      {userChats.map(chat => (
+      {openChats.map(chat => (
         <ChatItem
           key={chat.chatId}
           chat={chat}
