@@ -19,7 +19,7 @@ export const DeleteAccountConfirmModal = () => {
   
   const navigate = useNavigate();
 
-
+  // Listen for the custom event to open the modal
   useEffect(() => {
     const open = () => setIsOpen(true);
     window.addEventListener("showDeleteAccountModal", open);

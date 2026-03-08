@@ -246,7 +246,6 @@ const openChatWithFriend = async (friend: any) => {
   </div>
 )}
 
-    
       <div className="flex border-b border-purple-900/30">
         <button onClick={() => setActiveTab('chats')} className={`flex-1 p-4 text-sm font-medium cursor-pointer ${activeTab === 'chats' ? 'text-purple-500 border-b-2 border-purple-500' : 'text-gray-400 hover:text-purple-500'}`}>
           <MessageSquareIcon className="h-5 w-5 mx-auto mb-1" />
