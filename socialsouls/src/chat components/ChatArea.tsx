@@ -144,7 +144,7 @@ useEffect(() => {
 };
 
    // Update document title based on unread messages
-useEffect(() => {
+  useEffect(() => {
   if (unreadCount > 0) {
     document.title = `(${unreadCount}) New message${unreadCount > 1 ? "s" : ""} ${BASE_TITLE}`;
   } else {
@@ -165,6 +165,7 @@ useEffect(() => {
   return () => unsub();
 }, [activeChatUser?.otherUser?.uid]);
 
+// Check if they blocked current user 
 useEffect(() => {
   if (!user || !activeChatUser?.otherUser?.uid) return;
 
@@ -200,7 +201,7 @@ useEffect(() => {
 }, [activeChatUser?.chatId]);
 
 
-
+ // set messages to empty when no user exists 
  useEffect(() => {
   if (!activeChatUser?.chatId) {
     setUserMessages([]);
