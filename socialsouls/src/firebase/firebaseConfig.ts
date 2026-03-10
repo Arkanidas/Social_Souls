@@ -3,6 +3,7 @@ import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage} from "firebase/storage";
 import { enableIndexedDbPersistence } from "firebase/firestore";
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 
 const firebaseConfig = {
@@ -15,6 +16,14 @@ const firebaseConfig = {
   };
 
   const app = initializeApp(firebaseConfig);
+  
+
+  initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+  isTokenAutoRefreshEnabled: true
+});
+
+console.log(import.meta.env.VITE_RECAPTCHA_SITE_KEY);
 
 export const db = getFirestore(app);
 

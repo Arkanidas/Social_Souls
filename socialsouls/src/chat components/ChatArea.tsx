@@ -67,6 +67,8 @@ export const ChatArea = () => {
   const [iBlockedThem, setIBlockedThem] = useState<boolean>(false);
   const [theyBlockedMe, setTheyBlockedMe] = useState<boolean>(false);
   const activeChatUser = openChats.find((chat) => chat.chatId === activeChatId);
+  const [lastFriendRequestTime, setLastFriendRequestTime] = useState<number>(0);
+  const [lastUploadTime, setLastUploadTime] = useState<number>(0);
   const BASE_TITLE = "Social Souls";
   
 
@@ -94,6 +96,17 @@ useEffect(() => {
   if (!text.trim() && attachments.length === 0) return;
   if (isChatBlocked) return;
   if (isSpamBlocked) return;
+  if (isUploading) return;
+
+  const now = Date.now();
+
+if (attachments.length > 0 && now - lastUploadTime < 10000) {
+  const remaining = Math.ceil((10000 - (now - lastUploadTime)) / 1000);
+  toast.error(`Please wait ${remaining}s before sending another file.`);
+  return;
+}
+
+
 
   const isSpamming = checkSpam();
   if (isSpamming) return;
@@ -102,6 +115,7 @@ useEffect(() => {
   setIsUploading(true);
 
   try{
+
   let uploadedAttachments: any[] = [];
 
   if (attachments.length > 0) {
@@ -124,8 +138,7 @@ useEffect(() => {
     text: text || "",
     senderId: user.uid,
     createdAt: serverTimestamp(),
-    attachments: uploadedAttachments,
-    limit: 50,
+    attachments: uploadedAttachments.length > 0 ? uploadedAttachments : [],
   });
 
   await updateDoc(doc(db, "Chats", chatId), {
@@ -136,6 +149,10 @@ useEffect(() => {
 
 
   setAttachments([]);
+  
+  if (attachments.length > 0) {
+  setLastUploadTime(now);
+}
   } catch (error) {
     toast.error("Failed to send message. Please try again.");
   } finally {
@@ -352,6 +369,13 @@ const triggerSpamCooldown = () => {
  const handleAddFriendSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
+  const now = Date.now();
+
+if (now - lastFriendRequestTime < 10000) {
+  toast.error("You must wait before summoning another soul.");
+  return;
+}
+
   const input = addFriendInputRef.current;
   const rawUsername = input?.value.trim();
   if (!rawUsername) return;
@@ -419,6 +443,7 @@ const triggerSpamCooldown = () => {
     if(input)
     input.value = "";
     setShowAddFriend(false);
+    setLastFriendRequestTime(now);
 
   } catch (error) {
     console.error(error);
