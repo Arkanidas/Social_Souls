@@ -149,7 +149,7 @@ if (attachments.length > 0 && now - lastUploadTime < 10000) {
 
 
   setAttachments([]);
-  
+
   if (attachments.length > 0) {
   setLastUploadTime(now);
 }
@@ -523,7 +523,7 @@ const handleDownloadImage = async () => {
   //Component to show block notice text
 const BlockNotice = ({ theyBlockedMe, iBlockedThem, activeChatUser }: { theyBlockedMe: boolean; iBlockedThem: boolean; activeChatUser: any }) => {
 
-   if (!activeChatUser) return null; 
+  if (!activeChatUser) return null; 
 
   if (theyBlockedMe) {
   return <div className="self-center inline-flex px-4 py-2 rounded-md border border-red-500 text-red-500 bg-red-500/10 relative top-4">You have been blocked!</div>;
@@ -540,7 +540,7 @@ return null
   
 return <div className="flex-1 flex flex-col relative">
       <div className="p-4 border-b backdrop-blur-sm border-white/8 bg-zinc-950 flex items-center ">
-        <div className="flex items-center ">
+        <div className="flex items-center">
           <div className="w-11 h-11 rounded-full overflow-hidden border-1 border-purple-400 cursor-pointer" onClick={() => {
              if (!activeChatUser) return;
                 showUserProfileModal(activeChatUser.otherUser.uid);}}>
@@ -548,7 +548,7 @@ return <div className="flex-1 flex flex-col relative">
           </div>
 
           <div className="ml-3 ">
-            <h3 className="text-white">
+            <h3 className="text-white font-[Arial] font-semibold">
               {activeChatUser ? activeChatUser.otherUser.username : 'Select a Soul to Chat'}
             </h3>
 

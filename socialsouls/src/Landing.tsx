@@ -81,7 +81,7 @@ if (!snapshot.empty) {
     setPassword("");
 
   } catch (error) {
-    console.error("❌ Sign-up failed:", ErrorMessage);
+    console.error("Sign-up failed:", ErrorMessage);
     toast.error("Please enter a valid email, password and username", {
     duration: 6000, 
 });
@@ -142,8 +142,7 @@ const HandleLogin = async (e:React.FormEvent) => {
   }
 };
 
-
-const togglePassword = () => {
+  const togglePassword = () => {
   setShowPassword(prev => !prev);
 };
 
