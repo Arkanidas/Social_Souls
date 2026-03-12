@@ -3,7 +3,7 @@ import { useChat } from "../context/ChatContext";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase/firebaseConfig";
+import { auth, db } from "../firebase/firebaseConfig";
 
 
 type UserProps = {
@@ -23,7 +23,7 @@ export const ChatItem = ({ chat, isActive }: UserProps) => {
 
   const { setActiveChatId, closeChat } = useChat();
   const [status, setStatus] = useState<"online" | "idle" | "offline">("offline");
-
+  const [unread, setUnread] = useState(0); 
   
 useEffect(() => {
   const userRef = doc(db, "users", chat.otherUser.uid);
@@ -38,8 +38,24 @@ useEffect(() => {
   return () => unsub();
 }, [chat.otherUser.uid]);
 
+useEffect(() => {
+  const ref = doc(db, "Chats", chat.chatId);
+
+  const unsub = onSnapshot(ref, (snap) => {
+    const data = snap.data();
+    if (!data) return;
+
+    const currentUser = auth.currentUser?.uid;
+    if (!currentUser) return;
+
+    setUnread(data.unreadCount?.[currentUser] || 0);
+  });
+
+  return () => unsub();
+}, [chat.chatId]);
 
   return (
+    
     <div
       onClick={() => setActiveChatId(chat.chatId)}
       className={`flex items-center gap-3 px-3 py-3 cursor-pointer transition  
@@ -72,6 +88,12 @@ useEffect(() => {
       >
         <X size={20} />
       </button>
+
+      {!isActive && unread > 0 && (
+  <div className="ml-auto bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
+    {unread}
+  </div>
+)}
     </div>
   );
 };

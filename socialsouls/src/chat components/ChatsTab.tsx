@@ -6,7 +6,7 @@ export const ChatTab = () => {
   const { userChats, activeChatId, openChats } = useChat();
 
   
-  if (userChats.length === 0) {
+  if (openChats.length === 0) {
     return (
       <div className="text-gray-500 text-md overflow-y-scroll relative left-[33%] top-4">
         No open chats...

@@ -3,7 +3,7 @@ import { MessageInput } from './MessageInput';
 import { XIcon, SkullIcon, FileInput, PaperclipIcon, X, Download, Copy, ArrowDown  } from 'lucide-react'
 import { auth, db, storage } from '../firebase/firebaseConfig'
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, serverTimestamp, addDoc, orderBy, onSnapshot, getDoc, limit } from "firebase/firestore"
+import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, serverTimestamp, addDoc, orderBy, onSnapshot, getDoc, limit, increment } from "firebase/firestore"
 import { toast } from 'react-hot-toast'
 import { useChat } from "../context/ChatContext";
 import Ghostly from "../assets/ghosts.png";
@@ -99,6 +99,7 @@ useEffect(() => {
   if (isUploading) return;
 
   const now = Date.now();
+  const receiverId = activeChatUser.otherUser.uid;
 
 if (attachments.length > 0 && now - lastUploadTime < 10000) {
   const remaining = Math.ceil((10000 - (now - lastUploadTime)) / 1000);
@@ -141,10 +142,13 @@ if (attachments.length > 0 && now - lastUploadTime < 10000) {
     attachments: uploadedAttachments.length > 0 ? uploadedAttachments : [],
   });
 
+  
+
   await updateDoc(doc(db, "Chats", chatId), {
     lastMessage:
     text || (uploadedAttachments.length > 0 ? "Attachment" : ""),
     lastMessageAt: serverTimestamp(),
+    [`unreadCount.${receiverId}`]: increment(1)
   });
 
 

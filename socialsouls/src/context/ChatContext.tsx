@@ -49,12 +49,37 @@ useEffect(() => {
       orderBy("lastMessageAt", "desc")
     );
 
-    const unsubChats = onSnapshot(q, (snapshot) => {
-      setUserChats(snapshot.docs.map(doc => ({
-        chatId: doc.id,
-        ...doc.data(),
-      })));
-    });
+ const unsubChats = onSnapshot(q, (snapshot) => {
+
+  const chats = snapshot.docs.map(doc => ({
+    chatId: doc.id,
+    ...doc.data(),
+  }));
+
+  setUserChats(chats);
+
+  chats.forEach((chat: any) => {
+
+    const exists = openChats.some(c => c.chatId === chat.chatId);
+
+    if (!exists && chat.unreadCount?.[user.uid] > 0) {
+
+      const otherUid = chat.participants.find((p: string) => p !== user.uid);
+
+      const otherUser = {
+        uid: otherUid,
+        username: chat.otherUsername || "Unknown",
+        profilePic: chat.otherUserPic || "",
+      };
+
+      setOpenChats(prev => [
+        ...prev,
+        { chatId: chat.chatId, otherUser }
+      ]);
+    }
+  });
+
+});
 
     return () => unsubChats();
   });
@@ -94,7 +119,8 @@ useEffect(() => {
 
 
 
-const openChat = async (chat: OpenChat): Promise<void> => {
+
+const openChat = async (chat: OpenChat) => {
   if (!user) return;
 
   const exists = openChats.some(c => c.chatId === chat.chatId);
@@ -104,8 +130,12 @@ const openChat = async (chat: OpenChat): Promise<void> => {
     openChats: updatedChats,
     activeChatId: chat.chatId,
   });
-};
 
+  // reset unread count
+  await updateDoc(doc(db, "Chats", chat.chatId), {
+    [`unreadCount.${user.uid}`]: 0
+  });
+};
 
 
 const closeChat = async (chatId: string): Promise<void> => {
