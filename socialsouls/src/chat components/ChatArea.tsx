@@ -143,13 +143,17 @@ if (attachments.length > 0 && now - lastUploadTime < 10000) {
   });
 
   
-
-  await updateDoc(doc(db, "Chats", chatId), {
-    lastMessage:
+const updateData: any = {
+  lastMessage:
     text || (uploadedAttachments.length > 0 ? "Attachment" : ""),
-    lastMessageAt: serverTimestamp(),
-    [`unreadCount.${receiverId}`]: increment(1)
-  });
+  lastMessageAt: serverTimestamp(),
+};
+
+if (activeChatId !== chatId) {
+  updateData[`unreadCount.${receiverId}`] = increment(1);
+}
+
+await updateDoc(doc(db, "Chats", chatId), updateData);
 
 
   setAttachments([]);

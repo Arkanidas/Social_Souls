@@ -40,53 +40,56 @@ const [user, setUser] = useState(() => auth.currentUser);
 const [userChats, setUserChats] = useState<any[]>([]);
 
 useEffect(() => {
-  const unsubAuth = auth.onAuthStateChanged((user) => {
-    if (!user) return;
+  if (!user) return;
 
-    const q = query(
-      collection(db, "Chats"),
-      where("participants", "array-contains", user.uid),
-      orderBy("lastMessageAt", "desc")
-    );
+  const q = query(
+    collection(db, "Chats"),
+    where("participants", "array-contains", user.uid),
+    orderBy("lastMessageAt", "desc")
+  );
 
- const unsubChats = onSnapshot(q, (snapshot) => {
+  const unsubChats = onSnapshot(q, (snapshot) => {
 
-  const chats = snapshot.docs.map(doc => ({
-    chatId: doc.id,
-    ...doc.data(),
-  }));
+    const chats = snapshot.docs.map(doc => ({
+      chatId: doc.id,
+      ...doc.data(),
+    }));
 
-  setUserChats(chats);
+    setUserChats(chats);
 
-  chats.forEach((chat: any) => {
+    chats.forEach((chat: any) => {
 
-    const exists = openChats.some(c => c.chatId === chat.chatId);
+      const unread = chat.unreadCount?.[user.uid] || 0;
 
-    if (!exists && chat.unreadCount?.[user.uid] > 0) {
+      if (unread > 0) {
 
-      const otherUid = chat.participants.find((p: string) => p !== user.uid);
+        setOpenChats(prev => {
 
-      const otherUser = {
-        uid: otherUid,
-        username: chat.otherUsername || "Unknown",
-        profilePic: chat.otherUserPic || "",
-      };
+          const exists = prev.some(c => c.chatId === chat.chatId);
+          if (exists) return prev;
 
-      setOpenChats(prev => [
-        ...prev,
-        { chatId: chat.chatId, otherUser }
-      ]);
-    }
+          const otherUid = chat.participants.find(
+            (p: string) => p !== user.uid
+          );
+
+          const newChat = {
+            chatId: chat.chatId,
+            otherUser: {
+              uid: otherUid,
+              username: chat.otherUsername || "Unknown",
+              profilePic: chat.otherUserPic || ""
+            }
+          };
+
+          return [...prev, newChat];
+        });
+      }
+    });
   });
 
-});
+  return () => unsubChats();
 
-    return () => unsubChats();
-  });
-
-  return () => unsubAuth();
-}, []);
-
+}, [user]);
 
 
 useEffect(() => {
