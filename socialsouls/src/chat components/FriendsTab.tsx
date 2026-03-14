@@ -81,14 +81,14 @@ export const FriendsTab = () => {
   const chatRef = doc(db, "Chats", chatId);
   const chatSnap = await getDoc(chatRef);
 
-  //if (!chatSnap.exists()) {
-    //await setDoc(chatRef, {
-      //participants: [currentUserId, friendId],
-      //createdAt: serverTimestamp(),
-      //lastMessage: "",
-      //lastMessageAt: serverTimestamp(),
-    //});
-  //}
+  if (!chatSnap.exists()) {
+    await setDoc(chatRef, {
+      participants: [currentUserId, friendId],
+      createdAt: serverTimestamp(),
+      lastMessage: "",
+      lastMessageAt: serverTimestamp(),
+    });
+  }
 
   await openChat({
     chatId,

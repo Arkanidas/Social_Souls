@@ -98,6 +98,8 @@ useEffect(() => {
   if (isSpamBlocked) return;
   if (isUploading) return;
 
+  
+
   const now = Date.now();
   const receiverId = activeChatUser.otherUser.uid;
 
