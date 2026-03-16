@@ -3,7 +3,7 @@ import { MessageInput } from './MessageInput';
 import { XIcon, SkullIcon, FileInput, PaperclipIcon, X, Download, Copy, ArrowDown  } from 'lucide-react'
 import { auth, db, storage } from '../firebase/firebaseConfig'
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, serverTimestamp, addDoc, orderBy, onSnapshot, getDoc, limit, increment, setDoc } from "firebase/firestore"
+import { collection, query, where, getDocs, doc, updateDoc, arrayUnion, serverTimestamp, addDoc, orderBy, onSnapshot, getDoc, limit, increment, setDoc, startAfter } from "firebase/firestore"
 import { toast } from 'react-hot-toast'
 import { useChat } from "../context/ChatContext";
 import Ghostly from "../assets/ghosts.png";
@@ -62,13 +62,15 @@ export const ChatArea = () => {
   const [messageTimestamps, setMessageTimestamps] = useState<number[]>([]);
   const [isSpamBlocked, setIsSpamBlocked] = useState<boolean>(false);
   const [spamCountdown, setSpamCountdown] = useState<number>(0);
-  const { openChats, activeChatId } = useChat();
+  const {openChats, activeChatId } = useChat();
   const [mutedSouls, setMutedSouls] = useState<string[]>([]);
   const [iBlockedThem, setIBlockedThem] = useState<boolean>(false);
   const [theyBlockedMe, setTheyBlockedMe] = useState<boolean>(false);
   const activeChatUser = openChats.find((chat) => chat.chatId === activeChatId);
   const [lastFriendRequestTime, setLastFriendRequestTime] = useState<number>(0);
   const [lastUploadTime, setLastUploadTime] = useState<number>(0);
+  const [oldestMessage, setOldestMessage] = useState<any>(null);
+  const [loadingOlder, setLoadingOlder] = useState<boolean>(false);
   const BASE_TITLE = "Social Souls";
   
 
@@ -251,7 +253,7 @@ useEffect(() => {
   }
 
   const messagesRef = collection(db, "Chats", activeChatUser.chatId, "messages");
-  const q = query(messagesRef, orderBy("createdAt", "desc"), limit(100));
+  const q = query(messagesRef, orderBy("createdAt", "desc"), limit(50));
 
   const unsubscribe = onSnapshot(q, (snapshot) => {
     const msgs = snapshot.docs.map((doc) => ({id: doc.id, ...doc.data() as Omit<ChatMessage, "id">})).reverse();
@@ -267,6 +269,7 @@ if (lastMsg && lastMsg.id !== lastMessageIdRef.current && lastMsg.senderId !== u
 
 lastMessageIdRef.current = lastMsg?.id || null;
     setUserMessages(msgs);
+    setOldestMessage(snapshot.docs[snapshot.docs.length - 1]);
 });
 
   return () => unsubscribe();
@@ -286,6 +289,55 @@ useEffect(() => {
   return () => unsub();
 }, []);
 
+const loadOlderMessages = async () => {
+  if (loadingOlder) return;
+  if (!oldestMessage || !activeChatUser?.chatId) return;
+
+   setLoadingOlder(true); 
+const container = messagesContainerRef.current;
+  if (!container) return;
+
+  const previousScrollHeight = container.scrollHeight;
+
+const messagesRef = collection(
+    db,
+    "Chats",
+    activeChatUser.chatId,
+    "messages"
+  );
+
+const q = query(
+    messagesRef,
+    orderBy("createdAt", "desc"),
+    startAfter(oldestMessage),
+    limit(50)
+  );
+
+const snapshot = await getDocs(q);
+  if (snapshot.empty) {
+  setLoadingOlder(false);
+  return;
+}
+
+const olderMsgs = snapshot.docs
+    .map(doc => ({
+      id: doc.id,
+      ...doc.data()as Omit<ChatMessage, "id">
+    }))
+    .reverse();
+
+  setUserMessages(prev => [...olderMsgs, ...prev]);
+
+  setOldestMessage(snapshot.docs[snapshot.docs.length - 1]);
+
+  requestAnimationFrame(() => {
+    const newScrollHeight = container.scrollHeight;
+    container.scrollTop += newScrollHeight - previousScrollHeight;
+  });
+
+  setLoadingOlder(false);
+};
+
 // Play sound on new message if not muted
 useEffect(() => {
   if (!activeChatUser) return;
@@ -304,6 +356,7 @@ useEffect(() => {
   }
 
   prevMessageCountRef.current = Usermessages.length;
+
 }, [Usermessages, activeChatUser, mutedSouls, play]);
 
 
@@ -608,7 +661,7 @@ return <div className="flex-1 flex flex-col relative">
 
 {isChatBlocked && (<BlockNotice theyBlockedMe={theyBlockedMe} iBlockedThem={iBlockedThem} activeChatUser={activeChatUser}/>)}
 
-{isUploading && (
+{isUploading &&(
   <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-md flex items-center justify-center">
     <svg
       aria-hidden="true"
@@ -628,15 +681,21 @@ return <div className="flex-1 flex flex-col relative">
 )}
 
 
+
     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95 shadow-[inset_0px_0px_100px_50px_rgba(0,_0,_0,_0.8)]" ref={messagesContainerRef}
      onScroll={() => {
     const scroller = messagesContainerRef.current;
     if (!scroller) return;
 
-    const isNearBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 550;
+    const isNearBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 3000;
 
     setShowScrollToBottom(!isNearBottom);
+
+    if (scroller.scrollTop <= 50 && !loadingOlder) {
+    loadOlderMessages();
+  }
   }}
+  
 
      onDragEnter={(e) => {e.preventDefault(); setIsDragging(true);}}
 
@@ -651,6 +710,11 @@ return <div className="flex-1 flex flex-col relative">
     const validFiles = validateFiles(droppedFiles);
     setAttachments((prev) => [...prev, ...validFiles]);
   }}>
+    {loadingOlder && (
+  <div className="flex justify-center py-2">
+    <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+)}
 
 {isDragging && (
   <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center pointer-events-none border-dashed border-4 border-purple-500 rounded-xl">
@@ -673,8 +737,7 @@ return <div className="flex-1 flex flex-col relative">
       shadow-lg
       animate-bounce
       transition"
-    title="Scroll to latest"
-  >
+    title="Scroll to latest">
     <ArrowDown size={29}/>
   </button>
 )}

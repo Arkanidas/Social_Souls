@@ -123,7 +123,7 @@ export const DeleteAccountConfirmModal = () => {
           <button
             disabled={isDeleting}
             onClick={() => handleDeleteAccount(password)}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-red-600 hover:bg-red-800 text-white transition shadow-lg shadow-purple-500/30 cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-red-600 hover:bg-red-800 text-white transition shadow-lg shadow-red-800 cursor-pointer"
           >
           <span>End me</span>
           <Skull size={15} />
