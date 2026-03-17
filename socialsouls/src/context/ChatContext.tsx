@@ -72,14 +72,16 @@ useEffect(() => {
             (p: string) => p !== user.uid
           );
 
+          const otherUserData = chat.userData?.[otherUid];
+          
           const newChat = {
             chatId: chat.chatId,
             otherUser: {
-              uid: otherUid,
-              username: chat.otherUsername || "Unknown",
-              profilePic: chat.otherUserPic || ""
-            }
-          };
+             uid: otherUid,
+             username: otherUserData?.username || "Unknown",
+             profilePic: otherUserData?.profilePic || ""
+  }
+};
 
           return [...prev, newChat];
         });

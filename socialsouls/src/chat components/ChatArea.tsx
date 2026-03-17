@@ -42,7 +42,6 @@ export const ChatArea = () => {
   const [otherUserStatus, setOtherUserStatus] = useState<"online" | "idle"| "offline">("offline");
   const [showAddFriend, setShowAddFriend] = useState<boolean>(false);
   const addFriendInputRef = useRef<HTMLInputElement>(null);
-  const bottomScroll = useRef<HTMLDivElement>(null);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -62,7 +61,7 @@ export const ChatArea = () => {
   const [messageTimestamps, setMessageTimestamps] = useState<number[]>([]);
   const [isSpamBlocked, setIsSpamBlocked] = useState<boolean>(false);
   const [spamCountdown, setSpamCountdown] = useState<number>(0);
-  const {openChats, activeChatId } = useChat();
+  const {openChats, activeChatId, openChat } = useChat();
   const [mutedSouls, setMutedSouls] = useState<string[]>([]);
   const [iBlockedThem, setIBlockedThem] = useState<boolean>(false);
   const [theyBlockedMe, setTheyBlockedMe] = useState<boolean>(false);
@@ -121,16 +120,28 @@ const chatSnap = await getDoc(chatRef);
 
 if (!chatSnap.exists()) {
   await setDoc(chatRef, {
-    participants: [user.uid, receiverId],
-    createdAt: serverTimestamp(),
-    lastMessage: "",
-    lastMessageAt: serverTimestamp(),
-    unreadCount: {
-      [user.uid]: 0,
-      [receiverId]: 0
+  participants: [user.uid, receiverId],
+  createdAt: serverTimestamp(),
+  lastMessage: "",
+  lastMessageAt: serverTimestamp(),
+
+  userData: {
+    [user.uid]: {
+      username: user.displayName,
+      profilePic: user.photoURL
+    },
+    [receiverId]: {
+      username: activeChatUser.otherUser.username,
+      profilePic: activeChatUser.otherUser.profilePic
     }
-  });
-}
+  },
+
+  unreadCount: {
+    [user.uid]: 0,
+    [receiverId]: 0
+  }
+})};
+
   setIsUploading(true);
 
   try{
@@ -167,12 +178,26 @@ const updateData: any = {
   lastMessageAt: serverTimestamp(),
 };
 
-if (activeChatId !== chatId) {
   updateData[`unreadCount.${receiverId}`] = increment(1);
-}
+
 
 await updateDoc(doc(db, "Chats", chatId), updateData);
 
+await updateDoc(doc(db, "users", receiverId), {
+  openChats: arrayUnion({
+    chatId,
+    otherUser: {
+      uid: user.uid,
+      username: user.displayName,
+      profilePic: user.photoURL
+    }
+  })
+});
+
+await openChat({
+  chatId,
+  otherUser: activeChatUser.otherUser
+});
 
   setAttachments([]);
 
@@ -185,6 +210,8 @@ await updateDoc(doc(db, "Chats", chatId), updateData);
     setIsUploading(false);
   }
 };
+
+
 
 
    // Update document title based on unread messages
@@ -746,7 +773,7 @@ return <div className="flex-1 flex flex-col relative">
     const isOwnMessage = message.senderId === user?.uid;
 
     return (
-      <div key={message.id} className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`} ref={bottomScroll}>
+      <div key={message.id} className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}>
 
        <div className={`max-w-[50%] p-4 rounded-lg ${
         isOwnMessage
@@ -756,7 +783,7 @@ return <div className="flex-1 flex flex-col relative">
        <p className="mb-1 text-base font-bold text-lg">
         {isOwnMessage ? "You" : activeChatUser?.otherUser.username}
        </p>
-    <div ref={bottomRef} />
+  
 
   {message.attachments && message.attachments.length > 0 && (
     <div className="flex flex-wrap gap-2 mb-2">
@@ -803,7 +830,7 @@ return <div className="flex-1 flex flex-col relative">
       
     );
   })}
-
+  <div ref={bottomRef} />
 </div>
 
 
