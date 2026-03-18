@@ -3,7 +3,7 @@ import { ChatItem } from "./ChatItem";
 
 export const ChatTab = () => {
 
-  const { userChats, activeChatId, openChats } = useChat();
+  const { activeChatId, openChats } = useChat();
 
   
   if (openChats.length === 0) {

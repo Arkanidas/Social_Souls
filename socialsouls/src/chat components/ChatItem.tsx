@@ -90,7 +90,7 @@ useEffect(() => {
       </button>
 
       {!isActive && unread > 0 && (
-  <div className="ml-auto bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
+  <div className="ml-auto bg-purple-600 text-white text-xs px-2.5 py-1 rounded-full relative right-20">
     {unread}
   </div>
 )}

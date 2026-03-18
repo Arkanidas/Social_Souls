@@ -59,16 +59,9 @@ useEffect(() => {
 
     chats.forEach((chat: any) => {
 
-      const unread = chat.unreadCount?.[user.uid] || 0;
-
-      if (unread > 0) {
-
-        setOpenChats(prev => {
-
-          const exists = prev.some(c => c.chatId === chat.chatId);
-          if (exists) return prev;
-
-          const otherUid = chat.participants.find(
+    const unread = chat.unreadCount?.[user.uid] || 0;
+    
+     const otherUid = chat.participants.find(
             (p: string) => p !== user.uid
           );
 
@@ -79,16 +72,25 @@ useEffect(() => {
             otherUser: {
              uid: otherUid,
              username: otherUserData?.username || "Unknown",
-             profilePic: otherUserData?.profilePic || ""
-  }
-};
+             profilePic: otherUserData?.profilePic || ""}};
 
-          return [...prev, newChat];
+
+        setOpenChats(prev => {
+          const exists = prev.some(c => c.chatId === chat.chatId);
+       
+if (unread > 0) {
+    if (exists) return prev;
+    return [...prev, newChat];
+  }
+         if (unread === 0 && exists) {
+    return prev.filter(c => c.chatId !== chat.chatId);
+  }
+
+           return prev;
         });
-      }
+      
     });
   });
-
   return () => unsubChats();
 
 }, [user]);
@@ -123,13 +125,15 @@ useEffect(() => {
 }, [user]);
 
 
-
-
+// function for adding a chat to ChatsTab between users 
 const openChat = async (chat: OpenChat) => {
   if (!user) return;
 
   const exists = openChats.some(c => c.chatId === chat.chatId);
   const updatedChats = exists ? openChats : [...openChats, chat];
+
+  setOpenChats(updatedChats);
+  setActiveChatId(chat.chatId);
 
   await updateDoc(doc(db, "users", user.uid), {
     openChats: updatedChats,
@@ -142,7 +146,7 @@ const openChat = async (chat: OpenChat) => {
   });
 };
 
-
+  // function for closing/removing a chat in chatsTab
 const closeChat = async (chatId: string): Promise<void> => {
   if (!user) return;
 

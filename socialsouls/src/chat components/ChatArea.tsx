@@ -117,6 +117,8 @@ if (attachments.length > 0 && now - lastUploadTime < 10000) {
   
 const chatRef = doc(db, "Chats", chatId);
 const chatSnap = await getDoc(chatRef);
+const senderSnap = await getDoc(doc(db, "users", user.uid));
+const senderData = senderSnap.data();
 
 if (!chatSnap.exists()) {
   await setDoc(chatRef, {
@@ -127,8 +129,8 @@ if (!chatSnap.exists()) {
 
   userData: {
     [user.uid]: {
-      username: user.displayName,
-      profilePic: user.photoURL
+      username: senderData?.username || "Unknown Ghost",
+      profilePic: senderData?.profilePic || Ghostly
     },
     [receiverId]: {
       username: activeChatUser.otherUser.username,
@@ -181,15 +183,16 @@ const updateData: any = {
   updateData[`unreadCount.${receiverId}`] = increment(1);
 
 
+
 await updateDoc(doc(db, "Chats", chatId), updateData);
 
 await updateDoc(doc(db, "users", receiverId), {
   openChats: arrayUnion({
     chatId,
     otherUser: {
-      uid: user.uid,
-      username: user.displayName,
-      profilePic: user.photoURL
+     uid: user.uid,
+     username: senderData?.username || "Unknown Ghost",
+     profilePic: senderData?.profilePic || Ghostly
     }
   })
 });
@@ -210,7 +213,6 @@ await openChat({
     setIsUploading(false);
   }
 };
-
 
 
 
@@ -815,7 +817,7 @@ return <div className="flex-1 flex flex-col relative">
   )}
 
   {message.text && (
-    <p className="mb-2 font-[messageFont] text-lg break-words break-all whitespace-pre-wrap max-w-full">
+    <p className="mb-2 font-[messageFont] text-xl break-words break-all whitespace-pre-wrap max-w-full">
       {message.text}
     </p>
   )}
