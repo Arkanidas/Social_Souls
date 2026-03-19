@@ -84,11 +84,16 @@ export const ChatArea = () => {
 
 // Scroll to bottom when messages change
 useEffect(() => {
- if (!showScrollToBottom) {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  const container = messagesContainerRef.current;
+  if (!container) return;
+
+  const isNearBottom =
+    container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+
+  if (isNearBottom) {
+    bottomRef.current?.scrollIntoView({ behavior: "auto" }); // 👈 no smooth!
   }
 }, [Usermessages]);
-
 
    //function for sending a message
   const handleSendMessage = async (text: string) => {
