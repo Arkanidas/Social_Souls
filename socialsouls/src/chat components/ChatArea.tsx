@@ -16,7 +16,7 @@ import { PerishModal } from './PerishModal';
 import {DeleteAccountConfirmModal} from '../chat components/DeleteAccModal';
 
 
-
+// creating a custom modal event waiting to be called
 export const showAddFriendModal = () => {
   const event = new CustomEvent('showAddFriendModal')
   window.dispatchEvent(event)
@@ -84,16 +84,22 @@ export const ChatArea = () => {
 
 // Scroll to bottom when messages change
 useEffect(() => {
+  if (loadingOlder) return;
+
   const container = messagesContainerRef.current;
   if (!container) return;
 
   const isNearBottom =
-    container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+    container.scrollHeight - container.scrollTop - container.clientHeight < 200;
 
   if (isNearBottom) {
-    bottomRef.current?.scrollIntoView({ behavior: "auto" }); // 👈 no smooth!
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: "smooth",
+    });
   }
-}, [Usermessages]);
+}, [Usermessages, loadingOlder]);
+
 
    //function for sending a message
   const handleSendMessage = async (text: string) => {
@@ -103,8 +109,6 @@ useEffect(() => {
   if (isChatBlocked) return;
   if (isSpamBlocked) return;
   if (isUploading) return;
-
-  
 
   const now = Date.now();
   const receiverId = activeChatUser.otherUser.uid;
