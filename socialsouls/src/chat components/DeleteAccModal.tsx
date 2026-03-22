@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 
 
-
+// creates a listener for showDeleteAccountModal to execute when called
 export const showDeleteAccountModal = () => {
   window.dispatchEvent(new CustomEvent("showDeleteAccountModal"));
 };
