@@ -52,6 +52,7 @@ export const ChatArea = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [lastSeen, setLastSeen] = useState<number | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const scrollPositionRef = useRef(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const { play } = useNotificationSound();
@@ -80,25 +81,19 @@ export const ChatArea = () => {
   return value.charAt(0).toUpperCase() + value.slice(1);
 };
 
-
+useEffect(() => {
+  setUserMessages([]);
+  setOldestMessage(null);
+}, [activeChatUser?.chatId]);
 
 // Scroll to bottom when messages change
 useEffect(() => {
-  if (loadingOlder) return;
-
   const container = messagesContainerRef.current;
   if (!container) return;
 
-  const isNearBottom =
-    container.scrollHeight - container.scrollTop - container.clientHeight < 200;
-
-  if (isNearBottom) {
-    container.scrollTo({
-      top: container.scrollHeight,
-      behavior: "smooth",
-    });
-  }
-}, [Usermessages, loadingOlder]);
+  container.scrollTop =
+    container.scrollHeight - scrollPositionRef.current;
+}, [Usermessages]);
 
 
    //function for sending a message
@@ -306,7 +301,17 @@ if (lastMsg && lastMsg.id !== lastMessageIdRef.current && lastMsg.senderId !== u
 }
 
 lastMessageIdRef.current = lastMsg?.id || null;
-    setUserMessages(msgs);
+  setUserMessages(prev => {
+  const map = new Map();
+
+  [...prev, ...msgs].forEach(msg => {
+    map.set(msg.id, msg);
+  });
+
+  return Array.from(map.values()).sort((a, b) => {
+    return (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0);
+  });
+});
     setOldestMessage(snapshot.docs[snapshot.docs.length - 1]);
 });
 
@@ -334,6 +339,11 @@ const loadOlderMessages = async () => {
    setLoadingOlder(true); 
 const container = messagesContainerRef.current;
   if (!container) return;
+
+  if (container) {
+  scrollPositionRef.current =
+    container.scrollHeight - container.scrollTop;
+}
 
   const previousScrollHeight = container.scrollHeight;
 
@@ -733,10 +743,7 @@ return <div className="flex-1 flex flex-col relative">
     loadOlderMessages();
   }
   }}
-  
-
      onDragEnter={(e) => {e.preventDefault(); setIsDragging(true);}}
-
      onDragOver={handleDragOver}
       onDragLeave={(e) => {
        if (e.currentTarget === e.target) {
@@ -764,9 +771,15 @@ return <div className="flex-1 flex flex-col relative">
 
 {showScrollToBottom && (
   <button
-    onClick={() =>
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-    }
+   onClick={() => {
+  const container = messagesContainerRef.current;
+  if (!container) return;
+
+  container.scrollTo({
+    top: container.scrollHeight,
+    behavior: "smooth",
+  });
+}}
     className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 bg-gray-400/20 hover:bg-purple-700 text-white px-3 w-14 h-14
       rounded-full
       duration-300
@@ -841,7 +854,7 @@ return <div className="flex-1 flex flex-col relative">
       
     );
   })}
-  <div ref={bottomRef} />
+
 </div>
 
 
