@@ -52,8 +52,7 @@ export const ChatArea = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [lastSeen, setLastSeen] = useState<number | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const scrollPositionRef = useRef(0);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const shouldScrollToBottomRef = useRef<boolean>(true);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const { play } = useNotificationSound();
   const prevMessageCountRef = useRef<number>(0);
@@ -89,11 +88,12 @@ useEffect(() => {
 // Scroll to bottom when messages change
 useEffect(() => {
   const container = messagesContainerRef.current;
-  if (!container) return;
+  if (!container || loadingOlder) return;
 
-  container.scrollTop =
-    container.scrollHeight - scrollPositionRef.current;
-}, [Usermessages]);
+  if (shouldScrollToBottomRef.current) {
+    container.scrollTop = container.scrollHeight;
+  }
+}, [Usermessages, loadingOlder]);
 
 
    //function for sending a message
@@ -150,6 +150,8 @@ if (!chatSnap.exists()) {
 
   setIsUploading(true);
 
+  shouldScrollToBottomRef.current = true;
+
   try{
 
   let uploadedAttachments: any[] = [];
@@ -185,8 +187,6 @@ const updateData: any = {
 };
 
   updateData[`unreadCount.${receiverId}`] = increment(1);
-
-
 
 await updateDoc(doc(db, "Chats", chatId), updateData);
 
@@ -336,55 +336,53 @@ const loadOlderMessages = async () => {
   if (loadingOlder) return;
   if (!oldestMessage || !activeChatUser?.chatId) return;
 
-   setLoadingOlder(true); 
-const container = messagesContainerRef.current;
+  setLoadingOlder(true);
+
+  const container = messagesContainerRef.current;
   if (!container) return;
 
-  if (container) {
-  scrollPositionRef.current =
-    container.scrollHeight - container.scrollTop;
-}
 
+  const previousScrollTop = container.scrollTop;
   const previousScrollHeight = container.scrollHeight;
 
-const messagesRef = collection(
+  const messagesRef = collection(
     db,
     "Chats",
     activeChatUser.chatId,
     "messages"
   );
 
-const q = query(
+  const q = query(
     messagesRef,
     orderBy("createdAt", "desc"),
     startAfter(oldestMessage),
     limit(50)
   );
 
-const snapshot = await getDocs(q);
+  const snapshot = await getDocs(q);
   if (snapshot.empty) {
-  setLoadingOlder(false);
-  return;
-}
+    setLoadingOlder(false);
+    return;
+  }
 
-const olderMsgs = snapshot.docs
-    .map(doc => ({
+  const olderMsgs = snapshot.docs
+    .map((doc) => ({
       id: doc.id,
-      ...doc.data()as Omit<ChatMessage, "id">
+      ...(doc.data() as Omit<ChatMessage, "id">),
     }))
     .reverse();
 
-  setUserMessages(prev => [...olderMsgs, ...prev]);
-
+  setUserMessages((prev) => [...olderMsgs, ...prev]);
   setOldestMessage(snapshot.docs[snapshot.docs.length - 1]);
 
   requestAnimationFrame(() => {
     const newScrollHeight = container.scrollHeight;
-    container.scrollTop += newScrollHeight - previousScrollHeight;
+    container.scrollTop = previousScrollTop + (newScrollHeight - previousScrollHeight);
+    setLoadingOlder(false);
   });
-
-  setLoadingOlder(false);
 };
+
+
 
 // Play sound on new message if not muted
 useEffect(() => {
@@ -732,17 +730,19 @@ return <div className="flex-1 flex flex-col relative">
 
     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/95 shadow-[inset_0px_0px_100px_50px_rgba(0,_0,_0,_0.8)]" ref={messagesContainerRef}
      onScroll={() => {
-    const scroller = messagesContainerRef.current;
-    if (!scroller) return;
+  const scroller = messagesContainerRef.current;
+  if (!scroller) return;
 
-    const isNearBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 3000;
+  const distFromBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight;
+  const isNearBottom = distFromBottom < 1500;
 
-    setShowScrollToBottom(!isNearBottom);
+  shouldScrollToBottomRef.current = isNearBottom;
+  setShowScrollToBottom(!isNearBottom);
 
-    if (scroller.scrollTop <= 50 && !loadingOlder) {
+  if (scroller.scrollTop <= 50 && !loadingOlder) {
     loadOlderMessages();
   }
-  }}
+}}
      onDragEnter={(e) => {e.preventDefault(); setIsDragging(true);}}
      onDragOver={handleDragOver}
       onDragLeave={(e) => {
