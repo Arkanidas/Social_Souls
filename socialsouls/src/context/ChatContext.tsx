@@ -57,39 +57,43 @@ useEffect(() => {
 
     setUserChats(chats);
 
-    chats.forEach((chat: any) => {
+const newOpenChats: OpenChat[] = [];
 
-    const unread = chat.unreadCount?.[user.uid] || 0;
+chats.forEach((chat: any) => {
+  const unread = chat.unreadCount?.[user.uid] || 0;
+
+  if (unread > 0) {
+    const otherUid = chat.participants.find(
+      (p: string) => p !== user.uid
+    );
+
+    const otherUserData = chat.userData?.[otherUid];
+
     
-     const otherUid = chat.participants.find(
-            (p: string) => p !== user.uid
-          );
 
-          const otherUserData = chat.userData?.[otherUid];
-          
-          const newChat = {
-            chatId: chat.chatId,
-            otherUser: {
-             uid: otherUid,
-             username: otherUserData?.username || "Unknown",
-             profilePic: otherUserData?.profilePic || ""}};
-
-
-        setOpenChats(prev => {
-          const exists = prev.some(c => c.chatId === chat.chatId);
-       
-if (unread > 0) {
-    if (exists) return prev;
-    return [...prev, newChat];
-  }
-         if (unread === 0 && exists) {
-    return prev.filter(c => c.chatId !== chat.chatId);
-  }
-
-           return prev;
-        });
-      
+    newOpenChats.push({
+      chatId: chat.chatId,
+      otherUser: {
+        uid: otherUid,
+        username: otherUserData?.username || "Unknown ghost",
+        profilePic: otherUserData?.profilePic || ""
+      }
     });
+  }
+});
+
+setOpenChats(prev => {
+  const merged = [...prev];
+
+  newOpenChats.forEach(chat => {
+    if (!merged.some(c => c.chatId === chat.chatId)) {
+      merged.push(chat);
+    }
+  });
+
+  return merged;
+});
+
   });
   return () => unsubChats();
 
@@ -117,7 +121,20 @@ useEffect(() => {
     if (!snap.exists()) return;
 
     const data = snap.data();
-    setOpenChats(data.openChats || []);
+
+    setOpenChats(prev => {
+  const fromDb = data.openChats || [];
+
+  const merged = [...prev];
+
+  fromDb.forEach((chat: OpenChat) => {
+    if (!merged.some(c => c.chatId === chat.chatId)) {
+      merged.push(chat);
+    }
+  });
+
+  return merged;
+});
     setActiveChatId(data.activeChatId || null);
   });
 

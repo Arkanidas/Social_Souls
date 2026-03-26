@@ -190,16 +190,7 @@ const updateData: any = {
 
 await updateDoc(doc(db, "Chats", chatId), updateData);
 
-await updateDoc(doc(db, "users", receiverId), {
-  openChats: arrayUnion({
-    chatId,
-    otherUser: {
-     uid: user.uid,
-     username: senderData?.username || "Unknown Ghost",
-     profilePic: senderData?.profilePic || Ghostly
-    }
-  })
-});
+
 
 await openChat({
   chatId,
