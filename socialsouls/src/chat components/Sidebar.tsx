@@ -61,7 +61,7 @@ export const Sidebar = ({profile, onProfileUpdated}:SidebarProps) => {
 
   
 
- // Fetches FriendsTab info
+ // Fetches FriendsTab info data
 useEffect(() => {
   const user = auth.currentUser;
   if (!user) return;
