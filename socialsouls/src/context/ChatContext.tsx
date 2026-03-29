@@ -27,7 +27,7 @@ type OpenChat = {
   otherUser: {
     uid: string;
     username: string;
-    profilePic: string;
+    profilePic: string | any;
   };
 };
 
@@ -69,7 +69,6 @@ chats.forEach((chat: any) => {
 
     const otherUserData = chat.userData?.[otherUid];
 
-    
 
     newOpenChats.push({
       chatId: chat.chatId,
@@ -80,18 +79,6 @@ chats.forEach((chat: any) => {
       }
     });
   }
-});
-
-setOpenChats(prev => {
-  const merged = [...prev];
-
-  newOpenChats.forEach(chat => {
-    if (!merged.some(c => c.chatId === chat.chatId)) {
-      merged.push(chat);
-    }
-  });
-
-  return merged;
 });
 
   });
