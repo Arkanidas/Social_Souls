@@ -48,40 +48,42 @@ useEffect(() => {
     orderBy("lastMessageAt", "desc")
   );
 
-  const unsubChats = onSnapshot(q, (snapshot) => {
+ const unsubChats = onSnapshot(q, (snapshot) => {
+  const chats = snapshot.docs.map(doc => ({
+    chatId: doc.id,
+    ...doc.data(),
+  }));
 
-    const chats = snapshot.docs.map(doc => ({
-      chatId: doc.id,
-      ...doc.data(),
-    }));
-
-    setUserChats(chats);
-
-const newOpenChats: OpenChat[] = [];
-
-chats.forEach((chat: any) => {
-  const unread = chat.unreadCount?.[user.uid] || 0;
-
-  if (unread > 0) {
-    const otherUid = chat.participants.find(
-      (p: string) => p !== user.uid
-    );
-
-    const otherUserData = chat.userData?.[otherUid];
+  setUserChats(chats);
 
 
-    newOpenChats.push({
-      chatId: chat.chatId,
-      otherUser: {
-        uid: otherUid,
-        username: otherUserData?.username || "Unknown ghost",
-        profilePic: otherUserData?.profilePic || ""
+  setOpenChats(prev => {
+    const updated = [...prev];
+
+    chats.forEach((chat: any) => {
+      const unread = chat.unreadCount?.[user.uid] || 0;
+      const alreadyOpen = updated.some(c => c.chatId === chat.chatId);
+
+      if (unread > 0 && !alreadyOpen) {
+        const otherUid = chat.participants.find(
+          (p: string) => p !== user.uid
+        );
+        const otherUserData = chat.userData?.[otherUid];
+
+        updated.push({
+          chatId: chat.chatId,
+          otherUser: {
+            uid: otherUid,
+            username: otherUserData?.username || "Unknown Ghost",
+            profilePic: otherUserData?.profilePic || "",
+          },
+        });
       }
     });
-  }
-});
 
+    return updated;
   });
+});
   return () => unsubChats();
 
 }, [user]);
@@ -108,20 +110,18 @@ useEffect(() => {
     if (!snap.exists()) return;
 
     const data = snap.data();
+    const fromDb: OpenChat[] = data.openChats || [];
 
     setOpenChats(prev => {
-  const fromDb = data.openChats || [];
+      const merged = [...fromDb];
+      prev.forEach(localChat => {
+        if (!merged.some(c => c.chatId === localChat.chatId)) {
+          merged.push(localChat);
+        }
+      });
+      return merged;
+    });
 
-  const merged = [...prev];
-
-  fromDb.forEach((chat: OpenChat) => {
-    if (!merged.some(c => c.chatId === chat.chatId)) {
-      merged.push(chat);
-    }
-  });
-
-  return merged;
-});
     setActiveChatId(data.activeChatId || null);
   });
 
@@ -157,12 +157,14 @@ const closeChat = async (chatId: string): Promise<void> => {
   const updated = openChats.filter(c => c.chatId !== chatId);
   const nextActive = activeChatId === chatId ? updated[0]?.chatId || null : activeChatId;
 
+  setOpenChats(updated);
+  setActiveChatId(nextActive);
+
   await updateDoc(doc(db, "users", user.uid), {
     openChats: updated,
     activeChatId: nextActive,
   });
 };
-
 
   return (
     <ChatContext.Provider value={{openChats, activeChatId, openChat, closeChat, setActiveChatId, userChats}}>

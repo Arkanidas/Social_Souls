@@ -181,14 +181,22 @@ if (!chatSnap.exists()) {
 
   
 const updateData: any = {
-  lastMessage:
-    text || (uploadedAttachments.length > 0 ? "Attachment" : ""),
+  lastMessage: text || (uploadedAttachments.length > 0 ? "Attachment" : ""),
   lastMessageAt: serverTimestamp(),
+
+  [`userData.${user.uid}`]: {
+    username: senderData?.username || "Unknown Ghost",
+    profilePic: senderData?.profilePic || Ghostly,
+  },
+  [`userData.${receiverId}`]: {
+    username: activeChatUser.otherUser.username,
+    profilePic: activeChatUser.otherUser.profilePic,
+  },
 };
 
   updateData[`unreadCount.${receiverId}`] = increment(1);
 
-await updateDoc(doc(db, "Chats", chatId), updateData);
+  await updateDoc(doc(db, "Chats", chatId), updateData);
 
 
 
