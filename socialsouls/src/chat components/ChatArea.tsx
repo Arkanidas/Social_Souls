@@ -70,6 +70,9 @@ export const ChatArea = () => {
   const [lastUploadTime, setLastUploadTime] = useState<number>(0);
   const [oldestMessage, setOldestMessage] = useState<any>(null);
   const [loadingOlder, setLoadingOlder] = useState<boolean>(false);
+  const [isOtherUserTyping, setIsOtherUserTyping] = useState<boolean>(false);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const BASE_TITLE = "Social Souls";
   
 
@@ -104,6 +107,8 @@ useEffect(() => {
   if (isChatBlocked) return;
   if (isSpamBlocked) return;
   if (isUploading) return;
+
+  handleTypingChange(false);
 
   const now = Date.now();
   const receiverId = activeChatUser.otherUser.uid;
@@ -228,18 +233,52 @@ await openChat({
   }
 }, [unreadCount]);
 
+
+
 useEffect(() => {
   if (!user || !activeChatUser?.otherUser?.uid) return;
+  if (!activeChatUser?.chatId || !user) return;
 
+  const chatRef = doc(db, "Chats", activeChatUser.chatId);
   const ref = doc(db, "users", user.uid);
 
   const unsub = onSnapshot(ref, snap => {
+  
+    const data = snap.data();
+    if (!data) return;
+
+    const otherUid = activeChatUser.otherUser.uid;
+    setIsOtherUserTyping(data.typing?.[otherUid] === true);
+
     const blocked = snap.data()?.blockedSouls || [];
     setIBlockedThem(blocked.includes(activeChatUser.otherUser.uid));
   });
 
   return () => unsub();
-}, [activeChatUser?.otherUser?.uid]);
+}, [activeChatUser?.otherUser?.uid, activeChatUser?.chatId]);
+
+const handleTypingChange = async (isTyping: boolean) => {
+  if (!user || !activeChatUser?.chatId) return;
+
+  const chatRef = doc(db, "Chats", activeChatUser.chatId);
+
+  if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+  await updateDoc(chatRef, {
+    [`typing.${user.uid}`]: isTyping,
+  }).catch(() => {}); 
+
+
+  if (isTyping) {
+    typingTimeoutRef.current = setTimeout(async () => {
+      await updateDoc(chatRef, {
+        [`typing.${user.uid}`]: false,
+      }).catch(() => {});
+    }, 10000);
+  }
+};
+
+
 
 // Check if they blocked current user 
 useEffect(() => {
@@ -854,6 +893,21 @@ return <div className="flex-1 flex flex-col relative">
     );
   })}
 
+  {isOtherUserTyping && (
+  <div className="flex justify-start">
+    <div className="bg-white text-gray-900 shadow-sm mr-12 px-4 py-3 rounded-lg max-w-[80px]">
+      <p className="mb-2 text-base font-bold text-lg">
+        {activeChatUser?.otherUser.username}
+      </p>
+      <div className="flex items-center gap-1 h-5">
+        <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce [animation-delay:0ms]" />
+        <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce [animation-delay:150ms]" />
+        <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce [animation-delay:300ms]" />
+      </div>
+    </div>
+  </div>
+)}
+
 </div>
 
 
@@ -959,7 +1013,7 @@ return <div className="flex-1 flex flex-col relative">
       setAttachments((prev) => [...prev, ...validFiles]);}}/>
       </div>)}
 
-      <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments} setAttachments={setAttachments} isSpamBlocked={isSpamBlocked} spamCountdown={spamCountdown} isChatBlocked={isChatBlocked} hasActiveChat={!!activeChatUser}/>
+      <MessageInput onSend={handleSendMessage} fileInputRef={fileInputRef} attachments={attachments} setAttachments={setAttachments} isSpamBlocked={isSpamBlocked} spamCountdown={spamCountdown} isChatBlocked={isChatBlocked} hasActiveChat={!!activeChatUser}  onTypingChange={handleTypingChange} />
       <LogoutConfirmModal/>
       <PerishModal/>
       <DeleteAccountConfirmModal/>

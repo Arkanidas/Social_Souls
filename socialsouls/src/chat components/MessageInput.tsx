@@ -12,11 +12,12 @@ type MessageInputProps = {
   spamCountdown: number;
   isChatBlocked: boolean;
   hasActiveChat: boolean;
+  onTypingChange: (isTyping: boolean) => void; 
 };
 
 
 
-export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments, isSpamBlocked, spamCountdown, isChatBlocked, hasActiveChat}:MessageInputProps) => {
+export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments, isSpamBlocked, spamCountdown, isChatBlocked, hasActiveChat, onTypingChange}:MessageInputProps) => {
 
  const [MessageText, setMessageText] = useState<string>("");
  const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
@@ -46,16 +47,19 @@ export const MessageInput = ({onSend, setAttachments, fileInputRef, attachments,
     if (emojiPickerRef.current?.contains(target) || emojiButtonRef.current?.contains(target)) {
       return; 
     }
-
     setShowEmojiPicker(false); 
-  };
-
+};
     document.addEventListener("mousedown", handleClickOutside);
 
   return () => {
     document.removeEventListener("mousedown", handleClickOutside);
   };
 }, []);
+
+useEffect(() => {
+  if (isChatBlocked || !hasActiveChat) return;
+  onTypingChange(MessageText.length > 0);
+}, [MessageText]);
 
 // Close emoji picker if chat gets blocked while it's open
 useEffect(() => {
@@ -69,6 +73,7 @@ useEffect(() => {
     if (isSpamBlocked) return;
     if (isChatBlocked) return;
     if (!MessageText.trim() && attachments.length === 0) return;
+    onTypingChange(false);
     onSend(MessageText);
     setMessageText("");
     setAttachments([]);

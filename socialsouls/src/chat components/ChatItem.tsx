@@ -70,7 +70,7 @@ useEffect(() => {
     
     <div
       onClick={handleChatClick} 
-      className={`flex items-center gap-3 px-3 py-3 cursor-pointer transition  
+      className={`flex items-center gap-3 px-3 py-3 cursor-pointer transition border-b border-gray-800/50
         ${isActive ? "bg-purple-600/30" : "hover:bg-purple-500/10"}
       `}
     >
