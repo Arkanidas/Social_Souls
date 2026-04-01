@@ -85,6 +85,7 @@ export const ChatArea = () => {
 
 useEffect(() => {
   setUserMessages([]);
+  setIsOtherUserTyping(false); 
   setOldestMessage(null);
 }, [activeChatUser?.chatId]);
 
@@ -234,28 +235,35 @@ await openChat({
 }, [unreadCount]);
 
 
-
 useEffect(() => {
   if (!user || !activeChatUser?.otherUser?.uid) return;
-  if (!activeChatUser?.chatId || !user) return;
 
-  const chatRef = doc(db, "Chats", activeChatUser.chatId);
   const ref = doc(db, "users", user.uid);
 
   const unsub = onSnapshot(ref, snap => {
-  
-    const data = snap.data();
-    if (!data) return;
-
-    const otherUid = activeChatUser.otherUser.uid;
-    setIsOtherUserTyping(data.typing?.[otherUid] === true);
-
     const blocked = snap.data()?.blockedSouls || [];
     setIBlockedThem(blocked.includes(activeChatUser.otherUser.uid));
   });
 
   return () => unsub();
-}, [activeChatUser?.otherUser?.uid, activeChatUser?.chatId]);
+}, [activeChatUser?.otherUser?.uid]);
+
+
+useEffect(() => {
+  if (!user || !activeChatUser?.chatId) return;
+
+  const chatRef = doc(db, "Chats", activeChatUser.chatId);
+
+  const unsub = onSnapshot(chatRef, snap => {
+    const data = snap.data();
+    if (!data) return;
+    const otherUid = activeChatUser.otherUser.uid;
+    setIsOtherUserTyping(data.typing?.[otherUid] === true); 
+  });
+
+  return () => unsub();
+}, [activeChatUser?.chatId, activeChatUser?.otherUser?.uid]);
+
 
 const handleTypingChange = async (isTyping: boolean) => {
   if (!user || !activeChatUser?.chatId) return;
@@ -274,7 +282,7 @@ const handleTypingChange = async (isTyping: boolean) => {
       await updateDoc(chatRef, {
         [`typing.${user.uid}`]: false,
       }).catch(() => {});
-    }, 10000);
+    }, 60000);
   }
 };
 
@@ -700,8 +708,8 @@ return null
  
   
 return <div className="flex-1 flex flex-col relative">
-      <div className="p-4 border-b backdrop-blur-sm border-white/8 bg-zinc-950 flex items-center ">
-        <div className="flex items-center">
+      <div className="p-4 border-b border-white/8 bg-zinc-950 flex items-center overflow-visible relative">
+        <div className="flex items-center overflow-visible">
           <div className="w-11 h-11 rounded-full overflow-hidden border-1 border-purple-400 cursor-pointer" onClick={() => {
              if (!activeChatUser) return;
                 showUserProfileModal(activeChatUser.otherUser.uid);}}>
@@ -734,7 +742,7 @@ return <div className="flex-1 flex flex-col relative">
           : "text-gray-400 shadow-[-1px_0px_23px_15px_rgba(0,_0,_0,_0.3)]"}/>
 
         {otherUserStatus === "offline" && lastSeen && (
-            <div className="absolute top-full left-0 mt-1 px-2 py-1 rounded-md text-xs bg-gray-50 text-black opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            <div className="absolute z-50 top-full left-0 mt-1 px-2 py-1 rounded-md text-xs bg-gray-50 text-black opacity-0 group-hover:opacity-100 transition pointer-events-none">
                Last seen {formatLastSeen(lastSeen)}
             </div>)}
            </div>)}
@@ -881,6 +889,7 @@ return <div className="flex-1 flex flex-col relative">
       {message.text}
     </p>
   )}
+  
 
   {message.createdAt && (
     <p className="text-xs opacity-70">
@@ -894,17 +903,13 @@ return <div className="flex-1 flex flex-col relative">
   })}
 
   {isOtherUserTyping && (
-  <div className="flex justify-start">
-    <div className="bg-white text-gray-900 shadow-sm mr-12 px-4 py-3 rounded-lg max-w-[80px]">
-      <p className="mb-2 text-base font-bold text-lg">
-        {activeChatUser?.otherUser.username}
-      </p>
-      <div className="flex items-center gap-1 h-5">
-        <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce [animation-delay:0ms]" />
-        <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce [animation-delay:150ms]" />
-        <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce [animation-delay:300ms]" />
+  <div className="flex justify-start">   
+      <div className="flex items-center gap-5 h-9">
+        <span className="w-5 h-5 rounded-full bg-purple-500 animate-bounce [animation-delay:0ms]" />
+        <span className="w-5 h-5 rounded-full bg-purple-500 animate-bounce [animation-delay:150ms]" />
+        <span className="w-5 h-5 rounded-full bg-purple-500 animate-bounce [animation-delay:300ms]" />
       </div>
-    </div>
+ 
   </div>
 )}
 
