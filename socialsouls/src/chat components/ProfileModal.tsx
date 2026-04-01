@@ -38,6 +38,7 @@ export const UserProfileModal = () => {
   setProfile(null);
 };
 
+  //listen to ProfileModal call and then execute it 
   useEffect(() => {
     const handler = async (e: any) => {
 
