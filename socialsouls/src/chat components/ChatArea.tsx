@@ -252,9 +252,9 @@ useEffect(() => {
 useEffect(() => {
   if (!user || !activeChatUser?.chatId) return;
 
-  const chatRef = doc(db, "Chats", activeChatUser.chatId);
+  const chatRefer = doc(db, "Chats", activeChatUser.chatId);
 
-  const unsub = onSnapshot(chatRef, snap => {
+  const unsub = onSnapshot(chatRefer, snap => {
     const data = snap.data();
     if (!data) return;
     const otherUid = activeChatUser.otherUser.uid;
