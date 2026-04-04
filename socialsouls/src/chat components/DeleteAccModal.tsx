@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { XIcon, Skull  } from "lucide-react";
-import { deleteUser} from "firebase/auth";
-import { doc, collection, query, where, getDocs, writeBatch} from "firebase/firestore";
+import { doc, updateDoc, getDoc, deleteDoc} from "firebase/firestore";
 import { auth, db} from "../firebase/firebaseConfig";
 import { useNavigate } from 'react-router-dom';
-import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
+import { EmailAuthProvider, reauthenticateWithCredential, deleteUser } from "firebase/auth";
+import { toast } from "react-hot-toast";
 
 
 // creates a listener for showDeleteAccountModal to execute when called
@@ -18,6 +18,11 @@ export const DeleteAccountConfirmModal = () => {
   const [password, setPassword] = useState("");
   
   const navigate = useNavigate();
+
+  const handleClose = () => {
+  setIsOpen(false);
+  setPassword("");
+};
 
   // Listen for the custom event to open the modal
   useEffect(() => {
@@ -35,45 +40,50 @@ export const DeleteAccountConfirmModal = () => {
   try {
     setIsDeleting(true);
 
-    const credential = EmailAuthProvider.credential(
-      user.email,
-      password
-    );
 
+    const credential = EmailAuthProvider.credential(user.email, password);
     await reauthenticateWithCredential(user, credential);
 
 
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    const userData = userSnap.data();
+
+    const relatedUids: string[] = [
+      ...(userData?.friends || []),
+      ...(userData?.sentRequests || []),
+      ...(userData?.friendRequests || []),
+    ];
+
+    const uniqueUids = [...new Set(relatedUids)];
+
+
+    for (const uid of uniqueUids) {
+      const relatedSnap = await getDoc(doc(db, "users", uid));
+      const relatedData = relatedSnap.data();
+      if (!relatedData) continue;
+
+      await updateDoc(doc(db, "users", uid), {
+        friends:        (relatedData.friends        || []).filter((id: string) => id !== user.uid),
+        sentRequests:   (relatedData.sentRequests   || []).filter((id: string) => id !== user.uid),
+        friendRequests: (relatedData.friendRequests || []).filter((id: string) => id !== user.uid),
+        openChats:      (relatedData.openChats      || []).filter((c: any) => c.otherUser?.uid !== user.uid),
+      });
+    }
+
+
+    await deleteDoc(doc(db, "users", user.uid));
+
+
     await deleteUser(user);
-
-
-    const batch = writeBatch(db);
-
-    const userRef = doc(db, "users", user.uid);
-    batch.delete(userRef);
-
-    const messagesQuery = query(
-      collection(db, "messages"),
-      where("senderId", "==", user.uid)
-    );
-
-    const messagesSnapshot = await getDocs(messagesQuery);
-    messagesSnapshot.forEach((docSnap) => {
-      batch.delete(docSnap.ref);
-    });
-
-    await batch.commit();
 
     navigate("/");
 
   } catch (error: any) {
     console.error(error);
-
-    if (error.code === "auth/requires-recent-login") {
-      alert("Please log in again.");
-    } else if (error.code === "auth/wrong-password") {
-      alert("Incorrect password.");
+    if (error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
+      toast.error("Incorrect password. Please try again.");
     } else {
-      alert("Delete failed. Enter your password correctly and try again.");
+      toast.error("Deletion failed. Please try again.");
     }
   } finally {
     setIsDeleting(false);
@@ -93,7 +103,7 @@ export const DeleteAccountConfirmModal = () => {
           </h2>
 
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
             className="text-gray-400 hover:text-red-500 transition"
           >
             <XIcon size={24} className="cursor-pointer hover:text-purple-600 duration-200"/>
@@ -114,7 +124,7 @@ export const DeleteAccountConfirmModal = () => {
 
         <div className="flex justify-center gap-3 ">
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
             className="px-4 py-2 rounded-md bg-gray-700 hover:bg-gray-600 text-white transition duration-200 shadow-md shadow-gray-500/30 cursor-pointer"
           >
             Hell Nah

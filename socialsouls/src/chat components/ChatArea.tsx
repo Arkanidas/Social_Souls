@@ -36,6 +36,18 @@ interface ChatMessage {
   }[];
 }
 
+const BlockNotice = ({ theyBlockedMe, iBlockedThem, activeChatUser }: { theyBlockedMe: boolean; iBlockedThem: boolean; activeChatUser: any }) => {
+
+  if (!activeChatUser) return null; 
+  if (theyBlockedMe) {
+  return <div className="self-center inline-flex px-4 py-2 rounded-md border border-red-500 text-red-500 bg-red-500/10 relative top-4">You have been blocked!</div>;
+}
+if (iBlockedThem) {
+  return <div className="self-center inline-flex px-4 py-2 rounded-md border border-red-500 text-red-500 bg-red-500/10 relative top-4">You have blocked {activeChatUser.otherUser.username}</div>;
+}
+return null
+};
+
 export const ChatArea = () => {
 
   const [Usermessages, setUserMessages] = useState<ChatMessage[]>([]);
@@ -61,7 +73,7 @@ export const ChatArea = () => {
   const [messageTimestamps, setMessageTimestamps] = useState<number[]>([]);
   const [isSpamBlocked, setIsSpamBlocked] = useState<boolean>(false);
   const [spamCountdown, setSpamCountdown] = useState<number>(0);
-  const {openChats, activeChatId, openChat } = useChat();
+  const {openChats, activeChatId } = useChat();
   const [mutedSouls, setMutedSouls] = useState<string[]>([]);
   const [iBlockedThem, setIBlockedThem] = useState<boolean>(false);
   const [theyBlockedMe, setTheyBlockedMe] = useState<boolean>(false);
@@ -205,12 +217,6 @@ const updateData: any = {
   await updateDoc(doc(db, "Chats", chatId), updateData);
 
 
-
-await openChat({
-  chatId,
-  otherUser: activeChatUser.otherUser
-});
-
   setAttachments([]);
 
   if (attachments.length > 0) {
@@ -222,7 +228,6 @@ await openChat({
     setIsUploading(false);
   }
 };
-
 
 
    // Update document title based on unread messages
@@ -282,7 +287,7 @@ const handleTypingChange = async (isTyping: boolean) => {
       await updateDoc(chatRef, {
         [`typing.${user.uid}`]: false,
       }).catch(() => {});
-    }, 60000);
+    }, 4000);
   }
 };
 
@@ -326,11 +331,8 @@ useEffect(() => {
 
  // set messages to empty when no user exists 
  useEffect(() => {
-  if (!activeChatUser?.chatId) {
-    setUserMessages([]);
-    return;
-  }
-
+  if (!activeChatUser?.chatId) return;
+  
   const messagesRef = collection(db, "Chats", activeChatUser.chatId, "messages");
   const q = query(messagesRef, orderBy("createdAt", "desc"), limit(50));
 
@@ -363,6 +365,8 @@ lastMessageIdRef.current = lastMsg?.id || null;
 
   return () => unsubscribe();
 }, [activeChatUser?.chatId]);
+
+
 
 // Silence Souls OnSnapShot
 useEffect(() => {
@@ -690,20 +694,7 @@ const handleDownloadImage = async () => {
 };
 
   //Component to show block notice text
-const BlockNotice = ({ theyBlockedMe, iBlockedThem, activeChatUser }: { theyBlockedMe: boolean; iBlockedThem: boolean; activeChatUser: any }) => {
 
-  if (!activeChatUser) return null; 
-
-  if (theyBlockedMe) {
-  return <div className="self-center inline-flex px-4 py-2 rounded-md border border-red-500 text-red-500 bg-red-500/10 relative top-4">You have been blocked!</div>;
-}
-
-if (iBlockedThem) {
-  return <div className="self-center inline-flex px-4 py-2 rounded-md border border-red-500 text-red-500 bg-red-500/10 relative top-4">You have blocked {activeChatUser.otherUser.username}</div>;
-}
-
-return null
-};
 
  
   
