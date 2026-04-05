@@ -38,8 +38,8 @@ export const DeleteAccountConfirmModal = () => {
   if (!user || !user.email) return;
 
   try {
-    setIsDeleting(true);
 
+    setIsDeleting(true);
 
     const credential = EmailAuthProvider.credential(user.email, password);
     await reauthenticateWithCredential(user, credential);
@@ -70,10 +70,7 @@ export const DeleteAccountConfirmModal = () => {
       });
     }
 
-
     await deleteDoc(doc(db, "users", user.uid));
-
-
     await deleteUser(user);
 
     navigate("/");

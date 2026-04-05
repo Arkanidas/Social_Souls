@@ -771,7 +771,7 @@ return <div className="flex-1 flex flex-col relative">
   if (!scroller) return;
 
   const distFromBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight;
-  const isNearBottom = distFromBottom < 1500;
+  const isNearBottom = distFromBottom < 150;
 
   shouldScrollToBottomRef.current = isNearBottom;
   setShowScrollToBottom(!isNearBottom);

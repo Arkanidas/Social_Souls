@@ -3,8 +3,6 @@ import { auth, db } from "../firebase/firebaseConfig";
 import { collection, doc, onSnapshot, orderBy, query, updateDoc, where } from "firebase/firestore";
 
 
-
-
 const ChatContext = createContext<{
   openChats: OpenChat[];
   activeChatId: string | null;

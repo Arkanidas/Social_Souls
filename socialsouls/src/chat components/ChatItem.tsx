@@ -2,7 +2,7 @@ import Ghost from "../assets/ghosts.png";
 import { useChat } from "../context/ChatContext";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { doc, onSnapshot} from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
 
 
@@ -21,7 +21,7 @@ type UserProps = {
 export const ChatItem = ({ chat, isActive }: UserProps) => {
 
 
-  const { setActiveChatId, closeChat } = useChat();
+  const { openChat, closeChat } = useChat();
   const [status, setStatus] = useState<"online" | "idle" | "offline">("offline");
   const [unread, setUnread] = useState(0); 
   
@@ -39,15 +39,7 @@ useEffect(() => {
 }, [chat.otherUser.uid]);
 
 const handleChatClick = async () => {
-  setActiveChatId(chat.chatId);
-
-  const currentUser = auth.currentUser;
-  if (!currentUser || unread === 0) return;
-
-
-  await updateDoc(doc(db, "Chats", chat.chatId), {
-    [`unreadCount.${currentUser.uid}`]: 0,
-  });
+  await openChat(chat);
 };
 
 useEffect(() => {
