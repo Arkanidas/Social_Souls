@@ -23,8 +23,6 @@ const firebaseConfig = {
   isTokenAutoRefreshEnabled: true
 });
 
-console.log(import.meta.env.VITE_RECAPTCHA_SITE_KEY);
-
 export const db = getFirestore(app);
 
 enableIndexedDbPersistence(db).catch((err) => {

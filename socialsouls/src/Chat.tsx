@@ -8,6 +8,7 @@ import { UserProfileModal } from "../src/chat components/ProfileModal";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
+
 interface UserProfile {
   profilePic: string;
   bio: string;
@@ -22,7 +23,9 @@ interface UserProfile {
 const Chat = () => {
 
  const [profile, setProfile] = useState<UserProfile | null>(null);
+
  const navigate = useNavigate();
+
 
  const useUserPresence = () => {
 

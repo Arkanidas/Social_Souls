@@ -120,7 +120,7 @@ useEffect(() => {
            <EmojiPicker height={400} emojiStyle={EmojiStyle.GOOGLE} theme={Theme.DARK} onEmojiClick={ (emojiData) => {setMessageText(prev => prev + emojiData.emoji);}}/></div>)}
 
           <div className={`flex flex-col ${attachments.length > 0 ? "pt-2": ""} ${isChatBlocked ? "cursor-not-allowed": ""}`}> 
-           <input value={MessageText} onChange={(e) => setMessageText(e.target.value)} disabled={isSpamBlocked || (isChatBlocked && hasActiveChat) || !hasActiveChat} onKeyDown={(e) => e.key === "Enter" && handleSend()}
+           <input value={MessageText} autoComplete="off" onChange={(e) => setMessageText(e.target.value)} disabled={isSpamBlocked || (isChatBlocked && hasActiveChat) || !hasActiveChat} onKeyDown={(e) => e.key === "Enter" && handleSend()}
             type="text" placeholder={
             !hasActiveChat
         ? "Send a message into the void..."

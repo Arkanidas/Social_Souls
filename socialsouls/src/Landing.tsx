@@ -8,12 +8,13 @@ import { useNavigate } from 'react-router-dom';
 import {Toaster, toast} from 'react-hot-toast';
 import { Eye, EyeClosed, Copyright } from 'lucide-react';
 import { sendPasswordResetEmail } from "firebase/auth";
+import { useIsMobile } from "./Hooks/MobileSupport";
 import './index.css'
 
 function Landing() {
 
 const [allowRedirect, setAllowRedirect] = useState(true);
-
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
 
 
@@ -146,9 +147,25 @@ const HandleLogin = async (e:React.FormEvent) => {
   setShowPassword(prev => !prev);
 };
 
+
+if (isMobile) {
+  return (
+    <div className="fixed inset-0 z-[9999] bg-red-600 flex flex-col items-center justify-center px-6 text-center">
+      <h1 className="text-white text-2xl font-bold mb-3">
+        ⚠️ Device Not Supported
+      </h1>
+      <p className="text-white text-lg">
+        Social Souls is not currently supporting mobile or tablet devices.
+      </p>
+      <p className="text-white/70 text-sm mt-4">
+        Please visit us on a desktop or laptop browser.
+      </p>
+    </div>
+  );
+}
+
   return (
     <>
-
   <Toaster position="top-center" reverseOrder={false}/>
 
       <div className="flex justify-center items-center flex-wrap mb-8">

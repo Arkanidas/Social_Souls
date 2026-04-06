@@ -113,6 +113,7 @@ export const DeleteAccountConfirmModal = () => {
 
         <input
           type="password"
+          autoComplete="new-password" 
           placeholder="Enter your password to confirm"
           value={password}
           onChange={(e) => setPassword(e.target.value)}

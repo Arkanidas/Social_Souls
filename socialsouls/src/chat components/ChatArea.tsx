@@ -693,11 +693,7 @@ const handleDownloadImage = async () => {
   }
 };
 
-  //Component to show block notice text
 
-
- 
-  
 return <div className="flex-1 flex flex-col relative">
       <div className="p-4 border-b border-white/8 bg-zinc-950 flex items-center overflow-visible relative">
         <div className="flex items-center overflow-visible">
@@ -711,7 +707,6 @@ return <div className="flex-1 flex flex-col relative">
             <h3 className="text-white font-[Arial] font-semibold">
               {activeChatUser ? activeChatUser.otherUser.username : 'Select a Soul to Chat'}
             </h3>
-
 
 
   {activeChatUser && (
@@ -876,7 +871,7 @@ return <div className="flex-1 flex flex-col relative">
   )}
 
   {message.text && (
-    <p className="mb-2 font-[messageFont] text-xl break-words break-all whitespace-pre-wrap max-w-full">
+    <p className="mb-2 font-[messageFont] text-md break-words break-all whitespace-pre-wrap max-w-full">
       {message.text}
     </p>
   )}
