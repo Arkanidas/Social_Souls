@@ -128,7 +128,7 @@ const HandleLogin = async (e:React.FormEvent) => {
 
     if (docSnap.exists()) {
       const userData = docSnap.data();
-      console.log("Username:", userData.username);
+      console.log("Your Username:", userData.username);
 
     } else {
       console.log("No user document found!");
