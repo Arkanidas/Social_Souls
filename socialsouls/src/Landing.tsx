@@ -6,7 +6,7 @@ import { doc,setDoc, getDoc,where, getDocs, collection, query } from "firebase/f
 import { auth, db} from './firebase/firebaseConfig'; // auth: connects app to firebase auth service, db: handles storing and app data in cloud lets your app read, write, update, and delete data in your Firestore database.
 import { useNavigate } from 'react-router-dom';
 import {Toaster, toast} from 'react-hot-toast';
-import { Eye, EyeClosed, Copyright } from 'lucide-react';
+import { Eye, EyeClosed, Copyright, MailWarning  } from 'lucide-react';
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useIsMobile } from "./Hooks/MobileSupport";
 import './index.css'
@@ -37,6 +37,7 @@ const [email, setEmail] = useState<string>('');
 const [password, setPassword] = useState<string>('');
 const [ErrorMessage, setErrorMessage] = useState('');
 const [showPassword, setShowPassword] = useState<boolean>(false);
+const [showCreatorHint, setShowCreatorHint] = useState(false);
 
 
 const capitalizeUsername = (name: string) => {
@@ -44,6 +45,19 @@ const capitalizeUsername = (name: string) => {
   return name.charAt(0).toUpperCase() + name.slice(1);
 };
 
+useEffect(() => {
+  const handleClickOutside = () => {
+    setShowCreatorHint(false);
+  };
+
+  if (showCreatorHint) {
+    document.addEventListener("click", handleClickOutside);
+  }
+
+  return () => {
+    document.removeEventListener("click", handleClickOutside);
+  };
+}, [showCreatorHint]);
 
 const HandleSignup = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -139,9 +153,7 @@ const HandleLogin = async (e:React.FormEvent) => {
     setErrorMessage("Login failed. Please check your email and password.");
     toast.error("Password or email is incorrect, please try again", {
     duration: 4000, 
-});
-  }
-};
+})}};
 
   const togglePassword = () => {
   setShowPassword(prev => !prev);
@@ -164,8 +176,30 @@ if (isMobile) {
   );
 }
 
+
+
   return (
     <>
+
+<div className="absolute top-4 left-4 z-50">
+  <MailWarning
+  size={28}
+    className="text-gray-400 hover:text-[#f06868] cursor-pointer transition"
+    onClick={(e) => {
+      e.stopPropagation();
+      setShowCreatorHint(prev => !prev);
+    }}
+  />
+
+  {showCreatorHint && (
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="mt-2 w-[220px] bg-black/50 border border-gray-700 text-gray-200 text-sm p-3 rounded-lg shadow-lg">
+      Psst... don't forget to add the creator <span className="text-[#ff8c19] font-semibold">"Arkanidas"</span>
+    </div>
+  )}
+</div>
+
   <Toaster position="top-center" reverseOrder={false}/>
 
       <div className="flex justify-center items-center flex-wrap mb-8">
