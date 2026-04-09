@@ -40,6 +40,7 @@ const [showPassword, setShowPassword] = useState<boolean>(false);
 const [showCreatorHint, setShowCreatorHint] = useState(false);
 
 
+//First letter will always be in captial
 const capitalizeUsername = (name: string) => {
   if (!name) return "";
   return name.charAt(0).toUpperCase() + name.slice(1);
