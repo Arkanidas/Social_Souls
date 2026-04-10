@@ -1,4 +1,4 @@
-# 👻 Social Souls
+# Social Souls
 
 > *A dreadfully engaging social platform for the restless and the bold.*
 
