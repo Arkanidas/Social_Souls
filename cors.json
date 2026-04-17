@@ -1,8 +1,8 @@
 [
   {
-    "origin": ["http://localhost:5173"],
-    "method": ["GET", "POST", "PUT", "DELETE", "HEAD"],
+    "origin": ["https://socialsouls.se", "https://www.socialsouls.se","http://localhost:5173"],
+    "method": ["GET","DELETE"],
     "maxAgeSeconds": 3600,
-    "responseHeader": ["Content-Type", "x-goog-meta-foo"]
+    "responseHeader": ["Content-Type"]
   }
 ]
