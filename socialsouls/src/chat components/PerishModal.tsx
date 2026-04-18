@@ -14,6 +14,7 @@ export const showPerishModal = (friendId: string, username: string) => {
   );
 };
 
+//Modal for deleting a Soul 
 export const PerishModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const user = auth.currentUser;
