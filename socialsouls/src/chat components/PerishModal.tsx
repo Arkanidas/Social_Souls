@@ -36,6 +36,8 @@ export const PerishModal = () => {
   return () => window.removeEventListener("showPerishModal", open);
 }, []);
 
+
+// Sound effect for declining a soul, plays when the user clicks the perish button
 useEffect(() => {
   const Declineaudio = new Audio(DeclineSound);
 
@@ -47,6 +49,7 @@ useEffect(() => {
 }, []);
 
 
+// Function to handle perishing a soul, removes the friend from both users' friend lists and closes the chat
   const handlePerishSoul = async (friendId: string) => {
     if (!user) return;
     
